@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  @apply border-border;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-surface-alt text-text-primary antialiased;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+:focus-visible {
+  @apply outline-none ring-2 ring-primary-500/70 ring-offset-2 ring-offset-white;
+}
+
+::-moz-focus-inner {
+  border: 0;
+}
+
+::selection {
+  @apply bg-primary-500/15 text-primary-700;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+a {
+  @apply text-primary-500 hover:text-primary-600 transition-colors;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
