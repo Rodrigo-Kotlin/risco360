@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
 import { WizardNavigation } from '@/components/ui/WizardNavigation'
-import { ArrowRight, Building2, FileText, User, Hash, Calendar } from 'lucide-react'
+import { Building2, FileText, User, Hash, Calendar } from 'lucide-react'
 import type { Levantamento, LevantamentoCreateInput } from '@/types/levantamento'
 
 interface Step01IdentificacaoProps {

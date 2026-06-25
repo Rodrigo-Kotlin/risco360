@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react'
 import { APP_NAME } from '@/constants/app'
 
 interface LogoProps {
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
   showText?: boolean
   className?: string
 }

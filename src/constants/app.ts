@@ -21,9 +21,12 @@ export const DRAWER_NAV_ITEMS = [
 ] as const
 
 const ALL_NAV_ITEMS = [...BOTTOM_NAV_ITEMS, ...DRAWER_NAV_ITEMS] as const
-export const NAV_ITEMS = ALL_NAV_ITEMS.filter(
-  (item, index, self) => index === self.findIndex((i) => i.label === item.label)
-) as typeof ALL_NAV_ITEMS
+const seen = new Set<string>()
+export const NAV_ITEMS = ALL_NAV_ITEMS.filter((item) => {
+  if (seen.has(item.label)) return false
+  seen.add(item.label)
+  return true
+})
 
 export const STEPS = [
   { id: 'identificacao',                label: 'Identificação da empresa e setor',                      number: 1 },

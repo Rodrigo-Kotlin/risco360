@@ -20,7 +20,7 @@ import {
   ativarItemBiblioteca,
   desativarItemBiblioteca,
 } from '@/services/biblioteca-tecnica.service'
-import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 import { Plus, Pencil, Trash2, Power, PowerOff, FileText, AlertTriangle, Shield } from 'lucide-react'
 import type { BibliotecaTecnicaItem, BibliotecaTecnicaCreateInput } from '@/types/biblioteca'
 

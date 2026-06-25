@@ -26,12 +26,12 @@ import { cn } from '@/lib/utils'
 /** Stepper horizontal — visível apenas em sm: e acima */
 function WizardStepperDesktop({
   currentStep,
-  totalSteps,
+  _totalSteps: _totalSteps,
   steps,
   onStepClick,
 }: {
   currentStep: number
-  totalSteps: number
+  _totalSteps: number
   steps: typeof STEPS
   onStepClick: (s: number) => void
 }) {
@@ -303,7 +303,7 @@ export default function LevantamentoWizardPage() {
           />
           <WizardStepperDesktop
             currentStep={wizard.currentStep}
-            totalSteps={STEPS.length}
+            _totalSteps={STEPS.length}
             steps={STEPS}
             onStepClick={(s) => wizard.goToStep(s)}
           />

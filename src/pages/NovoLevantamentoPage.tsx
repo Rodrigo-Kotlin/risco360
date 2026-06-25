@@ -65,13 +65,11 @@ export default function NovoLevantamentoPage() {
 
   useEffect(() => {
     if (!hasParams && selectedEmpresaId) {
-      setLoadingSetores(true)
       listarSetoresPorEmpresa(selectedEmpresaId).then((result) => {
-        setLoadingSetores(false)
         if (!result.error && result.data) {
           setSetores(result.data.map((s) => ({ value: s.id, label: s.nome })))
         }
-      })
+      }).finally(() => setLoadingSetores(false))
     }
   }, [selectedEmpresaId, hasParams])
 
@@ -146,7 +144,7 @@ export default function NovoLevantamentoPage() {
                     <Select
                       label="Empresa"
                       value={selectedEmpresaId}
-                      onChange={(e) => { setSelectedEmpresaId(e.target.value); setSelectedSetorId('') }}
+                      onChange={(e) => { setSelectedEmpresaId(e.target.value); setSelectedSetorId(''); setLoadingSetores(true) }}
                       options={empresas}
                       placeholder="Selecione uma empresa…"
                     />
