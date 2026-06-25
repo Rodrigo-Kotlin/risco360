@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { Button } from '@/components/ui/Button'
-import { Save, Loader2, ArrowLeft, ArrowRight } from 'lucide-react'
+import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import {
   PISO_OPCOES, PAREDE_OPCOES, TELHADO_OPCOES, FORRO_OPCOES,
   DIVISORIAS_OPCOES, PAVIMENTO_OPCOES, REVESTIMENTO_OPCOES,
@@ -100,21 +99,12 @@ export function Step02Caracteristicas({ caracteristicas, onSave, saving, onPrevi
         </div>
       </FormSection>
 
-      <div className="flex flex-col gap-3 pt-2 border-t border-border">
-        <div className="flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
-            <ArrowLeft size={16} /> Anterior
-          </Button>
-          <Button onClick={async () => { await handleSave(3) }} disabled={saving}>
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-            Próximo
-          </Button>
-        </div>
-        <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving} className="w-full">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Salvar rascunho
-        </Button>
-      </div>
+      <WizardNavigation
+        saving={saving}
+        onPrevious={onPrevious}
+        onNext={async () => { await handleSave(3) }}
+        onSave={async () => { await handleSave() }}
+      />
     </div>
   )
 }

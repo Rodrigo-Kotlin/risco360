@@ -7,7 +7,8 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { RiscoForm } from '@/components/forms/RiscoForm'
 import { RiscoCard } from '@/components/forms/RiscoCard'
 import { PlanoAcaoForm } from '@/components/forms/PlanoAcaoForm'
-import { Plus, ArrowLeft, ArrowRight, Loader2, Save } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import type { RiscoOcupacional, PlanoAcaoItem } from '@/types/risco'
 import type { AvaliacaoErgonomica } from '@/types/levantamento'
 import type { BibliotecaTecnicaItem } from '@/types/biblioteca'
@@ -212,21 +213,13 @@ export function Step07PerigosRiscosAep({
         )}
       </FormSection>
 
-      <div className="flex flex-col gap-3 pt-2 border-t border-border">
-        <div className="flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
-            <ArrowLeft size={16} /> Anterior
-          </Button>
-          <Button onClick={async () => { await handleSaveAll(8) }} disabled={saving}>
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-            Revisar
-          </Button>
-        </div>
-        <Button variant="secondary" onClick={async () => { await handleSaveAll() }} disabled={saving} className="w-full">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Salvar rascunho
-        </Button>
-      </div>
+      <WizardNavigation
+        saving={saving}
+        onPrevious={onPrevious}
+        onNext={async () => { await handleSaveAll(8) }}
+        onSave={async () => { await handleSaveAll() }}
+        nextLabel="Revisar"
+      />
     </div>
   )
 }

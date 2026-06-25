@@ -3,8 +3,9 @@ import { cn } from '@/lib/utils'
 import { Sidebar } from './Sidebar'
 import { MobileBottomNavigation } from './MobileBottomNavigation'
 import { OfflineBanner } from '@/components/ui/OfflineBanner'
+import { Logo } from '@/components/ui/Logo'
 import { LayoutProvider, useLayout } from '@/contexts/LayoutContext'
-import { APP_NAME, DRAWER_NAV_ITEMS, ROUTES } from '@/constants/app'
+import { DRAWER_NAV_ITEMS, ROUTES } from '@/constants/app'
 import { X, Plus } from 'lucide-react'
 import {
   LayoutDashboard, ClipboardList, BookOpen, Settings,
@@ -28,12 +29,7 @@ function MobileDrawer() {
       <div className="absolute inset-0 bg-black/40" onClick={closeDrawer} />
       <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-xl flex flex-col">
         <div className="flex items-center justify-between px-4 h-16 border-b border-border-light shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
-              R
-            </div>
-            <span className="text-sm font-bold text-text-primary">{APP_NAME}</span>
-          </div>
+          <Logo />
           <button type="button" onClick={closeDrawer}
             className="w-9 h-9 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-muted transition-colors"
             aria-label="Fechar menu">
@@ -81,9 +77,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         {children}
         <MobileBottomNavigation />
 
-        <button type="button" onClick={() => navigate(ROUTES.empresas)}
+        <button type="button" onClick={() => navigate(ROUTES.levantamentosNovo)}
           className="lg:hidden fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-primary-500 text-white shadow-lg flex items-center justify-center hover:bg-primary-600 active:scale-95 transition-all"
-          aria-label="Novo Levantamento">
+          aria-label="Novo levantamento">
           <Plus size={24} />
         </button>
       </div>

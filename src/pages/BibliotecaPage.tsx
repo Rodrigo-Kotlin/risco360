@@ -20,6 +20,7 @@ import {
   ativarItemBiblioteca,
   desativarItemBiblioteca,
 } from '@/services/biblioteca-tecnica.service'
+import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
 import { Plus, Pencil, Trash2, Power, PowerOff, FileText, AlertTriangle, Shield } from 'lucide-react'
 import type { BibliotecaTecnicaItem, BibliotecaTecnicaCreateInput } from '@/types/biblioteca'
 
@@ -160,7 +161,7 @@ export default function BibliotecaPage() {
 
   return (
     <>
-      <Header title="Biblioteca Técnica" description="Consultas e referências" />
+      <Header />
       <MainContainer>
         <div className="space-y-6">
           <PageHeader
@@ -203,12 +204,7 @@ export default function BibliotecaPage() {
           {status === 'loading' && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="p-4">
-                  <div className="animate-pulse space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/2" />
-                  </div>
-                </Card>
+                <SkeletonCard key={i} />
               ))}
             </div>
           )}

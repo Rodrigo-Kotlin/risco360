@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { ArrowRight, Loader2, Save, Building2, FileText, User, Hash, Calendar } from 'lucide-react'
+import { WizardNavigation } from '@/components/ui/WizardNavigation'
+import { ArrowRight, Building2, FileText, User, Hash, Calendar } from 'lucide-react'
 import type { Levantamento, LevantamentoCreateInput } from '@/types/levantamento'
 
 interface Step01IdentificacaoProps {
@@ -105,25 +105,21 @@ export function Step01Identificacao({ levantamento, onSave, saving }: Step01Iden
         />
       </FormSection>
 
-      <div className="flex flex-col gap-3 pt-2 border-t border-border">
-        <div className="flex items-center justify-end">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-            Próximo
-          </Button>
-        </div>
-        <Button variant="secondary" onClick={async () => { await onSave({
-          auditor_tecnico: auditorTecnico || undefined,
-          registro_mte: registroMte || undefined,
-          data_levantamento: dataLevantamento || undefined,
-          data_lancamento_sgg: dataLancamentoSgg || undefined,
-          responsavel_lancamento: responsavelLancamento || undefined,
-          observacoes_iniciais: observacoesIniciais || undefined,
-        })}} disabled={saving} className="w-full">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Salvar rascunho
-        </Button>
-      </div>
+      <WizardNavigation
+        saving={saving}
+        isFirst
+        onNext={handleSave}
+        onSave={async () => {
+          await onSave({
+            auditor_tecnico: auditorTecnico || undefined,
+            registro_mte: registroMte || undefined,
+            data_levantamento: dataLevantamento || undefined,
+            data_lancamento_sgg: dataLancamentoSgg || undefined,
+            responsavel_lancamento: responsavelLancamento || undefined,
+            observacoes_iniciais: observacoesIniciais || undefined,
+          })
+        }}
+      />
     </div>
   )
 }

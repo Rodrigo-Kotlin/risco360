@@ -22,9 +22,14 @@ export function getFriendlyAuthError(error: unknown): string {
   }
 
   if (
-    message.includes('invalid login') ||
-    message.includes('invalid credentials') ||
     message.includes('email not confirmed')
+  ) {
+    return 'Confirme seu e-mail antes de entrar.'
+  }
+
+  if (
+    message.includes('invalid login') ||
+    message.includes('invalid credentials')
   ) {
     return 'E-mail ou senha inválidos.'
   }

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { isMockModeEnabled } from '@/lib/mock-mode'
+import { Logo } from '@/components/ui/Logo'
 import { User, LogOut, Wifi, WifiOff, Loader2, Beaker, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -10,7 +11,7 @@ import { useLayout } from '@/contexts/LayoutContext'
 import { ROUTES } from '@/routes/routes.constants'
 
 interface HeaderProps {
-  title: string
+  title?: string
   description?: string
   className?: string
 }
@@ -42,23 +43,25 @@ export function Header({ title, description, className }: HeaderProps) {
           aria-label="Abrir menu">
           <Menu size={20} />
         </button>
-        <span className="lg:hidden w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
-          R
+        <span className="lg:hidden shrink-0">
+          <Logo size="sm" showText={false} />
         </span>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm md:text-base font-semibold text-text-primary truncate">{title}</h2>
-            {isMockModeEnabled && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
-                <Beaker size={10} />
-                Mock Dev
-              </span>
+        {title && (
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm md:text-base font-semibold text-text-primary truncate">{title}</h2>
+              {isMockModeEnabled && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
+                  <Beaker size={10} />
+                  Mock Dev
+                </span>
+              )}
+            </div>
+            {description && (
+              <p className="text-[11px] text-text-muted truncate hidden sm:block">{description}</p>
             )}
           </div>
-          {description && (
-            <p className="text-[11px] text-text-muted truncate hidden sm:block">{description}</p>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="flex items-center gap-1 md:gap-2">

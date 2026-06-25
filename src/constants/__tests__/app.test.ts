@@ -26,9 +26,12 @@ describe('NAV_ITEMS', () => {
     expect(DRAWER_NAV_ITEMS.some(i => i.label === 'Dashboard')).toBe(true)
   })
 
-  it('não contém Dashboard no BOTTOM_NAV_ITEMS', () => {
-    const labels = BOTTOM_NAV_ITEMS.map(i => i.label as string)
-    expect(labels.includes('Dashboard')).toBe(false)
+  it('contém Dashboard no BOTTOM_NAV_ITEMS', () => {
+    expect(BOTTOM_NAV_ITEMS.some(i => i.label === 'Dashboard')).toBe(true)
+  })
+
+  it('contém Levantamentos no BOTTOM_NAV_ITEMS', () => {
+    expect(BOTTOM_NAV_ITEMS.some(i => i.label === 'Levantamentos')).toBe(true)
   })
 
   it('todos os itens têm label, href e icon', () => {

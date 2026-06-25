@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/hooks/useToast'
 import { useRelatorios } from '@/hooks/useRelatorios'
 import { excluirRelatorio } from '@/services/relatorios.service'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Download, Trash2 } from 'lucide-react'
 import type { Relatorio, StatusRelatorio } from '@/types/relatorio'
 
@@ -98,7 +99,7 @@ export default function RelatoriosPage() {
 
   return (
     <>
-      <Header title="Relatórios" description="Geração de documentos" />
+      <Header />
       <MainContainer>
         <div className="space-y-6">
           <PageHeader
@@ -115,13 +116,11 @@ export default function RelatoriosPage() {
           {status === 'loading' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="p-5">
-                  <div className="animate-pulse space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/2" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
-                  </div>
-                </Card>
+                <div key={i} className="bg-white border border-border-light rounded-xl p-5 space-y-3">
+                  <Skeleton height={16} width="75%" />
+                  <Skeleton height={12} width="50%" />
+                  <Skeleton height={12} width="33%" />
+                </div>
               ))}
             </div>
           )}

@@ -80,8 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = useCallback(async (userId: string) => {
     const result = await getCurrentProfile()
     if (result.data) {
+      if (env.isDev) console.log('[Auth] Profile carregado:', result.data.role)
       setProfile(result.data)
     } else {
+      if (env.isDev) console.log('[Auth] Profile não encontrado, criando fallback. Erro:', result.error)
       setProfile({
         id: userId,
         nome: 'Usuário',
@@ -112,9 +114,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const init = async () => {
       const result = await getCurrentSession()
       if (result.data?.user) {
+        if (env.isDev) console.log('[Auth] Sessão recuperada:', result.data.user.id)
         setUser(result.data.user)
         setSession(result.data)
         await loadProfile(result.data.user.id)
+      } else {
+        if (env.isDev) console.log('[Auth] Nenhuma sessão ativa encontrada')
       }
       setIsLoading(false)
     }
@@ -122,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     init()
 
     const subscription = onAuthStateChange((event, newSession) => {
+      if (env.isDev) console.log('[Auth] Evento:', event, 'Sessão:', !!newSession)
       if (newSession?.user) {
         setUser(newSession.user)
         setSession(newSession)
@@ -154,15 +160,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null)
     setIsLoading(true)
 
+    if (env.isDev) console.log('[Auth] signIn: chamando signInWithPassword')
+
     const result = await signInWithEmail(email, password)
 
     if (result.error) {
+      if (env.isDev) console.log('[Auth] signIn: erro', result.error)
       setError(result.error)
       setIsLoading(false)
       return
     }
 
     if (result.data) {
+      if (env.isDev) console.log('[Auth] signIn: usuário recebido', result.data.id)
       setUser(result.data)
       loadProfile(result.data.id)
     }

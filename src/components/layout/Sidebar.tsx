@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils'
-import { APP_NAME, NAV_ITEMS } from '@/constants/app'
+import { NAV_ITEMS } from '@/constants/app'
 import { NavLink } from 'react-router-dom'
+import { Logo } from '@/components/ui/Logo'
 import {
   LayoutDashboard, Building2, ClipboardList, BookOpen, FileText, Settings, Layers,
   type LucideIcon
@@ -28,11 +29,8 @@ export function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div className="flex items-center gap-2.5 px-5 h-16 border-b border-border-light shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
-          R
-        </div>
-        <span className="text-sm font-bold text-text-primary">{APP_NAME}</span>
+      <div className="px-5 h-16 border-b border-border-light shrink-0 flex items-center">
+        <Logo />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-3" aria-label="Navegação principal">
@@ -47,7 +45,7 @@ export function Sidebar({ className }: SidebarProps) {
                   className={({ isActive }) => cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-primary-50 text-primary-500'
+                      ? 'bg-primary-50 text-primary-500 border-l-2 border-primary-500 rounded-l-none'
                       : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
                   )}
                 >

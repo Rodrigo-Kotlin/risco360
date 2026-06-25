@@ -6,9 +6,11 @@ export const APP_DESCRIPTION = 'Sistema de Gestão de Riscos Ocupacionais'
 export const APP_VERSION = '1.0.0-beta'
 
 export const BOTTOM_NAV_ITEMS = [
-  { label: 'Empresas',  href: ROUTES.empresas,      icon: 'Building2' },
-  { label: 'Setores',   href: ROUTES.setores,       icon: 'Layers' },
-  { label: 'Relatórios', href: ROUTES.relatorios,   icon: 'FileText' },
+  { label: 'Dashboard',     href: ROUTES.dashboard,     icon: 'LayoutDashboard' },
+  { label: 'Empresas',      href: ROUTES.empresas,      icon: 'Building2' },
+  { label: 'Levantamentos', href: ROUTES.levantamentos, icon: 'ClipboardList' },
+  { label: 'Setores',       href: ROUTES.setores,       icon: 'Layers' },
+  { label: 'Relatórios',    href: ROUTES.relatorios,    icon: 'FileText' },
 ] as const
 
 export const DRAWER_NAV_ITEMS = [
@@ -18,10 +20,10 @@ export const DRAWER_NAV_ITEMS = [
   { label: 'Configurações',    href: ROUTES.configuracoes,     icon: 'Settings' },
 ] as const
 
-export const NAV_ITEMS = [
-  ...BOTTOM_NAV_ITEMS,
-  ...DRAWER_NAV_ITEMS,
-] as const
+const ALL_NAV_ITEMS = [...BOTTOM_NAV_ITEMS, ...DRAWER_NAV_ITEMS] as const
+export const NAV_ITEMS = ALL_NAV_ITEMS.filter(
+  (item, index, self) => index === self.findIndex((i) => i.label === item.label)
+) as typeof ALL_NAV_ITEMS
 
 export const STEPS = [
   { id: 'identificacao',                label: 'Identificação da empresa e setor',                      number: 1 },

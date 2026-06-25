@@ -4,7 +4,10 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Save, Loader2, ArrowLeft, ArrowRight, Plus, Trash2, Pencil, ImageIcon, AlertCircle } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
+import { Plus, Trash2, Pencil, ImageIcon, AlertCircle, Loader2, Shield, ShieldCheck, Camera, FileText, X, Maximize2 } from 'lucide-react'
+import { WizardNavigation } from '@/components/ui/WizardNavigation'
+import { cn } from '@/lib/utils'
 import type { EpisEpcsEvidencias, EpisItem, EpcItem, EvidenciaItem } from '@/types/levantamento'
 import { EPI_OPCOES, EPC_OPCOES } from '@/constants/formulario-options'
 import { uploadEvidenciaFotografica, revogarPreviewEvidencia, formatarTamanhoArquivo, obterPreviewLocal } from '@/services/evidencias.service'
@@ -106,10 +109,11 @@ function EpisSection({ items, onChange }: { items: EpisItem[] | null | undefined
               key={opt.value}
               type="button"
               onClick={() => addPredefined(opt.label)}
+              aria-pressed={selected}
               className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
                 selected
-                  ? 'bg-primary/10 border-primary text-primary cursor-default'
-                  : 'bg-surface border-border text-text-secondary hover:border-primary hover:text-primary'
+                  ? 'bg-primary-500/10 border-primary-500 text-primary-600 cursor-default'
+                  : 'bg-surface border-border text-text-secondary hover:border-primary-500 hover:text-primary-600'
               }`}
             >
               {opt.label}
@@ -188,10 +192,11 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
               key={opt.value}
               type="button"
               onClick={() => addPredefined(opt.label)}
+              aria-pressed={selected}
               className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
                 selected
-                  ? 'bg-primary/10 border-primary text-primary cursor-default'
-                  : 'bg-surface border-border text-text-secondary hover:border-primary hover:text-primary'
+                  ? 'bg-primary-500/10 border-primary-500 text-primary-600 cursor-default'
+                  : 'bg-surface border-border text-text-secondary hover:border-primary-500 hover:text-primary-600'
               }`}
             >
               {opt.label}
@@ -217,6 +222,7 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
   const safeItems = safeEvidenciaItems(items)
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
 
   const addImage = useCallback(() => {
     const input = document.createElement('input')
@@ -306,114 +312,168 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
           {errorMessage}
         </div>
       )}
-      {safeItems.map((ev, i) => (
-        <Card key={i} className="p-3">
-          <div className="flex gap-3">
-            {ev.preview_url ? (
-              <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-surface-muted">
-                <img src={ev.preview_url} alt={ev.legenda ?? ''} className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-16 h-16 rounded-lg bg-surface-muted flex items-center justify-center shrink-0">
-                <ImageIcon size={20} className="text-text-muted" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
-              {ev.mime_type && ev.size_bytes && (
-                <p className="text-xs text-text-muted">{ev.mime_type} — {formatarTamanhoArquivo(ev.size_bytes)}</p>
-              )}
-              {(ev.data || ev.hora) && (
-                <p className="text-xs text-text-muted">{ev.data ?? ''} {ev.hora ?? ''}</p>
-              )}
-              {ev.upload_status === 'uploading' && (
-                <div className="flex items-center gap-1 mt-1">
-                  <Loader2 size={12} className="animate-spin text-primary" />
-                  <span className="text-xs text-primary">Enviando...</span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {safeItems.map((ev, i) => (
+          <Card key={i} className="p-2 overflow-hidden group">
+            <div className="relative">
+              {ev.preview_url ? (
+                <div className="w-full aspect-video rounded-lg overflow-hidden bg-surface-muted cursor-pointer"
+                  onClick={() => setLightboxIdx(i)}>
+                  <img src={ev.preview_url} alt={ev.legenda ?? `Evidência ${i + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <Maximize2 size={18} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full aspect-video rounded-lg bg-surface-muted flex items-center justify-center">
+                  <ImageIcon size={24} className="text-text-muted" />
                 </div>
               )}
-              {ev.upload_status === 'error' && (
-                <p className="text-xs text-danger mt-1">Erro no envio</p>
-              )}
-              {ev.upload_status === 'uploaded' && (
-                <p className="text-xs text-success mt-1">Enviado</p>
-              )}
-              {ev.upload_status === 'pending' && (
-                <p className="text-xs text-warning mt-1">Aguardando sincronização</p>
+              {ev.upload_status === 'uploading' && (
+                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-lg">
+                  <Loader2 size={20} className="animate-spin text-primary" />
+                </div>
               )}
             </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              {ev.sync_status === 'pending' && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/10 text-warning border border-warning/30">
-                  pendente
-                </span>
-              )}
-              {ev.sync_status === 'synced' && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success border border-success/30">
-                  sincronizado
-                </span>
-              )}
-              {ev.sync_status === 'error' && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-danger/10 text-danger border border-danger/30">
-                  erro
-                </span>
-              )}
-              <Button variant="ghost" size="icon" onClick={() => removeImage(i)} className="text-danger" disabled={ev.upload_status === 'uploading'}>
-                <Trash2 size={14} />
-              </Button>
+            <div className="mt-1.5 space-y-1">
+              <p className="text-xs font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  {ev.upload_status === 'error' && <span className="text-[10px] text-danger">Erro</span>}
+                  {ev.upload_status === 'pending' && <span className="text-[10px] text-warning">Pendente</span>}
+                  {ev.upload_status === 'uploaded' && <span className="text-[10px] text-success">Enviado</span>}
+                  {ev.sync_status === 'pending' && !ev.upload_status && (
+                    <span className="text-[10px] px-1 py-0.5 rounded bg-warning/10 text-warning">pendente</span>
+                  )}
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => removeImage(i)}
+                  className="text-danger h-7 w-7" disabled={ev.upload_status === 'uploading'}>
+                  <Trash2 size={12} />
+                </Button>
+              </div>
             </div>
+          </Card>
+        ))}
+      </div>
+
+      {lightboxIdx !== null && safeItems[lightboxIdx]?.preview_url && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightboxIdx(null)}>
+          <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <button type="button" onClick={() => setLightboxIdx(null)}
+              className="absolute -top-10 right-0 text-white/80 hover:text-white transition-colors"
+              aria-label="Fechar">
+              <X size={24} />
+            </button>
+            <img src={safeItems[lightboxIdx].preview_url!}
+              alt={safeItems[lightboxIdx].legenda ?? `Evidência ${lightboxIdx + 1}`}
+              className="max-w-full max-h-[85vh] rounded-lg object-contain" />
+            {safeItems[lightboxIdx].legenda && (
+              <p className="text-white/80 text-sm mt-2 text-center">{safeItems[lightboxIdx].legenda}</p>
+            )}
           </div>
-        </Card>
-      ))}
+        </div>
+      )}
     </div>
   )
 }
+
+type TabId = 'epis' | 'epcs' | 'evidencias' | 'observacoes'
+
+const TABS: { id: TabId; label: string; icon: typeof Shield; count?: number }[] = [
+  { id: 'epis', label: 'EPIs', icon: Shield },
+  { id: 'epcs', label: 'EPCs', icon: ShieldCheck },
+  { id: 'evidencias', label: 'Evidências', icon: Camera },
+  { id: 'observacoes', label: 'Observações', icon: FileText },
+]
 
 export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisEpcsProps) {
   const [form, setForm] = useState<EpisEpcsEvidencias>(
     normalizeEpisEpcsEvidencias(data)
   )
+  const [activeTab, setActiveTab] = useState<TabId>('epis')
 
   const handleSave = async (next?: number) => {
     await onSave(form, next)
   }
 
+  const tabCounts: Record<TabId, number> = {
+    epis: safeEpisItems(form.epis).length,
+    epcs: safeEpcItems(form.epcs).length,
+    evidencias: safeEvidenciaItems(form.evidencias).length,
+    observacoes: (form.observacoes?.length ?? 0) > 0 ? 1 : 0,
+  }
+
   return (
     <div className="space-y-6">
-      <FormSection title="EPIs — Equipamentos de Proteção Individual">
-        <EpisSection items={form.epis} onChange={(epis) => setForm((prev) => ({ ...prev, epis }))} />
-      </FormSection>
-
-      <FormSection title="EPCs — Equipamentos de Proteção Coletiva">
-        <EpcsSection items={form.epcs} onChange={(epcs) => setForm((prev) => ({ ...prev, epcs }))} />
-      </FormSection>
-
-      <FormSection title="Imagens e evidências do ambiente">
-        <EvidenciasSection items={form.evidencias} onChange={(evidencias) => setForm((prev) => ({ ...prev, evidencias }))} />
-      </FormSection>
-
-      <FormSection title="Observações">
-        <Textarea value={form.observacoes ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, observacoes: e.target.value || null }))}
-          rows={3} placeholder="Observações sobre EPIs, EPCs e evidências…"
-        />
-      </FormSection>
-
-      <div className="space-y-3 pt-2 border-t border-border">
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="flex-1">
-            <ArrowLeft size={16} /> Anterior
-          </Button>
-          <Button onClick={async () => { await handleSave(6) }} disabled={saving} className="flex-1">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-            Próximo
-          </Button>
-        </div>
-        <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving} className="w-full">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Salvar rascunho
-        </Button>
+      <div className="flex border-b border-border-light overflow-x-auto -mx-1 px-1">
+        {TABS.map((tab) => {
+          const Icon = tab.icon
+          const isActive = activeTab === tab.id
+          const count = tabCounts[tab.id]
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors -mb-px',
+                isActive
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-text-muted hover:text-text-secondary hover:border-border-light'
+              )}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`panel-${tab.id}`}
+            >
+              <Icon size={14} aria-hidden="true" />
+              {tab.label}
+              {count > 0 && (
+                <span className={cn(
+                  'text-[10px] px-1.5 py-0.5 rounded-full',
+                  isActive ? 'bg-primary-500/10 text-primary-600' : 'bg-surface-muted text-text-muted'
+                )}>
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
+
+      <div role="tabpanel" id="panel-epis" hidden={activeTab !== 'epis'}>
+        {activeTab === 'epis' && (
+          <EpisSection items={form.epis} onChange={(epis) => setForm((prev) => ({ ...prev, epis }))} />
+        )}
+      </div>
+
+      <div role="tabpanel" id="panel-epcs" hidden={activeTab !== 'epcs'}>
+        {activeTab === 'epcs' && (
+          <EpcsSection items={form.epcs} onChange={(epcs) => setForm((prev) => ({ ...prev, epcs }))} />
+        )}
+      </div>
+
+      <div role="tabpanel" id="panel-evidencias" hidden={activeTab !== 'evidencias'}>
+        {activeTab === 'evidencias' && (
+          <EvidenciasSection items={form.evidencias} onChange={(evidencias) => setForm((prev) => ({ ...prev, evidencias }))} />
+        )}
+      </div>
+
+      <div role="tabpanel" id="panel-observacoes" hidden={activeTab !== 'observacoes'}>
+        {activeTab === 'observacoes' && (
+          <Textarea value={form.observacoes ?? ''}
+            onChange={(e) => setForm((prev) => ({ ...prev, observacoes: e.target.value || null }))}
+            rows={4} placeholder="Observações sobre EPIs, EPCs e evidências…"
+          />
+        )}
+      </div>
+
+      <WizardNavigation
+        saving={saving}
+        onPrevious={onPrevious}
+        onNext={async () => { await handleSave(6) }}
+        onSave={async () => { await handleSave() }}
+      />
     </div>
   )
 }

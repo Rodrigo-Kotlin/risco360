@@ -1,8 +1,9 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, RouterProvider, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { LoadingScreen } from '@/components/ui/LoadingScreen'
 import { AppErrorBoundary } from '@/components/ui/AppErrorBoundary'
 import { ROUTES } from '@/routes/routes.constants'
+import { AuthLayout } from '@/components/layout/AuthLayout'
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout'
 import { useAuth } from '@/hooks/useAuth'
 import { env } from '@/lib/env'
@@ -32,14 +33,15 @@ function Lazy({ children }: { children: React.ReactNode }) {
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth()
-  const navigate = useNavigate()
 
-  // em mock mode, sempre autenticado
   const requiresAuth = !env.enableMockMode
 
   if (requiresAuth && !isLoading && !isAuthenticated) {
-    navigate(ROUTES.login, { replace: true })
-    return null
+    return <Navigate to={ROUTES.login} replace />
+  }
+
+  if (requiresAuth && isLoading) {
+    return <LoadingScreen />
   }
 
   return (
@@ -57,8 +59,11 @@ const router = createBrowserRouter([
 
   {
     path: ROUTES.login,
-    element: <Lazy><LoginPage /></Lazy>,
+    element: <AuthLayout />,
     errorElement: <AppErrorBoundary />,
+    children: [
+      { index: true, element: <Lazy><LoginPage /></Lazy> },
+    ],
   },
 
   {

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { Button } from './Button'
+import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 
 interface BreadcrumbItem {
@@ -29,7 +30,7 @@ export function PageHeader({ title, description, breadcrumb, action, secondaryAc
             <span key={item.label} className="flex items-center gap-1.5">
               {index > 0 && <ChevronRight size={12} aria-hidden="true" />}
               {item.href ? (
-                <a href={item.href} className="hover:text-text-primary transition-colors">{item.label}</a>
+                <Link to={item.href} className="hover:text-text-primary transition-colors">{item.label}</Link>
               ) : (
                 <span className="text-text-secondary font-medium">{item.label}</span>
               )}

@@ -8,7 +8,8 @@ import { Modal } from '@/components/ui/Modal'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { NivelRiscoBadge } from '@/components/forms/NivelRiscoBadge'
 import { AssinaturaForm } from '@/components/forms/AssinaturaForm'
-import { CheckCircle2, ArrowLeft, Loader2, ClipboardCheck, UserCheck, Building2, FileText } from 'lucide-react'
+import { CheckCircle2, UserCheck, Building2, FileText } from 'lucide-react'
+import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import type { Levantamento, ParecerTecnico, Assinatura } from '@/types/levantamento'
 
 interface Step08RevisaoConclusaoProps {
@@ -112,13 +113,13 @@ export function Step08RevisaoConclusao({
               <p className="text-2xl font-bold text-text-primary">{totalRiscos}</p>
               <p className="text-xs text-text-muted">Riscos totais</p>
             </div>
-            <div className="p-3 bg-red-50 rounded-lg text-center">
+            <div className="p-3 bg-danger-50 rounded-lg text-center">
               <p className="text-2xl font-bold text-danger">{criticos}</p>
               <p className="text-xs text-danger">Críticos</p>
             </div>
-            <div className="p-3 bg-orange-50 rounded-lg text-center">
-              <p className="text-2xl font-bold text-orange-700">{altos}</p>
-              <p className="text-xs text-orange-700">Altos</p>
+            <div className="p-3 bg-warning-light rounded-lg text-center">
+              <p className="text-2xl font-bold text-warning">{altos}</p>
+              <p className="text-xs text-warning">Altos</p>
             </div>
             <div className="p-3 bg-surface-muted rounded-lg text-center">
               <p className="text-2xl font-bold text-text-primary">{totalMedicoes}</p>
@@ -235,21 +236,14 @@ export function Step08RevisaoConclusao({
           onSave={handleSaveEmpresa} onCancel={() => setModalEmpresaOpen(false)} />
       </Modal>
 
-      <div className="flex flex-col gap-3 pt-2 border-t border-border">
-        <div className="flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
-            <ArrowLeft size={16} /> Anterior
-          </Button>
-          <Button onClick={handleConcluir} disabled={saving || concluding} variant="success">
-            {saving || concluding ? <Loader2 size={16} className="animate-spin" /> : <ClipboardCheck size={16} />}
-            Concluir levantamento
-          </Button>
-        </div>
-        <Button variant="secondary" onClick={handleSaveParecer} disabled={saving} className="w-full">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <ClipboardCheck size={16} />}
-          Salvar rascunho
-        </Button>
-      </div>
+      <WizardNavigation
+        saving={saving || concluding}
+        onPrevious={onPrevious}
+        onNext={handleConcluir}
+        onSave={handleSaveParecer}
+        isLast
+        nextLabel="Concluir levantamento"
+      />
     </div>
   )
 }

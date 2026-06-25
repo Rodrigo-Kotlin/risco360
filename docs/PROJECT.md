@@ -461,6 +461,11 @@ Fase 9.1 (conexão Supabase real), suas subfases de estabilização/hotfix e as 
 | Fase 9.0.4.5 — Migration Supabase consolidada futura, sem conectar | ✅ |
 | Fase 9.0.4.6 — Performance: import dinâmico XLSX, remoção @react-pdf/renderer, manualChunks | ✅ |
 | Fase 9.0.4.7 — QA final pré-Supabase: warnings, busca termos proibidos, testes, build | ✅ |
+| Fase 9.3.1 — Validação E2E (Playwright), testes condicionais e auditoria | ✅ |
+| Fase 9.3.2 — Ícones PWA reais, manifest final e acabamento mobile | ✅ |
+| Fase 9.3.3 — Validação smartphone real e preparação deploy Cloudflare/Supabase | ✅ |
+| Fase 9.3.3-HOTFIX-1 — Correção crítica Step05EpisEpcs: undefined.length em EpisSection | ✅ |
+| Fase 9.3.4A — Publicação segura do PWA no GitHub | ✅ |
 | Fase 9.1 — Conexão Supabase real: auth, CRUD remoto, migration, testes modo supabase | ✅ |
 | Fase 9.1.1 — Validação real local com Supabase real, Auth, migration e CRUD remoto | ✅ (parcial) |
 | Fase 9.1.2-HOTFIX — Correções de browser: nested button, PWA meta e PGRST116 | ✅ |
@@ -470,6 +475,11 @@ Fase 9.1 (conexão Supabase real), suas subfases de estabilização/hotfix e as 
 | Fase 9.2.1 — Arquitetura base para sincronização offline-first: tipos sync, sync queue expandida, sync-helpers, data-provider flags, ConfiguracoesPage real | ✅ |
 | Fase 9.2.2 — Sincronização remota offline-first para empresas e setores: sync processor, network detector, auto-sync hook, UI chips, 508 testes | ✅ |
 | Fase 9.2.5-AUDITORIA — Auditoria completa offline-first: Dexie, login offline, logout, conflitos, bucket privado + correções | ✅ |
+| Fase 9.3.1 — Validação E2E (Playwright), testes condicionais e auditoria | ✅ |
+| Fase 9.3.2 — Ícones PWA reais, manifest final e acabamento mobile | ✅ |
+| Fase 9.3.3 — Validação smartphone real e preparação deploy Cloudflare/Supabase | ✅ |
+| Fase 9.3.3-HOTFIX-1 — Correção crítica Step05EpisEpcs: undefined.length em EpisSection | ✅ |
+| Fase 9.3.4A — Publicação segura do PWA no GitHub | ✅ |
 
 ## 20. Resumo Fase 6 — Biblioteca Técnica conectada ao formulário de riscos
 
@@ -2135,14 +2145,15 @@ Executar em smartphone real antes do deploy:
 | `npm run test:e2e` | 19 passed, 2 skipped (supabase-mode sem .env real) ✅ |
 | `npm run dev -- --host 0.0.0.0` | ✅ Dev server escuta em 0.0.0.0:5173 |
 
-### Pendências pós-Fase 9.3.3
+### Pendências pós-Fase 9.3.3 (antes do deploy)
 
-1. **Deploy Cloudflare Pages** — configurar variáveis, fazer primeiro deploy, validar
-2. **Validação em smartphone real** — executar roteiro da seção 39 com app servido via Cloudflare (HTTPS)
-3. **Testar câmera em produção** — `getUserMedia` requer HTTPS, testar após deploy
-4. **Monitoramento pós-deploy** — verificar SW registration, cache behavior, erro 404s
-5. **Sync bidirecional completa offline-first**
-6. **Evidências base64 → blob storage** (reduzir tamanho IndexedDB)
+1. ~~**Publicação no GitHub** — init, commit, push~~ ✅ (Fase 9.3.4A)
+2. **Deploy Cloudflare Pages** — configurar variáveis, fazer primeiro deploy, validar
+3. **Validação em smartphone real** — executar roteiro da seção 39 com app servido via Cloudflare (HTTPS)
+4. **Testar câmera em produção** — `getUserMedia` requer HTTPS, testar após deploy
+5. **Monitoramento pós-deploy** — verificar SW registration, cache behavior, erro 404s
+6. **Sync bidirecional completa offline-first**
+7. **Evidências base64 → blob storage** (reduzir tamanho IndexedDB)
 
 ### Recomendação
 
@@ -2203,3 +2214,169 @@ O erro `TypeError: Cannot read properties of undefined (reading 'length')` ocorr
 ### Recomendação
 
 Retomar fluxo normal: **Fase 9.3.4 — Deploy controlado em Cloudflare Pages e checklist pós-deploy**.
+
+---
+
+## 42. Fase 9.3.4A — Publicação segura do PWA no GitHub
+
+**Status:** concluída em 24/06/2026.
+
+### Objetivo
+
+Disponibilizar o código-fonte do Risco360 no GitHub com segurança, garantindo que nenhuma credencial, segredo ou arquivo sensível seja versionado, e que todos os testes passem antes do primeiro push.
+
+### O que foi feito
+
+| Etapa | Detalhes |
+|-------|----------|
+| Auditoria .gitignore | Verificados `node_modules/`, `dist/`, `dist-ssr/`, `.env`, `.env.local`, `.env.*.local`, `.env.production`, `.env.development`, `.env.preview`, `*.tsbuildinfo`, `*.log`, `*.zip`, `.DS_Store`, `.vscode`, `.idea`, `coverage/`, `playwright-report/`, `test-results/`, `e2e-report/`, `.vite/`, `supabase/.temp/`, `dev-dist/` |
+| Auditoria de segredos | Busca global em `src/` por `service_role`, `sb_secret`, `placeholder.supabase.co`, `process.env`, `RiskFlow`, `LPP`, `getPublicUrl` — todas as ocorrências são legítimas (validação de rejeição ou testes) |
+| README.md criado | Documentação da stack, pré-requisitos, scripts, deploy, segurança, estrutura e fluxo principal |
+| `.env.example` atualizado | Adicionado aviso de segurança: "Nunca usar service_role, sb_secret ou qualquer chave secreta no frontend" |
+| Testes executados | `typecheck`: 0 errors ✅; `lint`: 0 errors ✅; `test`: 512 passed (44 files) ✅; `build`: OK (83 entries precached, 1.35 MB) ✅; `e2e`: 19 passed, 2 skipped ✅ |
+| Git init | `git init` no diretório raiz |
+| Primeiro commit | `81a4881` — "feat: initial commit — Risco360 PWA completo" (253 arquivos, 40426 inserções) |
+| Remote + Push | `origin` aponta para `https://github.com/Rodrigo-Kotlin/risco360.git`; push para `master` bem-sucedido |
+| Validação remota | `git ls-remote origin HEAD` confirma que o commit `81a4881` está no GitHub |
+
+### Arquivos alterados/criados
+
+| Arquivo | Ação |
+|---------|------|
+| `README.md` | Novo — documentação completa do projeto |
+| `.env.example` | Adicionado aviso de segurança sobre service_role / sb_secret |
+
+### Segurança verificada
+
+| Item | Status |
+|------|--------|
+| `.env.local` no .gitignore | ✅ Já incluso |
+| `service_role` em código executável | ✅ Apenas em validação de rejeição (`supabase.ts`) |
+| `sb_secret_` em código executável | ✅ Apenas em validação de rejeição |
+| `placeholder.supabase.co` | ✅ Apenas em teste |
+| `process.env` no frontend | ✅ Zero ocorrências em `src/` |
+| `RiskFlow` / `LPP` | ✅ Zero ocorrências em código executável |
+| `using (true)` | ✅ Zero ocorrências |
+| `getPublicUrl` em produção | ✅ Zero — apenas em mock de teste |
+
+### Pendências pós-Fase 9.3.4A
+
+1. **Deploy Cloudflare Pages** — configurar variáveis, fazer primeiro deploy, validar
+2. **Validação em smartphone real** — executar roteiro com app servido via Cloudflare (HTTPS)
+3. **Testar câmera em produção** — `getUserMedia` requer HTTPS
+4. **Monitoramento pós-deploy** — SW registration, cache behavior, 404s
+5. **Sync bidirecional completa offline-first**
+6. **Evidências base64 → blob storage**
+
+### Recomendação
+
+Próxima fase: **Fase 9.3.4 — Deploy controlado em Cloudflare Pages e checklist pós-deploy**.
+
+---
+
+## 43. Fase 9.3.4A-HOTFIX-LOGIN — Correção do login em produção Cloudflare e redesign minimalista da tela de login
+
+**Status:** concluída em 25/06/2026.
+
+### Causa raiz
+
+O login não funcionava em produção Cloudflare por dois motivos:
+
+1. **LoginPage não redirecionava após autenticação bem-sucedida.** `handleSubmit` chamava `await signIn(email, password)` mas não navegava para `/empresas`. O usuário ficava parado na tela de login após o botão parar de carregar, com a sessão já estabelecida no AuthContext.
+
+2. **ProtectedRoute usava `navigate()` como side-effect durante renderização.** A função `navigate(ROUTES.login, { replace: true })` era chamada diretamente no corpo do componente, o que é um anti-padrão no React Router v6+. Substituído por `<Navigate to={ROUTES.login} replace />`.
+
+3. **Mensagem de erro "email not confirmed" incorreta.** O erro `Email not confirmed` era mapeado para `"E-mail ou senha inválidos."` em vez de `"Confirme seu e-mail antes de entrar."`
+
+4. **Layout desktop esticado.** LoginPage não usava o AuthLayout existente, resultando em formulário full-width no desktop sem o card centralizado profissional.
+
+### Correções aplicadas
+
+1. **LoginPage.tsx** — Redesign completo:
+   - Adicionado `useEffect` com `loginAttempted` ref para redirecionar a `/empresas` após autenticação
+   - Layout encapsulado no `AuthLayout` (via routes) com `max-w-md`
+   - Card centralizado `bg-white border border-border-light rounded-xl p-6 shadow-card`
+   - Fundo off-white via AuthLayout (gradiente na direita, formulário na esquerda)
+   - Botão de mostrar/esconder senha com `Eye`/`EyeOff`
+   - Badge "Servidor configurado" com `CheckCircle2` verde
+   - Badge "Modo mock ativo" com `Beaker` amarelo
+   - Links "Esqueci minha senha" e "Criar conta" discretos com `text-text-muted`
+   - Altura confortável (`h-11`) no botão principal
+   - Versão "Servidor não configurado" mantida com ícone `ServerCrash`
+
+2. **routes/index.tsx**:
+   - `ProtectedRoute`: `navigate()` substituído por `<Navigate to={ROUTES.login} replace />`
+   - `ProtectedRoute`: adicionado `LoadingScreen` durante carregamento para evitar flash de conteúdo não autenticado
+   - LoginRoute: agora é filha de `AuthLayout`, que fornece layout split com branding
+
+3. **AuthContext.tsx** — Debug logging seguro (apenas em DEV, sem senhas/tokens):
+   - `[Auth] Sessão recuperada:` / `[Auth] Nenhuma sessão ativa encontrada`
+   - `[Auth] Evento: INITIAL_SESSION Sessão:` — monitora `onAuthStateChange`
+   - `[Auth] signIn: chamando signInWithPassword` / `[Auth] signIn: usuário recebido` / `[Auth] signIn: erro`
+   - `[Auth] Profile carregado:` / `[Auth] Profile não encontrado, criando fallback. Erro:`
+
+4. **lib/errors.ts** — Mensagem "email not confirmed" separada:
+   - `Email not confirmed` → `"Confirme seu e-mail antes de entrar."`
+   - `Invalid login credentials` → `"E-mail ou senha inválidos."`
+
+5. **components/layout/AuthLayout.tsx** — `max-w-sm` alterado para `max-w-md` para formulário mais confortável.
+
+### Login/Auth
+
+| Item | Status |
+|------|--------|
+| `signInWithPassword` | Chamado corretamente via `signInWithEmail` em `auth.service.ts` |
+| AuthContext | `signIn` atualiza `user`/`session`, `loadProfile` com fallback se profile não existir |
+| Profile | Fallback seguro: se `getCurrentProfile` falha (RLS/ausência), cria profile mínimo `{ role: 'tecnico' }` |
+| Redirect | `LoginPage` → `useEffect` com `loginAttempted.current` → `navigate(from, { replace: true })` |
+| Loading | `isLoading` sempre finalizado via ambas as branches do if |
+| Erros | `error` state exibido inline no formulário; `getFriendlyAuthError` mapeia erros comuns |
+
+### Design
+
+| Item | Implementação |
+|------|---------------|
+| Layout | Split: formulário à esquerda (AuthLayout), branding gradient verde à direita (lg+) |
+| Card | `bg-white border border-border-light rounded-xl p-6 shadow-card` |
+| Inputs | `h-10 rounded-xl`, foco com `ring-2 ring-primary-500/70` |
+| Botões | `h-11 w-full`, verde `primary-500`, loading com spinner |
+| Mobile | AuthLayout colapsa painel direito em `lg:hidden`; formulário ocupa largura total |
+| Desktop | Card centralizado com `max-w-md` no painel esquerdo |
+| Cores | Verde `#15803D`, Fundo `#F6F8FB`, Texto `#0F172A` / `#475569` / `#94A3B8` |
+
+### Cloudflare/Supabase
+
+| Item | Status |
+|------|--------|
+| Env vars | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ENABLE_MOCK_MODE=false` |
+| Site URL | Deve ser `https://risco360.pages.dev` no Supabase Dashboard |
+| Redirect URLs | `https://risco360.pages.dev`, `https://risco360.pages.dev/*`, `http://localhost:5173`, `http://localhost:5173/*` |
+| Mock mode | `VITE_ENABLE_MOCK_MODE=true` apenas em DEV; produção usa `false` |
+
+### Testes executados
+
+| Comando | Resultado |
+|---------|-----------|
+| `npm run typecheck` | 0 errors ✅ |
+| `npm run lint` | 0 errors ✅ |
+| `npm run test` | 512 passed (44 files) ✅ |
+| `npm run build` | ✅ OK — PWA, 83 entries precached, 1.35 MB |
+
+### Arquivos alterados
+
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/pages/LoginPage.tsx` | Redesign completo: redirect pós-login, card minimalista, show/hide senha, AuthLayout adaptado |
+| `src/routes/index.tsx` | ProtectedRoute com `<Navigate>`, LoadingScreen, login como filha de AuthLayout |
+| `src/contexts/AuthContext.tsx` | Debug logging seguro em DEV |
+| `src/lib/errors.ts` | Mensagem "email not confirmed" separada |
+| `src/components/layout/AuthLayout.tsx` | max-w-sm → max-w-md |
+
+### Pendências
+
+1. Configurar Supabase Auth URLs (Site URL + Redirect URLs) conforme documentado acima
+2. Retomar Fase 9.3.4B — Cloudflare Pages pós-hotfix e checklist final de produção
+
+### Recomendação
+
+**Fase 9.3.4B — Cloudflare Pages pós-hotfix e checklist final de produção.** Validar em produção que login funciona, refresh mantém sessão, logout retorna ao login, e todas as rotas protegidas redirecionam corretamente.

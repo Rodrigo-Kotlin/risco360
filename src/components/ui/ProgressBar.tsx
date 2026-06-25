@@ -34,7 +34,7 @@ export function ProgressBar({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <div
-        className={cn('flex-1 rounded-full bg-gray-200 overflow-hidden', sizeStyles[size])}
+        className={cn('flex-1 rounded-full bg-surface-muted overflow-hidden', sizeStyles[size])}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}

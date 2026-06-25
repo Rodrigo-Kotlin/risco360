@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/useToast'
 import { useLevantamentos } from '@/hooks/useLevantamentos'
 import { excluirLevantamento } from '@/services/levantamentos.service'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
-import { Trash2, Eye, Copy } from 'lucide-react'
+import { Trash2, Eye, Copy, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { Levantamento, TipoLevantamento, StatusLevantamento } from '@/types/levantamento'
 
@@ -141,6 +141,11 @@ export default function LevantamentosPage() {
           <PageHeader
             title="Levantamentos"
             description="Acompanhe todos os levantamentos realizados"
+            action={{
+              label: 'Novo levantamento',
+              onClick: () => navigate(ROUTES.levantamentosNovo),
+              icon: <Plus size={16} />,
+            }}
           />
 
           {status !== 'loading' && (

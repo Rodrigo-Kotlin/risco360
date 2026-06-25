@@ -11,6 +11,7 @@ interface StatCardProps {
   trendValue?: string
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
   className?: string
+  onClick?: () => void
 }
 
 const accentStyles: Record<string, string> = {
@@ -21,13 +22,35 @@ const accentStyles: Record<string, string> = {
   info:    'border-l-blue-500',
 }
 
-export function StatCard({ title, value, description, icon, trend, trendValue, variant = 'default', className }: StatCardProps) {
+const iconBgStyles: Record<string, string> = {
+  default: 'bg-primary-50 text-primary-600',
+  success: 'bg-success-50 text-success',
+  warning: 'bg-warning-50 text-warning',
+  danger:  'bg-danger-50 text-danger',
+  info:    'bg-blue-50 text-blue-700',
+}
+
+export function StatCard({
+  title, value, description, icon, trend, trendValue,
+  variant = 'default', className, onClick,
+}: StatCardProps) {
+  const isClickable = !!onClick
+
   return (
-    <div className={cn(
-      'bg-white border border-border-light rounded-xl p-4 md:p-5 border-l-4 shadow-card',
-      accentStyles[variant],
-      className
-    )}>
+    <div
+      className={cn(
+        'bg-white border border-border-light rounded-xl p-4 md:p-5 border-l-4 shadow-card transition-all',
+        accentStyles[variant],
+        isClickable && 'cursor-pointer hover:shadow-md hover:border-primary-200 active:scale-[0.99]',
+        className
+      )}
+      onClick={onClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.() }
+      } : undefined}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium text-text-secondary uppercase tracking-wide truncate">{title}</p>
@@ -51,7 +74,13 @@ export function StatCard({ title, value, description, icon, trend, trendValue, v
           )}
         </div>
         {icon && (
-          <div className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-primary-50 text-primary-500" aria-hidden="true">
+          <div
+            className={cn(
+              'shrink-0 w-10 h-10 flex items-center justify-center rounded-xl',
+              iconBgStyles[variant]
+            )}
+            aria-hidden="true"
+          >
             {icon}
           </div>
         )}
