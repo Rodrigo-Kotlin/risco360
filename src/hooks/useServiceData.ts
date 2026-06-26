@@ -23,8 +23,6 @@ export function useServiceData<T>(
   }, [])
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return
-
     let mounted = true
 
     const load = async () => {
