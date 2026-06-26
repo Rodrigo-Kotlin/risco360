@@ -94,12 +94,24 @@ class ReceitaWsProvider implements CnpjProvider {
         }))
       : []
 
+    const atividadePrincipal = (() => {
+      const raw = data.atividade_principal
+      if (!Array.isArray(raw) || raw.length === 0) return null
+      const item = raw[0]
+      if (!item || typeof item !== 'object') return null
+      const obj = item as Record<string, unknown>
+      return {
+        code: String(obj.code ?? ''),
+        text: String(obj.text ?? ''),
+      }
+    })()
+
     return {
       razao_social: String(data.nome ?? ''),
       nome_fantasia: String(data.fantasia ?? ''),
       cnpj: String(data.cnpj ?? ''),
-      cnae_principal: String(data.atividade_principal?.[0]?.code ?? ''),
-      cnae_principal_descricao: String(data.atividade_principal?.[0]?.text ?? ''),
+      cnae_principal: atividadePrincipal?.code ?? '',
+      cnae_principal_descricao: atividadePrincipal?.text ?? '',
       cnaes_secundarios: cnaesSecundarios,
       endereco: String(data.logradouro ?? ''),
       numero: String(data.numero ?? ''),
