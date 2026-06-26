@@ -18,6 +18,7 @@ export async function listarItensBiblioteca(): Promise<ServiceResult<BibliotecaT
     const { data, error } = await client
       .from('biblioteca_tecnica')
       .select('*')
+      .is('deleted_at', 'null')
       .order('categoria', { ascending: true, nullsFirst: false })
       .order('titulo', { ascending: true })
 
@@ -43,6 +44,7 @@ export async function buscarItemBibliotecaPorId(
       .from('biblioteca_tecnica')
       .select('*')
       .eq('id', id)
+      .is('deleted_at', 'null')
       .single()
 
     if (error) throw error
@@ -64,6 +66,7 @@ export async function buscarItensBibliotecaPorCategoria(
       .from('biblioteca_tecnica')
       .select('*')
       .eq('categoria', categoria)
+      .is('deleted_at', 'null')
       .order('titulo', { ascending: true })
 
     if (error) throw error
@@ -88,6 +91,7 @@ export async function buscarItensBibliotecaPorTipoRisco(
       .from('biblioteca_tecnica')
       .select('*')
       .eq('tipo_risco', tipoRisco)
+      .is('deleted_at', 'null')
       .order('titulo', { ascending: true })
 
     if (error) throw error
@@ -111,6 +115,7 @@ export async function pesquisarBibliotecaTecnica(
     const { data, error } = await client
       .from('biblioteca_tecnica')
       .select('*')
+      .is('deleted_at', 'null')
       .or(
         `titulo.ilike.%${termo}%,descricao.ilike.%${termo}%,perigo.ilike.%${termo}%,risco.ilike.%${termo}%`
       )

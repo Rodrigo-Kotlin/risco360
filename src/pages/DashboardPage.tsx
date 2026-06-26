@@ -11,12 +11,11 @@ import { APP_NAME, ROUTES } from '@/constants/app'
 import { useEmpresas } from '@/hooks/useEmpresas'
 import { useLevantamentos } from '@/hooks/useLevantamentos'
 import { useRelatorios } from '@/hooks/useRelatorios'
-import { listarSetores } from '@/services/setores.service'
 import { contarItensPendentes } from '@/services/offline/sync-queue.service'
 import {
   ClipboardList, Building2, FileText, Plus,
-  AlertTriangle, BarChart3, Activity, Layers,
-  Clock, CheckCircle2, CloudOff, Edit3,
+  BarChart3, Activity,
+  Clock, CheckCircle2, CloudOff,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -25,31 +24,21 @@ export default function DashboardPage() {
   const { data: empresas, status: empresasStatus } = useEmpresas()
   const { data: levantamentos, status: levStatus } = useLevantamentos()
   const { data: relatorios, status: relStatus } = useRelatorios()
-  const [totalSetores, setTotalSetores] = useState(0)
-  const [setoresLoading, setSetoresLoading] = useState(true)
   const [pendingSync, setPendingSync] = useState(0)
 
   useEffect(() => {
-    listarSetores().then((r) => {
-      setSetoresLoading(false)
-      if (!r.error && r.data) setTotalSetores(r.data.length)
-    })
     contarItensPendentes().then((count) => {
       setPendingSync(count)
     }).catch(() => setPendingSync(0))
   }, [])
 
-  const setoresStatus = setoresLoading ? 'loading' : 'success'
   const loadingStats =
     empresasStatus === 'loading' ||
     levStatus === 'loading' ||
-    relStatus === 'loading' ||
-    setoresStatus === 'loading'
+    relStatus === 'loading'
 
-  const rascunhos = levStatus === 'success' ? levantamentos.filter((l) => l.status === 'rascunho').length : 0
   const emAndamento = levStatus === 'success' ? levantamentos.filter((l) => l.status === 'em_andamento').length : 0
   const concluidos = levStatus === 'success' ? levantamentos.filter((l) => l.status === 'concluido').length : 0
-  const totalRiscos = levStatus === 'success' ? levantamentos.reduce((acc, l) => acc + (l.riscos?.length ?? 0), 0) : 0
 
   return (
     <>
@@ -82,20 +71,18 @@ export default function DashboardPage() {
                 onClick={() => navigate(ROUTES.empresas)}
               />
               <StatCard
-                title="Setores"
-                value={totalSetores}
-                description="Setores mapeados"
-                icon={<Layers size={20} />}
-                variant="default"
-                onClick={() => navigate(ROUTES.setores)}
+                title="Em andamento"
+                value={emAndamento}
+                description="Levantamentos em progresso"
+                icon={<Clock size={20} />}
+                variant="warning"
               />
               <StatCard
-                title="Levantamentos"
-                value={levStatus === 'success' ? levantamentos.length : 0}
-                description="Total de formulários"
-                icon={<ClipboardList size={20} />}
-                variant="info"
-                onClick={() => navigate(ROUTES.levantamentos)}
+                title="Concluídos"
+                value={concluidos}
+                description="Levantamentos finalizados"
+                icon={<CheckCircle2 size={20} />}
+                variant="success"
               />
               <StatCard
                 title="Relatórios"
@@ -104,44 +91,6 @@ export default function DashboardPage() {
                 icon={<FileText size={20} />}
                 variant="info"
                 onClick={() => navigate(ROUTES.relatorios)}
-              />
-            </div>
-          )}
-
-          {/* Status operacional */}
-          {loadingStats ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              <StatCard
-                title="Rascunhos"
-                value={rascunhos}
-                description="Aguardando edição"
-                icon={<Edit3 size={20} />}
-                variant="default"
-              />
-              <StatCard
-                title="Em andamento"
-                value={emAndamento}
-                description="Em progresso"
-                icon={<Clock size={20} />}
-                variant="warning"
-              />
-              <StatCard
-                title="Concluídos"
-                value={concluidos}
-                description="Finalizados"
-                icon={<CheckCircle2 size={20} />}
-                variant="success"
-              />
-              <StatCard
-                title="Riscos mapeados"
-                value={totalRiscos}
-                description="Total identificados"
-                icon={<AlertTriangle size={20} />}
-                variant="danger"
               />
             </div>
           )}
@@ -209,15 +158,6 @@ export default function DashboardPage() {
                   </span>
                   <span className={`text-xs font-semibold ${pendingSync > 0 ? 'text-warning' : 'text-success'}`}>
                     {pendingSync > 0 ? `${pendingSync} item${pendingSync > 1 ? 's' : ''}` : 'Em dia'}
-                  </span>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-text-secondary">
-                    <Edit3 size={14} className="text-text-muted" />
-                    Rascunhos
-                  </span>
-                  <span className={`text-xs font-semibold ${rascunhos > 0 ? 'text-warning' : 'text-text-muted'}`}>
-                    {loadingStats ? '—' : rascunhos}
                   </span>
                 </li>
                 <li className="flex items-center justify-between">

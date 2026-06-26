@@ -207,7 +207,7 @@ export async function excluirSetor(id: string): Promise<ServiceResult<boolean>> 
       const client = getClient()
       const { error } = await client
         .from('setores')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id)
 
       if (error) throw error

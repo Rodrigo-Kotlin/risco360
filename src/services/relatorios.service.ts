@@ -19,6 +19,7 @@ export async function listarRelatorios(): Promise<ServiceResult<Relatorio[]>> {
     const { data, error } = await client
       .from('relatorios')
       .select('*')
+      .is('deleted_at', 'null')
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -44,6 +45,7 @@ export async function buscarRelatorioPorId(id: string): Promise<ServiceResult<Re
       .from('relatorios')
       .select('*')
       .eq('id', id)
+      .is('deleted_at', 'null')
       .single()
 
     if (error) throw error
@@ -65,6 +67,7 @@ export async function listarRelatoriosPorLevantamento(
       .from('relatorios')
       .select('*')
       .eq('levantamento_id', levantamentoId)
+      .is('deleted_at', 'null')
       .order('created_at', { ascending: false })
 
     if (error) throw error

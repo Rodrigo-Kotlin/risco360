@@ -191,7 +191,7 @@ export async function excluirEmpresa(id: string): Promise<ServiceResult<boolean>
       const client = getClient()
       const { error } = await client
         .from('empresas')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id)
 
       if (error) throw error

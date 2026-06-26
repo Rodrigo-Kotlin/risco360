@@ -160,7 +160,7 @@ describe('offline-first empresas.service', () => {
     expect(cached).not.toBeNull()
   })
 
-  it('faz soft delete quando online', async () => {
+  it('faz hard delete quando online', async () => {
     const { getSupabaseClient } = await vi.importMock<typeof import('@/lib/supabase')>('@/lib/supabase')
     const client = getSupabaseClient()
     const empresaQuery = client.from('empresas') as unknown as Record<string, ReturnType<typeof vi.fn>>
@@ -171,7 +171,7 @@ describe('offline-first empresas.service', () => {
 
     expect(result.error).toBeNull()
     expect(result.data).toBe(true)
-    expect(empresaQuery.update).toHaveBeenCalled()
+    expect(empresaQuery.delete).toHaveBeenCalled()
     expect(empresaQuery.eq).toHaveBeenCalledWith('id', 'supabase-emp-1')
   })
 

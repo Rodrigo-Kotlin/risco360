@@ -36,6 +36,7 @@ export async function listarLevantamentos(): Promise<ServiceResult<Levantamento[
       const { data, error } = await client
         .from('levantamentos')
         .select('*')
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -68,6 +69,7 @@ export async function buscarLevantamentoPorId(
         .from('levantamentos')
         .select('*')
         .eq('id', id)
+        .is('deleted_at', 'null')
         .single()
 
       if (error) throw error
@@ -315,7 +317,7 @@ export async function excluirLevantamento(
       const client = getClient()
       const { error } = await client
         .from('levantamentos')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id)
 
       if (error) throw error
@@ -497,6 +499,7 @@ export async function buscarLevantamentosPorEmpresa(
         .from('levantamentos')
         .select('*')
         .eq('empresa_id', empresaId)
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -529,6 +532,7 @@ export async function buscarLevantamentosPorStatus(
         .from('levantamentos')
         .select('*')
         .eq('status', status)
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -561,6 +565,7 @@ export async function buscarLevantamentosPorTipo(
         .from('levantamentos')
         .select('*')
         .eq('tipo', tipo)
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -593,6 +598,7 @@ export async function listarLevantamentosPorSetor(
         .from('levantamentos')
         .select('*')
         .eq('setor_id', setorId)
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -626,6 +632,7 @@ export async function buscarFormularioSetorialPorSetor(
         .select('*')
         .eq('setor_id', setorId)
         .eq('tipo', 'LPR_AEP')
+        .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
         .limit(1)
 

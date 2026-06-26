@@ -12,6 +12,7 @@ function makeMockFrom() {
     update: vi.fn(),
     delete: vi.fn(),
     eq: vi.fn(),
+    is: vi.fn(),
     order: vi.fn(),
     single: vi.fn(),
     maybeSingle: vi.fn(),
@@ -22,6 +23,7 @@ function makeMockFrom() {
   builder.update.mockReturnValue(builder)
   builder.delete.mockReturnValue(builder)
   builder.eq.mockReturnValue(builder)
+  builder.is.mockReturnValue(builder)
   builder.order.mockReturnValue(builder)
   builder.single.mockResolvedValue({ data: null, error: null })
   builder.maybeSingle.mockResolvedValue({ data: null, error: null })
@@ -293,10 +295,6 @@ describe('sync.service', () => {
       await seedEmpresaOffline({ id: 'emp-del-1', remote_id: 'remote-del-1' })
       await enqueueSyncOperation('empresa', 'emp-del-1', 'delete', { id: 'emp-del-1' })
 
-      mockFromEmpresas.select.mockImplementationOnce(() =>
-        Promise.resolve({ data: [{ id: 'remote-del-1' }], error: null })
-      )
-
       const result = await syncNextBatch(5)
       expect(result.synced).toBe(1)
 
@@ -516,9 +514,6 @@ describe('sync.service', () => {
       await seedEvidenciaOffline({ id: 'local_evidencia_del_1', remote_id: 'remote-evidencia-del-1', storage_path: 'user/evidencias/foto.jpg' })
       await enqueueSyncOperation('evidencia', 'local_evidencia_del_1', 'delete', { id: 'local_evidencia_del_1' })
 
-      mockFromEvidencias.select.mockImplementationOnce(() =>
-        Promise.resolve({ data: [{ id: 'remote-evidencia-del-1' }], error: null })
-      )
       mockStorageRemove.mockResolvedValue({ error: null })
 
       const result = await syncNextBatch(5)

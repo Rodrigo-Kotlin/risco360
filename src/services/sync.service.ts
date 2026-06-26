@@ -151,7 +151,7 @@ async function syncEmpresa(item: SyncQueueItem): Promise<boolean> {
 
       if (error) {
         if (error.message?.toLowerCase().includes('duplicate') || error.code === '23505') {
-          const existing = await client.from('empresas').select('*').eq('cnpj', payload.cnpj).maybeSingle()
+          const existing = await client.from('empresas').select('*').eq('cnpj', payload.cnpj).is('deleted_at', 'null').maybeSingle()
           if (existing.data) {
             local.remote_id = existing.data.id
             local.sync_status = 'synced' as const
@@ -204,17 +204,12 @@ async function syncEmpresa(item: SyncQueueItem): Promise<boolean> {
 
     case 'delete': {
       if (local.remote_id) {
-        const { data, error } = await client
+        const { error } = await client
           .from('empresas')
-          .update({ deleted_at: nowISO() })
+          .delete()
           .eq('id', local.remote_id)
-          .select()
 
         if (error) throw error
-        if (!data || data.length === 0) {
-          await markConflict(item.id, 'Empresa remota não encontrada para exclusão. Possível conflito (já excluída ou sem permissão).')
-          return false
-        }
       }
 
       local.deleted = true
@@ -263,7 +258,7 @@ async function syncSetor(item: SyncQueueItem): Promise<boolean> {
 
       if (error) {
         if (error.message?.toLowerCase().includes('duplicate') || error.code === '23505') {
-          const existing = await client.from('setores').select('*').eq('nome', payload.nome).eq('empresa_id', empresaRemoteId).maybeSingle()
+          const existing = await client.from('setores').select('*').eq('nome', payload.nome).eq('empresa_id', empresaRemoteId).is('deleted_at', 'null').maybeSingle()
           if (existing.data) {
             local.remote_id = existing.data.id
             local.sync_status = 'synced' as const
@@ -316,17 +311,12 @@ async function syncSetor(item: SyncQueueItem): Promise<boolean> {
 
     case 'delete': {
       if (local.remote_id) {
-        const { data, error } = await client
+        const { error } = await client
           .from('setores')
-          .update({ deleted_at: nowISO() })
+          .delete()
           .eq('id', local.remote_id)
-          .select()
 
         if (error) throw error
-        if (!data || data.length === 0) {
-          await markConflict(item.id, 'Setor remoto não encontrado para exclusão. Possível conflito (já excluído ou sem permissão).')
-          return false
-        }
       }
 
       local.deleted = true
@@ -422,6 +412,7 @@ async function syncLevantamentoCreate(
         .select('*')
         .eq('setor_id', setorRemoteId ?? payload.setor_id)
         .eq('tipo', 'LPR_AEP')
+        .is('deleted_at', 'null')
         .maybeSingle()
       if (existing.data) {
         local.remote_id = existing.data.id
@@ -491,17 +482,12 @@ async function syncLevantamentoDelete(
 ): Promise<boolean> {
   if (local.remote_id) {
     const client = getClient()
-    const { data, error } = await client
+    const { error } = await client
       .from('levantamentos')
-      .update({ deleted_at: nowISO() })
+      .delete()
       .eq('id', local.remote_id)
-      .select()
 
     if (error) throw error
-    if (!data || data.length === 0) {
-      await markConflict(item.id, 'Levantamento remoto não encontrado para exclusão. Possível conflito.')
-      return false
-    }
   }
 
   local.deleted = true
@@ -712,17 +698,12 @@ async function syncEvidencia(item: SyncQueueItem): Promise<boolean> {
 
     case 'delete': {
       if (local.remote_id) {
-        const { data, error } = await client
+        const { error } = await client
           .from('evidencias')
-          .update({ deleted_at: nowISO() })
+          .delete()
           .eq('id', local.remote_id)
-          .select()
 
         if (error) throw error
-        if (!data || data.length === 0) {
-          await markConflict(item.id, 'Evidência remota não encontrada para exclusão. Possível conflito (já excluída ou sem permissão).')
-          return false
-        }
       }
 
       if (local.storage_path) {
