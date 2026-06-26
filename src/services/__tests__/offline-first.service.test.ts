@@ -14,6 +14,7 @@ function makeMockFrom() {
     single: vi.fn(),
     maybeSingle: vi.fn(),
     or: vi.fn(),
+    is: vi.fn(),
   }
   builder.select.mockReturnValue(builder)
   builder.insert.mockReturnValue(builder)
@@ -24,6 +25,7 @@ function makeMockFrom() {
   builder.single.mockResolvedValue({ data: null, error: null })
   builder.maybeSingle.mockResolvedValue({ data: null, error: null })
   builder.or.mockReturnValue(builder)
+  builder.is.mockReturnValue(builder)
   return builder
 }
 

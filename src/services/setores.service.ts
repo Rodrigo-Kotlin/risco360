@@ -26,6 +26,7 @@ export async function listarSetores(): Promise<ServiceResult<Setor[]>> {
       const { data, error } = await client
         .from('setores')
         .select('*')
+        .is('deleted_at', 'null')
         .order('nome', { ascending: true })
 
       if (error) throw error
@@ -58,6 +59,7 @@ export async function listarSetoresPorEmpresa(
         .from('setores')
         .select('*')
         .eq('empresa_id', empresaId)
+        .is('deleted_at', 'null')
         .order('nome', { ascending: true })
 
       if (error) throw error
@@ -88,6 +90,7 @@ export async function buscarSetorPorId(id: string): Promise<ServiceResult<Setor>
         .from('setores')
         .select('*')
         .eq('id', id)
+        .is('deleted_at', 'null')
         .single()
 
       if (error) throw error

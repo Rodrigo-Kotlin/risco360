@@ -25,6 +25,7 @@ export async function listarEmpresas(): Promise<ServiceResult<Empresa[]>> {
       const { data, error } = await client
         .from('empresas')
         .select('*')
+        .is('deleted_at', 'null')
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -55,6 +56,7 @@ export async function buscarEmpresaPorId(id: string): Promise<ServiceResult<Empr
         .from('empresas')
         .select('*')
         .eq('id', id)
+        .is('deleted_at', 'null')
         .single()
 
       if (error) throw error
@@ -213,13 +215,14 @@ export async function buscarEmpresasPorTermo(
   try {
     const client = getClient()
 
-    const { data, error } = await client
-      .from('empresas')
-      .select('*')
-      .or(
-        `razao_social.ilike.%${termo}%,nome_fantasia.ilike.%${termo}%,cnpj.ilike.%${termo}%`
-      )
-      .order('razao_social', { ascending: true })
+      const { data, error } = await client
+        .from('empresas')
+        .select('*')
+        .is('deleted_at', 'null')
+        .or(
+          `razao_social.ilike.%${termo}%,nome_fantasia.ilike.%${termo}%,cnpj.ilike.%${termo}%`
+        )
+        .order('razao_social', { ascending: true })
 
     if (error) throw error
 
