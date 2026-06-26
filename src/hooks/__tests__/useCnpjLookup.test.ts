@@ -10,6 +10,11 @@ vi.mock('@/services/cnpj.service', () => ({
   normalizarCnpj: vi.fn((cnpj: string) => cnpj.replace(/[^\d]/g, '')),
 }))
 
+vi.mock('@/lib/cnpj-cache', () => ({
+  getCachedCnpj: vi.fn(async () => null),
+  setCachedCnpj: vi.fn(async () => {}),
+}))
+
 const mockEmpresaReceita: EmpresaReceita = {
   razao_social: 'Empresa Exemplo LTDA',
   nome_fantasia: 'Exemplo',
@@ -25,7 +30,9 @@ const mockEmpresaReceita: EmpresaReceita = {
   cidade: 'São Paulo',
   uf: 'SP',
   cep: '01001000',
-  situacao_cadastral: 'ativa',
+  telefone: '(11) 999999999',
+  email: 'contato@exemplo.com',
+  situacao_cadastral: 'ATIVA',
 }
 
 describe('useCnpjLookup', () => {
@@ -114,6 +121,23 @@ describe('useCnpjLookup', () => {
 
     expect(vi.mocked(cnpjService.consultarCnpj)).not.toHaveBeenCalled()
     expect(result.current.empresa).not.toBeNull()
+  })
+
+  it('usa cache IndexedDB quando memória não tem', async () => {
+    const { getCachedCnpj } = await import('@/lib/cnpj-cache')
+    vi.mocked(getCachedCnpj).mockResolvedValue(mockEmpresaReceita)
+    vi.mocked(cnpjService.consultarCnpj).mockResolvedValue(mockEmpresaReceita)
+
+    const { result } = renderHook(() => useCnpjLookup())
+
+    await act(async () => {
+      await result.current.buscar('99887766000199')
+    })
+
+    await waitFor(() => {
+      expect(vi.mocked(cnpjService.consultarCnpj)).not.toHaveBeenCalled()
+      expect(result.current.empresa).not.toBeNull()
+    })
   })
 
   it('limpa dados quando chamado limpar', () => {

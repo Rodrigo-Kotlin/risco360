@@ -14,7 +14,74 @@ export interface EmpresaReceita {
   cidade: string
   uf: string
   cep: string
+  telefone: string
+  email: string
   situacao_cadastral: string
+}
+
+interface BrasilApiCnaeSecundario {
+  codigo: number
+  descricao: string
+}
+
+interface BrasilApiCnpjResponse {
+  cnpj: string
+  razao_social: string
+  nome_fantasia: string
+  cnae_fiscal: number
+  cnae_fiscal_descricao: string
+  cnaes_secundarios: BrasilApiCnaeSecundario[]
+  logradouro: string
+  numero: string
+  bairro: string
+  municipio: string
+  uf: string
+  cep: string
+  ddd_telefone_1: string
+  telefone_1: string
+  email: string
+  situacao_cadastral: string
+  porte: string
+  natureza_juridica: string
+  capital_social: string
+  data_situacao_cadastral: string
+  data_inicio_atividade: string
+  nome_cidade_exterior: string
+  pais: string
+  codigo_pais: number
+  codigo_municipio: number
+  complemento: string
+  ddd_fax: string
+  opcao_pelo_simples: boolean
+  opcao_pelo_mei: boolean
+  situacao_especial: string
+  data_situacao_especial: string
+  motivo_situacao_cadastral: number
+}
+
+export type CnpjErrorCode = 'NOT_FOUND' | 'RATE_LIMIT' | 'TIMEOUT' | 'OFFLINE' | 'UNEXPECTED'
+
+export class CnpjError extends Error {
+  code: CnpjErrorCode
+
+  constructor(code: CnpjErrorCode, message: string) {
+    super(message)
+    this.name = 'CnpjError'
+    this.code = code
+  }
+}
+
+const ERROR_MESSAGES: Record<CnpjErrorCode, string> = {
+  NOT_FOUND: 'CNPJ não encontrado na base da Receita Federal',
+  RATE_LIMIT: 'Limite temporário da API atingido. Tente novamente em alguns instantes',
+  TIMEOUT: 'A consulta ao CNPJ excedeu o tempo limite. Verifique sua conexão',
+  OFFLINE: 'Consulta automática indisponível sem internet',
+  UNEXPECTED: 'Erro inesperado ao consultar CNPJ. Tente novamente',
+}
+
+export function formatarCnae(cnaeNumber: number): string {
+  const str = String(cnaeNumber).padStart(5, '0')
+  return `${str.slice(0, 4)}-${str.slice(4)}`
 }
 
 export function normalizarCnpj(cnpj: string): string {
@@ -52,7 +119,7 @@ export interface CnpjProvider {
   consultar(cnpj: string): Promise<EmpresaReceita | null>
 }
 
-class ReceitaWsProvider implements CnpjProvider {
+class BrasilApiProvider implements CnpjProvider {
   async consultar(cnpj: string): Promise<EmpresaReceita | null> {
     const cnpjLimpo = normalizarCnpj(cnpj)
 
@@ -60,71 +127,77 @@ class ReceitaWsProvider implements CnpjProvider {
       return null
     }
 
-    const url = `https://www.receitaws.com.br/v1/cnpj/${cnpjLimpo}`
-
-    try {
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(10000),
-      })
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error('Limite de consultas excedido. Tente novamente em alguns segundos.')
-        }
-        return null
-      }
-
-      const data = await response.json()
-
-      if (data.status === 'ERROR') {
-        return null
-      }
-
-      return this.mapearResposta(data)
-    } catch {
-      return null
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw new CnpjError('OFFLINE', ERROR_MESSAGES.OFFLINE)
     }
+
+    const url = `https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`
+
+    let response: Response
+    try {
+      response = await fetch(url, {
+        signal: AbortSignal.timeout(15000),
+      })
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'TimeoutError') {
+        throw new CnpjError('TIMEOUT', ERROR_MESSAGES.TIMEOUT)
+      }
+      throw new CnpjError('UNEXPECTED', ERROR_MESSAGES.UNEXPECTED)
+    }
+
+    if (response.status === 404) {
+      throw new CnpjError('NOT_FOUND', ERROR_MESSAGES.NOT_FOUND)
+    }
+
+    if (response.status === 429) {
+      throw new CnpjError('RATE_LIMIT', ERROR_MESSAGES.RATE_LIMIT)
+    }
+
+    if (!response.ok) {
+      throw new CnpjError('UNEXPECTED', ERROR_MESSAGES.UNEXPECTED)
+    }
+
+    let data: BrasilApiCnpjResponse
+    try {
+      data = await response.json()
+    } catch {
+      throw new CnpjError('UNEXPECTED', ERROR_MESSAGES.UNEXPECTED)
+    }
+
+    return this.mapearResposta(data)
   }
 
-  private mapearResposta(data: Record<string, unknown>): EmpresaReceita {
-    const cnaesSecundarios = Array.isArray(data.atividades_secundarias)
-      ? (data.atividades_secundarias as Array<Record<string, unknown>>).map((a) => ({
-          codigo: String(a.code ?? ''),
-          descricao: String(a.text ?? ''),
-        }))
-      : []
+  private mapearResposta(data: BrasilApiCnpjResponse): EmpresaReceita {
+    const cnaesSecundarios = (data.cnaes_secundarios ?? []).map((c) => ({
+      codigo: formatarCnae(c.codigo),
+      descricao: c.descricao,
+    }))
 
-    const atividadePrincipal = (() => {
-      const raw = data.atividade_principal
-      if (!Array.isArray(raw) || raw.length === 0) return null
-      const item = raw[0]
-      if (!item || typeof item !== 'object') return null
-      const obj = item as Record<string, unknown>
-      return {
-        code: String(obj.code ?? ''),
-        text: String(obj.text ?? ''),
-      }
-    })()
+    const telefone = data.ddd_telefone_1
+      ? `(${data.ddd_telefone_1}) ${data.telefone_1}`
+      : (data.telefone_1 ?? '')
 
     return {
-      razao_social: String(data.nome ?? ''),
-      nome_fantasia: String(data.fantasia ?? ''),
-      cnpj: String(data.cnpj ?? ''),
-      cnae_principal: atividadePrincipal?.code ?? '',
-      cnae_principal_descricao: atividadePrincipal?.text ?? '',
+      razao_social: data.razao_social,
+      nome_fantasia: data.nome_fantasia ?? '',
+      cnpj: data.cnpj,
+      cnae_principal: formatarCnae(data.cnae_fiscal),
+      cnae_principal_descricao: data.cnae_fiscal_descricao,
       cnaes_secundarios: cnaesSecundarios,
-      endereco: String(data.logradouro ?? ''),
-      numero: String(data.numero ?? ''),
-      bairro: String(data.bairro ?? ''),
-      cidade: String(data.municipio ?? ''),
-      uf: String(data.uf ?? ''),
-      cep: String(data.cep ?? ''),
-      situacao_cadastral: String(data.situacao ?? ''),
+      endereco: data.logradouro,
+      numero: data.numero,
+      bairro: data.bairro,
+      cidade: data.municipio,
+      uf: data.uf,
+      cep: data.cep,
+      telefone,
+      email: data.email ?? '',
+      situacao_cadastral: data.situacao_cadastral,
     }
   }
 }
 
-let provider: CnpjProvider = new ReceitaWsProvider()
+let provider: CnpjProvider = new BrasilApiProvider()
 
 export function setCnpjProvider(novoProvider: CnpjProvider): void {
   provider = novoProvider
@@ -142,7 +215,7 @@ export async function consultarCnpj(cnpj: string): Promise<EmpresaReceita | null
   }
 
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return null
+    throw new CnpjError('OFFLINE', ERROR_MESSAGES.OFFLINE)
   }
 
   return provider.consultar(cnpjLimpo)

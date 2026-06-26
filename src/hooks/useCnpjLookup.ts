@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { consultarCnpj, validarCnpj, normalizarCnpj } from '@/services/cnpj.service'
+import type { CnpjErrorCode } from '@/services/cnpj.service'
+import { getCachedCnpj, setCachedCnpj } from '@/lib/cnpj-cache'
 import { buscarGrauRiscoPorCnae } from '@/data/cnae-grau-risco'
 import type { EmpresaReceita } from '@/services/cnpj.service'
 
@@ -16,6 +18,25 @@ export interface UseCnpjLookupReturn {
 }
 
 const cacheMemoria = new Map<string, CnpjLookupResult>()
+
+function enriquecerComRisco(data: EmpresaReceita): CnpjLookupResult {
+  const cnaeRisk = buscarGrauRiscoPorCnae(data.cnae_principal)
+  return {
+    ...data,
+    grau_risco_nr4: cnaeRisk?.grauRisco ?? null,
+  }
+}
+
+export function extrairMensagemErro(err: unknown): string {
+  if (err instanceof Error && 'code' in err) {
+    const code = (err as { code: string }).code
+    if (['NOT_FOUND', 'RATE_LIMIT', 'TIMEOUT', 'OFFLINE', 'UNEXPECTED'].includes(code)) {
+      return err.message
+    }
+  }
+  if (err instanceof Error) return err.message
+  return 'Erro inesperado ao consultar CNPJ. Tente novamente'
+}
 
 export function useCnpjLookup(): UseCnpjLookupReturn {
   const [loading, setLoading] = useState(false)
@@ -60,41 +81,40 @@ export function useCnpjLookup(): UseCnpjLookupReturn {
       return
     }
 
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      setError('Consulta automática indisponível sem internet')
-      setEmpresa(null)
-      setLoading(false)
-      return
-    }
-
     setLoading(true)
     setError(null)
     setEmpresa(null)
 
     timeoutRef.current = setTimeout(async () => {
       try {
+        const cached = await getCachedCnpj(cnpjLimpo)
+        if (cached) {
+          const resultado = enriquecerComRisco(cached)
+          cacheMemoria.set(cnpjLimpo, resultado)
+          setEmpresa(resultado)
+          setError(null)
+          setLoading(false)
+          return
+        }
+
         const resultado = await consultarCnpj(cnpjLimpo)
 
         if (!resultado) {
-          setError('Não foi possível localizar o CNPJ')
+          setError('CNPJ não encontrado na base da Receita Federal')
           setEmpresa(null)
           setLoading(false)
           return
         }
 
-        const cnaeRisk = buscarGrauRiscoPorCnae(resultado.cnae_principal)
-
-        const empresaComRisco: CnpjLookupResult = {
-          ...resultado,
-          grau_risco_nr4: cnaeRisk?.grauRisco ?? null,
-        }
+        const empresaComRisco = enriquecerComRisco(resultado)
 
         cacheMemoria.set(cnpjLimpo, empresaComRisco)
+        await setCachedCnpj(cnpjLimpo, resultado)
         setEmpresa(empresaComRisco)
         setError(null)
         setLoading(false)
-      } catch {
-        setError('Não foi possível localizar o CNPJ')
+      } catch (err) {
+        setError(extrairMensagemErro(err))
         setEmpresa(null)
         setLoading(false)
       }

@@ -4,6 +4,16 @@ export interface CnaeRisco {
   grauRisco: number
 }
 
+export interface CnaeSST {
+  codigo: string
+  descricao: string
+  grauRisco: number
+  treinamentos_recomendados: string[]
+  documentos_recomendados: string[]
+  eventos_esocial: string[]
+  indicadores_sst: Record<string, unknown>
+}
+
 const CNAE_RISCO_MAP: CnaeRisco[] = [
   { codigo: '0111-3', descricao: 'Cultivo de cereais', grauRisco: 3 },
   { codigo: '0112-1', descricao: 'Cultivo de algodão', grauRisco: 3 },
@@ -348,6 +358,126 @@ export function obterDescricaoGrauRisco(grau: number): string {
     4: 'Grau 4 - Muito Alto',
   }
   return descricoes[grau] ?? `Grau ${grau}`
+}
+
+export const CNAE_SST_MAP: CnaeSST[] = [
+  {
+    codigo: '1011-2',
+    descricao: 'Frigorífico - abate de bovinos',
+    grauRisco: 3,
+    treinamentos_recomendados: [
+      'NR-12 - Segurança no Trabalho em Máquinas e Equipamentos',
+      'NR-35 - Trabalho em Altura',
+      'NR-33 - Espaço Confinado',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO', 'LTCAT', 'Laudo NR-12'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO', 'S-2240 - Condições Ambientais'],
+    indicadores_sst: {
+      risco_ergonomico: 'alto',
+      risco_acidente: 'muito_alto',
+      risco_fisico: 'alto',
+      risco_biologico: 'medio',
+    },
+  },
+  {
+    codigo: '2711-5',
+    descricao: 'Construção de edifícios',
+    grauRisco: 4,
+    treinamentos_recomendados: [
+      'NR-06 - EPI',
+      'NR-18 - Condições e Meio Ambiente de Trabalho na Indústria da Construção',
+      'NR-35 - Trabalho em Altura',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO', 'PCMAT', 'LTCAT'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO', 'S-2240 - Condições Ambientais'],
+    indicadores_sst: {
+      risco_ergonomico: 'medio',
+      risco_acidente: 'muito_alto',
+      risco_fisico: 'alto',
+      risco_quimico: 'medio',
+    },
+  },
+  {
+    codigo: '3241-5',
+    descricao: 'Desenvolvimento de software',
+    grauRisco: 1,
+    treinamentos_recomendados: [
+      'NR-17 - Ergonomia',
+      'CIPA',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO'],
+    indicadores_sst: {
+      risco_ergonomico: 'medio',
+      risco_acidente: 'baixo',
+      risco_fisico: 'baixo',
+    },
+  },
+  {
+    codigo: '2911-7',
+    descricao: 'Comércio varejista não especializado',
+    grauRisco: 1,
+    treinamentos_recomendados: [
+      'NR-17 - Ergonomia',
+      'Prevenção de Incêndio',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO'],
+    indicadores_sst: {
+      risco_ergonomico: 'medio',
+      risco_acidente: 'baixo',
+    },
+  },
+  {
+    codigo: '2040-1',
+    descricao: 'Fabricação de cimento',
+    grauRisco: 4,
+    treinamentos_recomendados: [
+      'NR-12 - Segurança em Máquinas',
+      'NR-15 - Atividades e Operações Insalubres',
+      'NR-33 - Espaço Confinado',
+      'NR-35 - Trabalho em Altura',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO', 'LTCAT', 'PPRA', 'Laudo de Insalubridade'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO', 'S-2240 - Condições Ambientais', 'S-2245 - Treinamentos'],
+    indicadores_sst: {
+      risco_ergonomico: 'medio',
+      risco_acidente: 'alto',
+      risco_fisico: 'muito_alto',
+      risco_quimico: 'muito_alto',
+    },
+  },
+  {
+    codigo: '1220-4',
+    descricao: 'Refino de petróleo',
+    grauRisco: 4,
+    treinamentos_recomendados: [
+      'NR-12 - Segurança em Máquinas',
+      'NR-13 - Caldeiras e Vasos de Pressão',
+      'NR-20 - Líquidos Combustíveis e Inflamáveis',
+      'NR-33 - Espaço Confinado',
+      'NR-35 - Trabalho em Altura',
+    ],
+    documentos_recomendados: ['PGR', 'PCMSO', 'LTCAT', 'PPRA', 'Plano de Emergência'],
+    eventos_esocial: ['S-2210 - CAT', 'S-2220 - ASO', 'S-2240 - Condições Ambientais', 'S-2245 - Treinamentos'],
+    indicadores_sst: {
+      risco_ergonomico: 'medio',
+      risco_acidente: 'muito_alto',
+      risco_fisico: 'alto',
+      risco_quimico: 'muito_alto',
+    },
+  },
+]
+
+export function buscarSstPorCnae(cnae: string): CnaeSST | null {
+  const cnaeLimpo = limparCnae(cnae)
+
+  const encontrado = CNAE_SST_MAP.find((item) => {
+    const itemLimpo = limparCnae(item.codigo)
+    return cnaeLimpo.startsWith(itemLimpo)
+  })
+
+  return encontrado ?? null
 }
 
 export default CNAE_RISCO_MAP
