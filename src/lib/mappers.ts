@@ -65,6 +65,16 @@ export function mapEmpresaRowToEmpresa(row: EmpresaRow): Empresa {
     telefone: row.telefone,
     email: row.email,
     observacoes: row.observacoes,
+    cnae_principal: row.cnae_principal ?? undefined,
+    cnae_principal_descricao: row.cnae_principal_descricao ?? undefined,
+    cnaes_secundarios: (() => {
+      if (!row.cnaes_secundarios || !Array.isArray(row.cnaes_secundarios)) return undefined
+      return row.cnaes_secundarios.map((item) => ({
+        codigo: String((item as Record<string, unknown>).codigo ?? ''),
+        descricao: String((item as Record<string, unknown>).descricao ?? ''),
+      }))
+    })(),
+    grau_risco_nr4: row.grau_risco_nr4 ?? undefined,
     user_id: row.user_id,
     created_at: row.created_at,
     updated_at: row.updated_at,

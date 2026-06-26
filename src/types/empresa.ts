@@ -17,6 +17,13 @@ export interface Empresa extends UserOwnedEntity {
   telefone: string | null
   email: string | null
   observacoes: string | null
+  cnae_principal?: string
+  cnae_principal_descricao?: string
+  cnaes_secundarios?: Array<{
+    codigo: string
+    descricao: string
+  }>
+  grau_risco_nr4?: number | null
   sync_status?: SyncStatus
 }
 
@@ -36,6 +43,13 @@ export interface EmpresaCreateInput {
   telefone?: string
   email?: string
   observacoes?: string
+  cnae_principal?: string
+  cnae_principal_descricao?: string
+  cnaes_secundarios?: Array<{
+    codigo: string
+    descricao: string
+  }>
+  grau_risco_nr4?: number | null
 }
 
 export type EmpresaUpdateInput = Partial<EmpresaCreateInput>

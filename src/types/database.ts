@@ -30,6 +30,10 @@ export interface EmpresaRow {
   telefone: string | null
   email: string | null
   observacoes: string | null
+  cnae_principal?: string
+  cnae_principal_descricao?: string
+  cnaes_secundarios?: Record<string, unknown>[]
+  grau_risco_nr4?: number | null
   user_id: ID
   created_at: string
   updated_at: string
