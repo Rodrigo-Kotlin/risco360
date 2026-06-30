@@ -5,12 +5,13 @@ import { logDevError } from '@/lib/errors'
 import { isNetworkError } from '@/lib/network'
 import { salvarEvidenciaOffline, excluirEvidenciaOffline } from './offline/offline-evidencias.service'
 import { criarObjectURLDoBlob, revogarObjectURL as revogarBlobURL } from './offline/offline-evidencia-blobs.service'
+import { comprimirImagem, MAX_EVIDENCIA_SIZE_BYTES } from '@/lib/image-compression'
 import type { ServiceResult } from '@/types/common'
 import type { UploadStatus, OrigemEvidencia } from '@/types/levantamento'
 
 const EVIDENCIAS_BUCKET = 'evidencias'
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+const MAX_FILE_SIZE_BYTES = MAX_EVIDENCIA_SIZE_BYTES
 
 export interface UploadEvidenciaInput {
   file: File
@@ -35,7 +36,7 @@ export function validarArquivoEvidencia(file: File): string | null {
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    return `Arquivo muito grande. O tamanho máximo é 5 MB (recebido: ${(file.size / 1024 / 1024).toFixed(1)} MB).`
+    return `Arquivo muito grande. O tamanho máximo é 10 MB (recebido: ${(file.size / 1024 / 1024).toFixed(1)} MB).`
   }
 
   if (file.size === 0) {
@@ -135,31 +136,32 @@ export async function uploadEvidenciaFotografica(
     return { data: null, error: validationError }
   }
 
+  const file = await comprimirImagem(input.file)
   const now = new Date()
-  const mimeType = input.file.type
-  const sizeBytes = input.file.size
+  const mimeType = file.type
+  const sizeBytes = file.size
 
   if (isMockModeEnabled) {
     try {
-      const base64 = await fileToBase64(input.file)
+      const base64 = await fileToBase64(file)
       const offlineResult = await salvarEvidenciaOffline({
         levantamento_id: context?.levantamento_id ?? '',
         empresa_id: context?.empresa_id ?? null,
         setor_id: context?.setor_id ?? null,
-        caption: input.legenda ?? input.file.name,
-        observacao: input.observacao ?? `Arquivo: ${input.file.name}`,
+        caption: input.legenda ?? file.name,
+        observacao: input.observacao ?? `Arquivo: ${file.name}`,
         mime_type: mimeType,
         size: sizeBytes,
         blob_data: base64,
         captured_date: now.toISOString().slice(0, 10),
         captured_time: now.toTimeString().slice(0, 5),
         file: null,
-        arquivo_nome: input.file.name,
+        arquivo_nome: file.name,
       })
       if (offlineResult.error) {
         return { data: null, error: offlineResult.error }
       }
-      const previewUrl = URL.createObjectURL(input.file)
+      const previewUrl = URL.createObjectURL(file)
       return {
         data: {
           localId: offlineResult.data!.id,
@@ -183,12 +185,12 @@ export async function uploadEvidenciaFotografica(
         levantamento_id: context?.levantamento_id ?? '',
         empresa_id: context?.empresa_id ?? null,
         setor_id: context?.setor_id ?? null,
-        caption: input.legenda ?? input.file.name,
-        observacao: input.observacao ?? `Arquivo: ${input.file.name}`,
+        caption: input.legenda ?? file.name,
+        observacao: input.observacao ?? `Arquivo: ${file.name}`,
         captured_date: now.toISOString().slice(0, 10),
         captured_time: now.toTimeString().slice(0, 5),
-        file: input.file,
-        arquivo_nome: input.file.name,
+        file: file,
+        arquivo_nome: file.name,
         origem: input.origem ?? 'camera',
       })
 
@@ -197,7 +199,7 @@ export async function uploadEvidenciaFotografica(
       }
 
       const previewUrl = await criarObjectURLDoBlob(offlineResult.data!.local_blob_id!)
-        ?? URL.createObjectURL(input.file)
+        ?? URL.createObjectURL(file)
 
       return {
         data: {
@@ -229,22 +231,22 @@ export async function uploadEvidenciaFotografica(
       context?.empresa_id,
       context?.setor_id,
       context?.levantamento_id,
-      input.file.name
+      file.name
     )
 
-    const uploadResult = await fazerUploadParaSupabase(input.file, storagePath)
+    const uploadResult = await fazerUploadParaSupabase(file, storagePath)
     if (uploadResult.error) {
       if (isNetworkError(uploadResult.error)) {
         const offlineResult = await salvarEvidenciaOffline({
           levantamento_id: context?.levantamento_id ?? '',
           empresa_id: context?.empresa_id ?? null,
           setor_id: context?.setor_id ?? null,
-          caption: input.legenda ?? input.file.name,
-          observacao: input.observacao ?? `Arquivo: ${input.file.name}`,
+          caption: input.legenda ?? file.name,
+          observacao: input.observacao ?? `Arquivo: ${file.name}`,
           captured_date: now.toISOString().slice(0, 10),
           captured_time: now.toTimeString().slice(0, 5),
-          file: input.file,
-          arquivo_nome: input.file.name,
+          file: file,
+          arquivo_nome: file.name,
           origem: input.origem ?? 'camera',
         })
 
@@ -253,7 +255,7 @@ export async function uploadEvidenciaFotografica(
         }
 
         const previewUrl = await criarObjectURLDoBlob(offlineResult.data!.local_blob_id!)
-          ?? URL.createObjectURL(input.file)
+          ?? URL.createObjectURL(file)
 
         return {
           data: {
@@ -302,12 +304,12 @@ export async function uploadEvidenciaFotografica(
           levantamento_id: context?.levantamento_id ?? '',
           empresa_id: context?.empresa_id ?? null,
           setor_id: context?.setor_id ?? null,
-          caption: input.legenda ?? input.file.name,
-          observacao: input.observacao ?? `Arquivo: ${input.file.name}`,
+          caption: input.legenda ?? file.name,
+          observacao: input.observacao ?? `Arquivo: ${file.name}`,
           captured_date: now.toISOString().slice(0, 10),
           captured_time: now.toTimeString().slice(0, 5),
-          file: input.file,
-          arquivo_nome: input.file.name,
+          file: file,
+          arquivo_nome: file.name,
           origem: input.origem ?? 'camera',
         })
 
@@ -316,7 +318,7 @@ export async function uploadEvidenciaFotografica(
         }
 
         const previewUrl = await criarObjectURLDoBlob(offlineResult.data!.local_blob_id!)
-          ?? URL.createObjectURL(input.file)
+          ?? URL.createObjectURL(file)
 
         return {
           data: {

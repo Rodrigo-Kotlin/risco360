@@ -2,8 +2,11 @@ import { cn } from '@/lib/utils'
 import { NAV_ITEMS } from '@/constants/app'
 import { NavLink } from 'react-router-dom'
 import { Logo } from '@/components/ui/Logo'
+import { useSyncMetrics } from '@/hooks/useSyncMetrics'
+import { ROUTES } from '@/routes/routes.constants'
 import {
   LayoutDashboard, Building2, ClipboardList, BookOpen, FileText, Settings, Layers,
+  Cloud, CloudOff,
   type LucideIcon
 } from 'lucide-react'
 
@@ -22,6 +25,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const { data: metrics } = useSyncMetrics()
+  const pendingCount = metrics?.pending ?? 0
+
   return (
     <aside
       className={cn(
@@ -58,6 +64,27 @@ export function Sidebar({ className }: SidebarProps) {
         </ul>
       </nav>
 
+      {pendingCount > 0 && (
+        <NavLink
+          to={ROUTES.sincronizacao}
+          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/20 text-xs font-medium text-warning hover:bg-warning/20 transition-colors"
+        >
+          <CloudOff size={14} />
+          <span className="flex-1">Sincronização</span>
+          <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-warning text-white text-[10px] font-bold leading-none">
+            {pendingCount}
+          </span>
+        </NavLink>
+      )}
+      {pendingCount === 0 && (
+        <NavLink
+          to={ROUTES.sincronizacao}
+          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-text-muted hover:bg-surface-muted hover:text-text-secondary transition-colors"
+        >
+          <Cloud size={14} />
+          <span>Sincronização</span>
+        </NavLink>
+      )}
       <div className="px-3 py-3 border-t border-border-light shrink-0">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
           <div className="w-2 h-2 rounded-full bg-success" aria-hidden="true" />

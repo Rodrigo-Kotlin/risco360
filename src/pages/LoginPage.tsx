@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef, type FormEvent } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { APP_NAME } from '@/constants/app'
@@ -9,30 +11,40 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { isMockModeEnabled, MOCK_USER_EMAIL, MOCK_USER_PASSWORD } from '@/lib/mock-mode'
+import { LoginSchema, RegisterSchema, ResetPasswordSchema, type RegisterInput, type ResetPasswordInput } from '@/lib/validation/schemas/auth'
+
+type AuthFormValues = RegisterInput
 import { ServerCrash, CheckCircle2, ArrowLeft, Mail, Beaker, Eye, EyeOff } from 'lucide-react'
 import { Logo } from '@/components/ui/Logo'
 
 type AuthMode = 'login' | 'register'
 type PageMode = 'auth' | 'resetPassword'
 
-export default function LoginPage() {
+interface AuthFormProps {
+  onResetPasswordRequested: () => void
+}
+
+function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
   const { signIn, signUp, error, isLoading, isAuthenticated, clearError } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
   const loginAttempted = useRef(false)
-
-  const [pageMode, setPageMode] = useState<PageMode>('auth')
   const [authMode, setAuthMode] = useState<AuthMode>('login')
-
-  const [nome, setNome] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [resetEmail, setResetEmail] = useState('')
-  const [sendingReset, setSendingReset] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const schema = authMode === 'login' ? LoginSchema : RegisterSchema
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<AuthFormValues>({
+    resolver: zodResolver(schema) as never,
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
 
   useEffect(() => {
     if (loginAttempted.current && isAuthenticated && !isLoading) {
@@ -41,57 +53,20 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, isLoading, navigate, location])
 
-  function clearFieldErrors() {
-    if (Object.keys(fieldErrors).length > 0) setFieldErrors({})
-  }
+  useEffect(() => {
+    const sub = watch(() => clearError())
+    return () => sub.unsubscribe()
+  }, [watch, clearError])
 
-  function clearAll() {
-    clearFieldErrors()
-    clearError()
-  }
+  const isRegister = authMode === 'register'
 
-  function validateRegister(): boolean {
-    const errors: Record<string, string> = {}
-
-    if (!nome.trim()) errors.nome = 'Nome é obrigatório.'
-    if (!email.trim()) errors.email = 'E-mail é obrigatório.'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'E-mail inválido.'
-    if (!password) errors.password = 'Senha é obrigatória.'
-    else if (password.length < 6) errors.password = 'A senha deve ter pelo menos 6 caracteres.'
-    if (!confirmPassword) errors.confirmPassword = 'Confirmação de senha é obrigatória.'
-    else if (password !== confirmPassword) errors.confirmPassword = 'As senhas não coincidem.'
-
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
-  }
-
-  function validateLogin(): boolean {
-    const errors: Record<string, string> = {}
-
-    if (!email.trim()) errors.email = 'E-mail é obrigatório.'
-    if (!password) errors.password = 'Senha é obrigatória.'
-
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
-  }
-
-  function toggleAuthMode() {
-    setAuthMode((prev) => (prev === 'login' ? 'register' : 'login'))
-    clearAll()
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-
+  const onSubmit = async (data: AuthFormValues) => {
+    loginAttempted.current = true
     if (authMode === 'login') {
-      if (!validateLogin()) return
-      clearFieldErrors()
-      loginAttempted.current = true
+      const { email, password } = data
       await signIn(email, password)
     } else {
-      if (!validateRegister()) return
-      clearFieldErrors()
-      loginAttempted.current = true
+      const { nome, email, password } = data
       const needsConfirmation = await signUp(nome, email, password)
       if (needsConfirmation) {
         toast('Cadastro realizado! Verifique seu e-mail para confirmar.', 'success')
@@ -101,21 +76,185 @@ export default function LoginPage() {
     }
   }
 
-  async function handleResetPassword(e: FormEvent) {
-    e.preventDefault()
-    setSendingReset(true)
+  function toggleAuthMode() {
+    setAuthMode((prev) => (prev === 'login' ? 'register' : 'login'))
+    clearError()
+  }
 
-    const { error: resetError } = await resetPasswordForEmail(resetEmail)
+  return (
+    <div className="bg-white border border-border-light rounded-xl p-6 shadow-card text-left">
+      {isMockModeEnabled && (
+        <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
+          <Beaker size={14} className="text-warning" />
+          <span className="text-xs text-warning font-medium">Modo mock ativo para desenvolvimento</span>
+        </div>
+      )}
 
+      {isSupabaseConfigured && !isMockModeEnabled && (
+        <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
+          <CheckCircle2 size={14} className="text-success" />
+          <span className="text-xs text-success font-medium">Servidor configurado</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        {isRegister && (
+          <Input
+            label="Nome"
+            type="text"
+            placeholder="Seu nome completo"
+            required
+            error={errors.nome?.message}
+            {...register('nome')}
+          />
+        )}
+        <Input
+          label="E-mail"
+          type="email"
+          placeholder="seu@email.com"
+          required
+          error={errors.email?.message}
+          {...register('email')}
+        />
+        <div className="relative">
+          <Input
+            label="Senha"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            required
+            error={errors.password?.message}
+            {...register('password')}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[38px] text-text-muted hover:text-text-secondary transition-colors"
+            tabIndex={-1}
+            aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+        {isRegister && (
+          <Input
+            label="Confirmar senha"
+            type="password"
+            placeholder="••••••••"
+            required
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+        )}
+
+        {error && (
+          <p className="text-xs text-danger text-center" role="alert">{error}</p>
+        )}
+
+        <Button type="submit" className="w-full h-11" loading={isLoading}>
+          {authMode === 'login' ? 'Entrar' : 'Criar conta'}
+        </Button>
+      </form>
+
+      {authMode === 'login' && (
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            onClick={onResetPasswordRequested}
+            className="text-xs text-text-muted hover:text-primary-500 transition-colors"
+          >
+            Esqueci minha senha
+          </button>
+        </div>
+      )}
+
+      <div className="mt-5 pt-4 border-t border-border-light">
+        <p className="text-xs text-text-muted text-center">
+          {isRegister ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+        </p>
+        <button
+          type="button"
+          onClick={toggleAuthMode}
+          className="block mx-auto mt-1 text-sm text-primary-500 hover:text-primary-600 font-medium"
+          aria-label={isRegister ? 'Ir para login' : 'Ir para cadastro'}
+        >
+          {isRegister ? 'Fazer login' : 'Criar conta'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+interface ResetPasswordFormProps {
+  onBackToLogin: () => void
+}
+
+function ResetPasswordForm({ onBackToLogin }: ResetPasswordFormProps) {
+  const { toast } = useToast()
+  const [sending, setSending] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPasswordInput>({
+    resolver: zodResolver(ResetPasswordSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
+
+  const onSubmit = async (data: ResetPasswordInput) => {
+    setSending(true)
+    const { error: resetError } = await resetPasswordForEmail(data.resetEmail)
     if (resetError) {
       toast(resetError, 'error')
     } else {
       toast('E-mail de recuperação enviado! Verifique sua caixa de entrada.', 'success')
-      setPageMode('auth')
+      onBackToLogin()
     }
-
-    setSendingReset(false)
+    setSending(false)
   }
+
+  return (
+    <div className="bg-card border border-border-light rounded-xl p-6 shadow-card text-left">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <Input
+          label="E-mail"
+          type="email"
+          placeholder="seu@email.com"
+          required
+          error={errors.resetEmail?.message}
+          {...register('resetEmail')}
+        />
+        <Button type="submit" className="w-full" loading={sending}>
+          Enviar link de recuperação
+        </Button>
+      </form>
+      <div className="mt-5 pt-4 border-t border-border-light">
+        <button
+          type="button"
+          onClick={onBackToLogin}
+          className="flex items-center justify-center gap-1.5 mx-auto text-sm text-primary-500 hover:text-primary-600 font-medium"
+        >
+          <ArrowLeft size={16} />
+          Voltar ao login
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [pageMode, setPageMode] = useState<PageMode>('auth')
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? ROUTES.empresas
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, navigate, location])
 
   if (!isSupabaseConfigured && !isMockModeEnabled) {
     return (
@@ -149,31 +288,7 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-text-secondary mb-6">
           Receba um link para redefinir sua senha
         </p>
-        <div className="bg-card border border-border-light rounded-xl p-6 shadow-card text-left">
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <Input
-              label="E-mail"
-              type="email"
-              placeholder="seu@email.com"
-              required
-              value={resetEmail}
-              onChange={(e) => setResetEmail(e.target.value)}
-            />
-            <Button type="submit" className="w-full" loading={sendingReset}>
-              Enviar link de recuperação
-            </Button>
-          </form>
-          <div className="mt-5 pt-4 border-t border-border-light">
-            <button
-              type="button"
-              onClick={() => setPageMode('auth')}
-              className="flex items-center justify-center gap-1.5 mx-auto text-sm text-primary-500 hover:text-primary-600 font-medium"
-            >
-              <ArrowLeft size={16} />
-              Voltar ao login
-            </button>
-          </div>
-        </div>
+        <ResetPasswordForm onBackToLogin={() => setPageMode('auth')} />
       </div>
     )
   }
@@ -185,109 +300,7 @@ export default function LoginPage() {
         <p className="text-sm text-text-secondary">Plataforma de gestão de riscos ocupacionais</p>
       </div>
 
-      <div className="mt-6 bg-white border border-border-light rounded-xl p-6 shadow-card text-left">
-        {isMockModeEnabled && (
-          <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
-            <Beaker size={14} className="text-warning" />
-            <span className="text-xs text-warning font-medium">Modo mock ativo para desenvolvimento</span>
-          </div>
-        )}
-
-        {isSupabaseConfigured && !isMockModeEnabled && (
-          <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
-            <CheckCircle2 size={14} className="text-success" />
-            <span className="text-xs text-success font-medium">Servidor configurado</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {authMode === 'register' && (
-            <Input
-              label="Nome"
-              type="text"
-              placeholder="Seu nome completo"
-              required
-              error={fieldErrors.nome}
-              value={nome}
-              onChange={(e) => { setNome(e.target.value); clearAll() }}
-            />
-          )}
-          <Input
-            label="E-mail"
-            type="email"
-            placeholder="seu@email.com"
-            required
-            error={fieldErrors.email}
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); clearAll() }}
-          />
-          <div className="relative">
-            <Input
-              label="Senha"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              required
-              error={fieldErrors.password}
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); clearAll() }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[38px] text-text-muted hover:text-text-secondary transition-colors"
-              tabIndex={-1}
-              aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
-            >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-          {authMode === 'register' && (
-            <Input
-              label="Confirmar senha"
-              type="password"
-              placeholder="••••••••"
-              required
-              error={fieldErrors.confirmPassword}
-              value={confirmPassword}
-              onChange={(e) => { setConfirmPassword(e.target.value); clearAll() }}
-            />
-          )}
-
-          {error && (
-            <p className="text-xs text-danger text-center" role="alert">{error}</p>
-          )}
-
-          <Button type="submit" className="w-full h-11" loading={isLoading}>
-            {authMode === 'login' ? 'Entrar' : 'Criar conta'}
-          </Button>
-        </form>
-
-        {authMode === 'login' && (
-          <div className="mt-3 text-center">
-            <button
-              type="button"
-              onClick={() => setPageMode('resetPassword')}
-              className="text-xs text-text-muted hover:text-primary-500 transition-colors"
-            >
-              Esqueci minha senha
-            </button>
-          </div>
-        )}
-
-        <div className="mt-5 pt-4 border-t border-border-light">
-          <p className="text-xs text-text-muted text-center">
-            {authMode === 'login' ? 'Ainda não tem conta?' : 'Já tem uma conta?'}
-          </p>
-          <button
-            type="button"
-            onClick={toggleAuthMode}
-            className="block mx-auto mt-1 text-sm text-primary-500 hover:text-primary-600 font-medium"
-            aria-label={authMode === 'login' ? 'Ir para cadastro' : 'Ir para login'}
-          >
-            {authMode === 'login' ? 'Criar conta' : 'Fazer login'}
-          </button>
-        </div>
-      </div>
+      <AuthForm onResetPasswordRequested={() => setPageMode('resetPassword')} />
 
       {isMockModeEnabled && (
         <div className="mt-4 bg-white border border-border-light rounded-xl p-4 shadow-card text-left">

@@ -6,6 +6,7 @@ import { OfflineBanner } from '@/components/ui/OfflineBanner'
 import { Logo } from '@/components/ui/Logo'
 import { LayoutProvider, useLayout } from '@/contexts/LayoutContext'
 import { DRAWER_NAV_ITEMS, ROUTES } from '@/constants/app'
+import { SyncToastListener } from '@/components/sync/SyncToastListener'
 import { X, Plus } from 'lucide-react'
 import {
   LayoutDashboard, ClipboardList, BookOpen, Settings,
@@ -85,6 +86,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       </div>
 
       <MobileDrawer />
+      <SyncToastListener />
     </div>
   )
 }

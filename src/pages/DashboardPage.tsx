@@ -6,12 +6,15 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Header } from '@/components/layout/Header'
 import { MainContainer } from '@/components/layout/MainContainer'
 import { Button } from '@/components/ui/Button'
+
 import { APP_NAME, ROUTES } from '@/constants/app'
 import { useDashboardData } from '@/hooks/useDashboardData'
+import { useSyncMetrics } from '@/hooks/useSyncMetrics'
 import {
   ClipboardList, Building2, FileText, Plus,
   BarChart3, Activity,
   Clock, CheckCircle2, CloudOff,
+  AlertTriangle, RefreshCw, ArrowRight,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -22,8 +25,6 @@ export default function DashboardPage() {
   const empresas = data?.empresas ?? []
   const levantamentos = data?.levantamentos ?? []
   const relatorios = data?.relatorios ?? []
-  const pendingSync = data?.pendingSync ?? 0
-
   const emAndamento = levantamentos.filter((l) => l.status === 'em_andamento').length
   const concluidos = levantamentos.filter((l) => l.status === 'concluido').length
 
@@ -142,27 +143,17 @@ export default function DashboardPage() {
 
             {/* Painel de sincronização */}
             <Card>
-              <CardTitle className="mb-4">Sincronização</CardTitle>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-text-secondary">
-                    <CloudOff size={14} className="text-text-muted" />
-                    Pendentes de sync
-                  </span>
-                  <span className={`text-xs font-semibold ${pendingSync > 0 ? 'text-warning' : 'text-success'}`}>
-                    {pendingSync > 0 ? `${pendingSync} item${pendingSync > 1 ? 's' : ''}` : 'Em dia'}
-                  </span>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-text-secondary">
-                    <CheckCircle2 size={14} className="text-text-muted" />
-                    Concluídos
-                  </span>
-                  <span className="text-xs font-semibold text-success">
-                    {isLoading ? '—' : concluidos}
-                  </span>
-                </li>
-              </ul>
+              <CardTitle className="mb-4">Status da Sincronização</CardTitle>
+              <SyncStatusContent />
+              <div className="mt-3 pt-3 border-t border-border-light">
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.configuracoes)}
+                  className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                >
+                  Ver detalhes <ArrowRight size={12} />
+                </button>
+              </div>
             </Card>
           </div>
 
@@ -248,5 +239,74 @@ export default function DashboardPage() {
         </div>
       </MainContainer>
     </>
+  )
+}
+
+function SyncStatusContent() {
+  const { data: metrics, isLoading } = useSyncMetrics()
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2 animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-full" />
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+      </div>
+    )
+  }
+
+  const hasIssues = (metrics?.failed ?? 0) > 0 || (metrics?.conflicts ?? 0) > 0
+  const isPending = (metrics?.pending ?? 0) > 0
+  const hasSynced = (metrics?.synced ?? 0) > 0
+
+  return (
+    <div className="space-y-2.5">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2 text-sm text-text-secondary">
+          <CheckCircle2 size={14} className="text-success" />
+          Sincronizados
+        </span>
+        <span className="text-sm font-semibold text-success">{metrics?.synced ?? 0}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2 text-sm text-text-secondary">
+          <CloudOff size={14} className={isPending ? 'text-warning' : 'text-text-muted'} />
+          Pendentes
+        </span>
+        <span className={`text-sm font-semibold ${isPending ? 'text-warning' : 'text-text-muted'}`}>
+          {metrics?.pending ?? 0}
+        </span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2 text-sm text-text-secondary">
+          <AlertTriangle size={14} className={hasIssues ? 'text-danger' : 'text-text-muted'} />
+          Falhas
+        </span>
+        <span className={`text-sm font-semibold ${hasIssues ? 'text-danger' : 'text-text-muted'}`}>
+          {(metrics?.failed ?? 0) + (metrics?.conflicts ?? 0)}
+        </span>
+      </div>
+      {hasIssues && (
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-2 text-sm text-text-secondary">
+            <RefreshCw size={14} className="text-warning" />
+            Conflitos
+          </span>
+          <span className="text-sm font-semibold text-warning">{metrics?.conflicts ?? 0}</span>
+        </div>
+      )}
+      {metrics?.lastSyncAt && (
+        <div className="pt-2 mt-2 border-t border-border-light">
+          <p className="text-[11px] text-text-muted">
+            Última sincronização:{' '}
+            {new Date(metrics.lastSyncAt).toLocaleString('pt-BR')}
+          </p>
+        </div>
+      )}
+      {!metrics?.lastSyncAt && hasSynced && (
+        <div className="pt-2 mt-2 border-t border-border-light">
+          <p className="text-[11px] text-text-muted">Nenhuma sincronização registrada</p>
+        </div>
+      )}
+    </div>
   )
 }

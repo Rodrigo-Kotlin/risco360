@@ -23,6 +23,7 @@ const SetorDetalhePage = lazy(() => import('@/pages/SetorDetalhePage'))
 const SetoresPage = lazy(() => import('@/pages/SetoresPage'))
 const SetorFormPage = lazy(() => import('@/pages/SetorFormPage'))
 const ConfiguracoesPage = lazy(() => import('@/pages/ConfiguracoesPage'))
+const SincronizacaoPage = lazy(() => import('@/pages/SincronizacaoPage'))
 const EmpresaConsolidadoPage = lazy(() => import('@/pages/EmpresaConsolidadoPage'))
 const EmpresaPdfConferenciaPage = lazy(() => import('@/pages/EmpresaPdfConferenciaPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
@@ -91,6 +92,7 @@ const router = createBrowserRouter([
       { path: ROUTES.biblioteca,                   element: <Lazy><BibliotecaPage /></Lazy> },
       { path: ROUTES.relatorios,                   element: <Lazy><RelatoriosPage /></Lazy> },
       { path: ROUTES.configuracoes,                element: <Lazy><ConfiguracoesPage /></Lazy> },
+      { path: ROUTES.sincronizacao,               element: <Lazy><SincronizacaoPage /></Lazy> },
       { path: ROUTES.empresaConsolidado,           element: <Lazy><EmpresaConsolidadoPage /></Lazy> },
       { path: ROUTES.empresaPdfConferencia,        element: <Lazy><EmpresaPdfConferenciaPage /></Lazy> },
     ],

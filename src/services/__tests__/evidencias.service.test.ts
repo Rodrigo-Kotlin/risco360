@@ -52,10 +52,10 @@ describe('validarArquivoEvidencia', () => {
     expect(validarArquivoEvidencia(file)).toBe('Formato de arquivo não permitido. Use apenas JPG, PNG ou WEBP.')
   })
 
-  it('rejeita arquivo maior que 5 MB', () => {
-    const file = createMockFile('grande.jpg', 'image/jpeg', 6 * 1024 * 1024)
+  it('rejeita arquivo maior que 10 MB', () => {
+    const file = createMockFile('grande.jpg', 'image/jpeg', 11 * 1024 * 1024)
     const error = validarArquivoEvidencia(file)
-    expect(error).toContain('máximo é 5 MB')
+    expect(error).toContain('máximo é 10 MB')
   })
 
   it('rejeita arquivo vazio', () => {
@@ -63,8 +63,8 @@ describe('validarArquivoEvidencia', () => {
     expect(validarArquivoEvidencia(file)).toBe('Arquivo vazio.')
   })
 
-  it('aceita arquivo exatamente no limite de 5 MB', () => {
-    const file = createMockFile('limite.jpg', 'image/jpeg', 5 * 1024 * 1024)
+  it('aceita arquivo exatamente no limite de 10 MB', () => {
+    const file = createMockFile('limite.jpg', 'image/jpeg', 10 * 1024 * 1024)
     expect(validarArquivoEvidencia(file)).toBeNull()
   })
 })
@@ -118,7 +118,7 @@ describe('uploadEvidenciaFotografica (mock mode)', () => {
 
   it('rejeita arquivo maior que o limite no modo mock', async () => {
     const { uploadEvidenciaFotografica } = await import('../evidencias.service')
-    const file = createMockFile('grande.jpg', 'image/jpeg', 10 * 1024 * 1024)
+    const file = createMockFile('grande.jpg', 'image/jpeg', 11 * 1024 * 1024)
     const result = await uploadEvidenciaFotografica(
       { file, legenda: 'Grande', origem: 'arquivo' }
     )

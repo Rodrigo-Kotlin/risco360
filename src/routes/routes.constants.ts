@@ -22,6 +22,7 @@ export const ROUTES = {
   biblioteca: '/biblioteca',
   relatorios: '/relatorios',
   configuracoes: '/configuracoes',
+  sincronizacao: '/configuracoes/sincronizacao',
   empresaConsolidado: '/empresas/:empresaId/consolidado',
   empresaPdfConferencia: '/empresas/:empresaId/consolidado/pdf',
 } as const

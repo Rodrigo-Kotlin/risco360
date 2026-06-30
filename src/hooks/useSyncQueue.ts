@@ -3,6 +3,8 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { getSyncQueueStats } from '@/services/offline/sync-queue.service'
 import { syncNextBatch, onSyncEvent, isSyncInProgress } from '@/services/sync.service'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { queryClient } from '@/lib/query-client'
+import { syncMetricsKey, registerSyncCompletion } from '@/hooks/useSyncMetrics'
 import type { SyncQueueStats } from '@/types/sync'
 
 export interface SyncState {
@@ -51,6 +53,10 @@ export function useSyncQueue() {
       }))
       if (event.type === 'complete' || event.type === 'error') {
         refreshStats()
+        queryClient.invalidateQueries({ queryKey: syncMetricsKey })
+        if (event.type === 'complete') {
+          registerSyncCompletion()
+        }
       }
     })
     return unsubscribe
