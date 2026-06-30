@@ -1,6 +1,7 @@
 import { getMockData, setMockData } from './mock-storage.service'
 import { mockUserId } from '@/data/mock/mock-user'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type {
   Levantamento,
   LevantamentoCreateInput,
@@ -21,7 +22,9 @@ function now(): string {
   return new Date().toISOString()
 }
 
-export async function listarLevantamentos(): Promise<ServiceResult<Levantamento[]>> {
+export async function listarLevantamentos(
+  _params?: PaginationParams
+): Promise<PaginatedServiceResult<Levantamento>> {
   return { data: list(), error: null }
 }
 

@@ -1,6 +1,7 @@
 import { isMockModeEnabled } from '@/lib/mock-mode'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { getClient, handleServiceError } from './base.service'
+import { getOfflineDB, nowISO } from '@/lib/offline-db'
 import { mapSetorRowToSetor } from '@/lib/mappers'
 import { isNetworkError } from '@/lib/network'
 import {
@@ -13,21 +14,33 @@ import {
 } from './offline/offline-setores.service'
 import { cacheSetorLocalmente } from './sync.service'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type { Setor, SetorCreateInput, SetorUpdateInput } from '@/types/empresa'
 import type { SetorRow } from '@/types/database'
 import * as mockService from './mock-setores.service'
 
-export async function listarSetores(): Promise<ServiceResult<Setor[]>> {
-  if (isMockModeEnabled) return mockService.listarSetores()
+export async function listarSetores(
+  params?: PaginationParams
+): Promise<PaginatedServiceResult<Setor>> {
+  if (isMockModeEnabled) return mockService.listarSetores(params)
 
   if (navigator.onLine && isSupabaseConfigured) {
     try {
       const client = getClient()
-      const { data, error } = await client
+      const hasPagination = params?.page != null && params?.pageSize != null
+      let query = client
         .from('setores')
-        .select('*')
+        .select('*', hasPagination ? { count: 'exact' } : undefined)
         .is('deleted_at', 'null')
         .order('nome', { ascending: true })
+
+      if (params?.page && params?.pageSize) {
+        const start = (params.page - 1) * params.pageSize
+        const end = start + params.pageSize - 1
+        query = query.range(start, end)
+      }
+
+      const { data, error, count } = await query
 
       if (error) throw error
 
@@ -35,7 +48,17 @@ export async function listarSetores(): Promise<ServiceResult<Setor[]>> {
       for (const setor of setores) {
         await cacheSetorLocalmente(setor)
       }
-      return { data: setores, error: null }
+
+      const result: PaginatedServiceResult<Setor> = { data: setores, error: null }
+      if (count !== null && params?.page && params?.pageSize) {
+        result.pagination = {
+          total: count,
+          page: params.page,
+          pageSize: params.pageSize,
+          totalPages: Math.ceil(count / params.pageSize),
+        }
+      }
+      return result
     } catch (error) {
       if (isNetworkError(error)) {
         return listarSetoresOffline()
@@ -211,6 +234,18 @@ export async function excluirSetor(id: string): Promise<ServiceResult<boolean>> 
         .eq('id', id)
 
       if (error) throw error
+
+      const db = await getOfflineDB()
+      try {
+        const cached = await db.get('setores', id)
+        if (cached) {
+          cached.deleted = true
+          cached.updated_at = nowISO()
+          await db.put('setores', cached)
+        }
+      } catch {
+        // Non-critical: cache inconsistency resolved on next fetch
+      }
 
       return { data: true, error: null }
     } catch (error) {

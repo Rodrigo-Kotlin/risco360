@@ -49,3 +49,22 @@ export async function criarObjectURLDoBlob(id: string): Promise<string | null> {
 export function revogarObjectURL(url: string): void {
   URL.revokeObjectURL(url)
 }
+
+export async function limparBlobsOrfaos(): Promise<number> {
+  try {
+    const db = await getOfflineDB()
+    const blobs = await db.getAll('evidencia_blobs')
+    const evidencias = await db.getAll('evidencias')
+    const blobIdsEmUso = new Set(evidencias.map(e => e.local_blob_id).filter(Boolean))
+    let removidos = 0
+    for (const blob of blobs) {
+      if (!blobIdsEmUso.has(blob.id)) {
+        await db.delete('evidencia_blobs', blob.id)
+        removidos++
+      }
+    }
+    return removidos
+  } catch {
+    return 0
+  }
+}

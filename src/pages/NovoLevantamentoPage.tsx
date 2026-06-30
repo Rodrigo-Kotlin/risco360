@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Header } from '@/components/layout/Header'
@@ -101,6 +103,8 @@ export default function NovoLevantamentoPage() {
       return
     }
     toast('Novo Levantamento criado com sucesso!', 'success')
+    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
     navigate(ROUTES.levantamentosEditar.replace(':id', result.data!.id))
   }
 

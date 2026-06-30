@@ -1,6 +1,7 @@
 import { getMockData, setMockData } from './mock-storage.service'
 import { mockUserId } from '@/data/mock/mock-user'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type { Setor, SetorCreateInput, SetorUpdateInput } from '@/types/empresa'
 
 function list(): Setor[] {
@@ -15,7 +16,9 @@ function now(): string {
   return new Date().toISOString()
 }
 
-export async function listarSetores(): Promise<ServiceResult<Setor[]>> {
+export async function listarSetores(
+  _params?: PaginationParams
+): Promise<PaginatedServiceResult<Setor>> {
   return { data: list(), error: null }
 }
 

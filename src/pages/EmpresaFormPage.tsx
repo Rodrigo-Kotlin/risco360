@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Header } from '@/components/layout/Header'
 import { MainContainer } from '@/components/layout/MainContainer'
@@ -50,6 +52,8 @@ export default function EmpresaFormPage() {
         return
       }
       toast('Empresa atualizada com sucesso', 'success')
+      queryClient.invalidateQueries({ queryKey: queryKeys.empresas.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
       navigate(ROUTES.empresasDetalhe.replace(':id', id))
     } else {
       const result = await criarEmpresa(data as EmpresaCreateInput)
@@ -59,6 +63,8 @@ export default function EmpresaFormPage() {
         return
       }
       toast('Empresa cadastrada com sucesso', 'success')
+      queryClient.invalidateQueries({ queryKey: queryKeys.empresas.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
       navigate(ROUTES.empresas)
     }
   }

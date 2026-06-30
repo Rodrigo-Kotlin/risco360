@@ -94,13 +94,38 @@ export async function atualizarSetorOffline(id: string, input: Partial<Setor>): 
 export async function excluirSetorOffline(id: string): Promise<ServiceResult<boolean>> {
   try {
     const db = await getOfflineDB()
+
     const existing = await db.get('setores', id)
-    if (existing) {
-      existing.deleted = true
-      existing.updated_at = nowISO()
-      await db.put('setores', existing)
-      await adicionarSyncAposSalvar('setores', id, 'delete', { id })
+    if (!existing) {
+      return { data: false, error: 'Setor não encontrado' }
     }
+
+    existing.deleted = true
+    existing.updated_at = nowISO()
+    await db.put('setores', existing)
+    await adicionarSyncAposSalvar('setores', id, 'delete', { id })
+
+    const levIndex = db.transaction('levantamentos').store.index('setor_id')
+    const levantamentos = await levIndex.getAll(id)
+    for (const lev of levantamentos) {
+      if (lev.deleted) continue
+
+      lev.deleted = true
+      lev.updated_at = nowISO()
+      await db.put('levantamentos', lev)
+      await adicionarSyncAposSalvar('levantamentos', lev.id, 'delete', { id: lev.id })
+
+      const relIndex = db.transaction('relatorios').store.index('levantamento_id')
+      const relatorios = await relIndex.getAll(lev.id)
+      for (const rel of relatorios) {
+        if (rel.deleted) continue
+        rel.deleted = true
+        rel.updated_at = nowISO()
+        await db.put('relatorios', rel)
+        await adicionarSyncAposSalvar('relatorios', rel.id, 'delete', { id: rel.id })
+      }
+    }
+
     return { data: true, error: null }
   } catch (error) {
     return { data: null, error: String(error) }

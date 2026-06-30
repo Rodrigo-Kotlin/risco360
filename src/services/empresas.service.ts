@@ -1,6 +1,7 @@
 import { isMockModeEnabled } from '@/lib/mock-mode'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { getClient, handleServiceError } from './base.service'
+import { getOfflineDB, nowISO } from '@/lib/offline-db'
 import { mapEmpresaRowToEmpresa } from '@/lib/mappers'
 import { isNetworkError } from '@/lib/network'
 import {
@@ -12,21 +13,33 @@ import {
 } from './offline/offline-empresas.service'
 import { cacheEmpresaLocalmente } from './sync.service'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type { Empresa, EmpresaCreateInput, EmpresaUpdateInput } from '@/types/empresa'
 import type { EmpresaRow } from '@/types/database'
 import * as mockService from './mock-empresas.service'
 
-export async function listarEmpresas(): Promise<ServiceResult<Empresa[]>> {
-  if (isMockModeEnabled) return mockService.listarEmpresas()
+export async function listarEmpresas(
+  params?: PaginationParams
+): Promise<PaginatedServiceResult<Empresa>> {
+  if (isMockModeEnabled) return mockService.listarEmpresas(params)
 
   if (navigator.onLine && isSupabaseConfigured) {
     try {
       const client = getClient()
-      const { data, error } = await client
+      const hasPagination = params?.page != null && params?.pageSize != null
+      let query = client
         .from('empresas')
-        .select('*')
+        .select('*', hasPagination ? { count: 'exact' } : undefined)
         .is('deleted_at', 'null')
         .order('created_at', { ascending: false })
+
+      if (params?.page && params?.pageSize) {
+        const start = (params.page - 1) * params.pageSize
+        const end = start + params.pageSize - 1
+        query = query.range(start, end)
+      }
+
+      const { data, error, count } = await query
 
       if (error) throw error
 
@@ -34,7 +47,17 @@ export async function listarEmpresas(): Promise<ServiceResult<Empresa[]>> {
       for (const empresa of empresas) {
         await cacheEmpresaLocalmente(empresa)
       }
-      return { data: empresas, error: null }
+
+      const result: PaginatedServiceResult<Empresa> = { data: empresas, error: null }
+      if (count !== null && params?.page && params?.pageSize) {
+        result.pagination = {
+          total: count,
+          page: params.page,
+          pageSize: params.pageSize,
+          totalPages: Math.ceil(count / params.pageSize),
+        }
+      }
+      return result
     } catch (error) {
       if (isNetworkError(error)) {
         return listarEmpresasOffline()
@@ -195,6 +218,18 @@ export async function excluirEmpresa(id: string): Promise<ServiceResult<boolean>
         .eq('id', id)
 
       if (error) throw error
+
+      const db = await getOfflineDB()
+      try {
+        const cached = await db.get('empresas', id)
+        if (cached) {
+          cached.deleted = true
+          cached.updated_at = nowISO()
+          await db.put('empresas', cached)
+        }
+      } catch {
+        // Non-critical: cache inconsistency resolved on next fetch
+      }
 
       return { data: true, error: null }
     } catch (error) {

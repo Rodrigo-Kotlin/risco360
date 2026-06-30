@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { closeOfflineDB, clearAllData } from '@/lib/offline-db'
+import { closeOfflineDB, clearAllData, getOfflineDB } from '@/lib/offline-db'
 import {
   criarLevantamentoOffline,
   listarLevantamentosOffline,
@@ -10,6 +10,7 @@ import {
   concluirLevantamentoOffline,
   excluirLevantamentoOffline,
 } from '@/services/offline/offline-levantamentos.service'
+import { criarRelatorioOffline } from '@/services/offline/offline-relatorios.service'
 
 afterEach(async () => {
   await clearAllData()
@@ -74,5 +75,23 @@ describe('offline-levantamentos.service', () => {
     await excluirLevantamentoOffline(created.data!.id)
     const list = await listarLevantamentosOffline()
     expect(list.data).toHaveLength(0)
+  })
+
+  it('cascade: excluir levantamento deve marcar relatorios como deleted', async () => {
+    const lev = await criarLevantamentoOffline({ tipo: 'LPR_AEP', empresa_nome: 'Teste', setor_nome: 'Teste' })
+    const levId = lev.data!.id
+
+    const rel = await criarRelatorioOffline({ levantamento_id: levId, tipo: 'completo' })
+    const relId = rel.data!.id
+
+    await excluirLevantamentoOffline(levId)
+
+    const db = await getOfflineDB()
+    const storedRel = await db.get('relatorios', relId)
+    expect(storedRel.deleted).toBe(true)
+
+    const { listarRelatoriosOffline } = await import('@/services/offline/offline-relatorios.service')
+    const relList = await listarRelatoriosOffline()
+    expect(relList.data).toHaveLength(0)
   })
 })

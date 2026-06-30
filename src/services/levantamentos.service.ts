@@ -1,6 +1,7 @@
 import { isMockModeEnabled } from '@/lib/mock-mode'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { getClient, handleServiceError } from './base.service'
+import { getOfflineDB, nowISO } from '@/lib/offline-db'
 import { gerarCodigoLevantamento } from './codigo.service'
 import { mapLevantamentoRowToLevantamento } from '@/lib/mappers'
 import { isNetworkError } from '@/lib/network'
@@ -14,6 +15,7 @@ import {
 } from './offline/offline-levantamentos.service'
 import { cacheLevantamentoLocalmente } from './sync.service'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type {
   Levantamento,
   LevantamentoCreateInput,
@@ -27,17 +29,28 @@ import { STATUS_LEVANTAMENTO_VALIDOS } from '@/types/levantamento'
 import type { LevantamentoRow } from '@/types/database'
 import * as mockService from './mock-levantamentos.service'
 
-export async function listarLevantamentos(): Promise<ServiceResult<Levantamento[]>> {
-  if (isMockModeEnabled) return mockService.listarLevantamentos()
+export async function listarLevantamentos(
+  params?: PaginationParams
+): Promise<PaginatedServiceResult<Levantamento>> {
+  if (isMockModeEnabled) return mockService.listarLevantamentos(params)
 
   if (navigator.onLine && isSupabaseConfigured) {
     try {
       const client = getClient()
-      const { data, error } = await client
+      const hasPagination = params?.page != null && params?.pageSize != null
+      let query = client
         .from('levantamentos')
-        .select('*')
+        .select('*', hasPagination ? { count: 'exact' } : undefined)
         .is('deleted_at', 'null')
         .order('updated_at', { ascending: false })
+
+      if (params?.page && params?.pageSize) {
+        const start = (params.page - 1) * params.pageSize
+        const end = start + params.pageSize - 1
+        query = query.range(start, end)
+      }
+
+      const { data, error, count } = await query
 
       if (error) throw error
 
@@ -45,7 +58,17 @@ export async function listarLevantamentos(): Promise<ServiceResult<Levantamento[
       for (const lev of levantamentos) {
         await cacheLevantamentoLocalmente(lev)
       }
-      return { data: levantamentos, error: null }
+
+      const result: PaginatedServiceResult<Levantamento> = { data: levantamentos, error: null }
+      if (count !== null && params?.page && params?.pageSize) {
+        result.pagination = {
+          total: count,
+          page: params.page,
+          pageSize: params.pageSize,
+          totalPages: Math.ceil(count / params.pageSize),
+        }
+      }
+      return result
     } catch (error) {
       if (isNetworkError(error)) {
         return listarLevantamentosOffline()
@@ -321,6 +344,18 @@ export async function excluirLevantamento(
         .eq('id', id)
 
       if (error) throw error
+
+      const db = await getOfflineDB()
+      try {
+        const cached = await db.get('levantamentos', id)
+        if (cached) {
+          cached.deleted = true
+          cached.updated_at = nowISO()
+          await db.put('levantamentos', cached)
+        }
+      } catch {
+        // Non-critical: cache inconsistency resolved on next fetch
+      }
 
       return { data: true, error: null }
     } catch (error) {

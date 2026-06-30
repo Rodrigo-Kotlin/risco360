@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
@@ -10,18 +10,45 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ROUTES, STEPS } from '@/constants/app'
 import { useLevantamentoWizard } from '@/hooks/useLevantamentoWizard'
 import { listarEmpresas } from '@/services/empresas.service'
-import { Step01Identificacao } from '@/pages/steps/Step01Identificacao'
-import { Step02Caracteristicas } from '@/pages/steps/Step02Caracteristicas'
-import { Step03IluminacaoVentilacao } from '@/pages/steps/Step03IluminacaoVentilacao'
-import { Step04SegurancaEquipamentos } from '@/pages/steps/Step04SegurancaEquipamentos'
-import { Step05EpisEpcs } from '@/pages/steps/Step05EpisEpcs'
-import { Step06Medicoes } from '@/pages/steps/Step06Medicoes'
-import { Step07PerigosRiscosAep } from '@/pages/steps/Step07PerigosRiscosAep'
-import { Step08RevisaoConclusao } from '@/pages/steps/Step08RevisaoConclusao'
 import { useBibliotecaTecnica } from '@/hooks/useBibliotecaTecnica'
 import { ArrowLeft, Info, Building2, Layers, Check } from 'lucide-react'
 import { TIPOS_LEVANTAMENTO_SHORT_LABELS } from '@/constants/levantamentos'
 import { cn } from '@/lib/utils'
+
+const Step01Identificacao = lazy(() => import('@/pages/steps/Step01Identificacao').then(m => ({ default: m.Step01Identificacao })))
+const Step02Caracteristicas = lazy(() => import('@/pages/steps/Step02Caracteristicas').then(m => ({ default: m.Step02Caracteristicas })))
+const Step03IluminacaoVentilacao = lazy(() => import('@/pages/steps/Step03IluminacaoVentilacao').then(m => ({ default: m.Step03IluminacaoVentilacao })))
+const Step04SegurancaEquipamentos = lazy(() => import('@/pages/steps/Step04SegurancaEquipamentos').then(m => ({ default: m.Step04SegurancaEquipamentos })))
+const Step05EpisEpcs = lazy(() => import('@/pages/steps/Step05EpisEpcs').then(m => ({ default: m.Step05EpisEpcs })))
+const Step06Medicoes = lazy(() => import('@/pages/steps/Step06Medicoes').then(m => ({ default: m.Step06Medicoes })))
+const Step07PerigosRiscosAep = lazy(() => import('@/pages/steps/Step07PerigosRiscosAep').then(m => ({ default: m.Step07PerigosRiscosAep })))
+const Step08RevisaoConclusao = lazy(() => import('@/pages/steps/Step08RevisaoConclusao').then(m => ({ default: m.Step08RevisaoConclusao })))
+
+function StepSkeleton() {
+  return (
+    <div aria-label="Carregando etapa" role="status" className="space-y-4 animate-pulse">
+      <Skeleton className="h-5 w-48" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+      <Skeleton className="h-20 w-full rounded-lg" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+    </div>
+  )
+}
+
+function preloadStep(step: number) {
+  const loaders: Record<number, () => Promise<unknown>> = {
+    1: () => import('@/pages/steps/Step01Identificacao'),
+    2: () => import('@/pages/steps/Step02Caracteristicas'),
+    3: () => import('@/pages/steps/Step03IluminacaoVentilacao'),
+    4: () => import('@/pages/steps/Step04SegurancaEquipamentos'),
+    5: () => import('@/pages/steps/Step05EpisEpcs'),
+    6: () => import('@/pages/steps/Step06Medicoes'),
+    7: () => import('@/pages/steps/Step07PerigosRiscosAep'),
+    8: () => import('@/pages/steps/Step08RevisaoConclusao'),
+  }
+  loaders[step]?.()
+}
 
 /** Stepper horizontal — visível apenas em sm: e acima */
 function WizardStepperDesktop({
@@ -130,6 +157,11 @@ export default function LevantamentoWizardPage() {
       }
     })
   }, [])
+
+  useEffect(() => {
+    const next = wizard.currentStep + 1
+    if (next <= 8) preloadStep(next)
+  }, [wizard.currentStep])
 
   if (wizard.loading) {
     return (
@@ -338,7 +370,9 @@ export default function LevantamentoWizardPage() {
           )}
 
           <Card className="p-4 md:p-5">
-            {renderStep()}
+            <Suspense fallback={<StepSkeleton />}>
+              {renderStep()}
+            </Suspense>
           </Card>
         </div>
       </MainContainer>

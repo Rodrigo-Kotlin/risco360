@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
 import { Card, CardTitle } from '@/components/ui/Card'
@@ -8,10 +7,7 @@ import { Header } from '@/components/layout/Header'
 import { MainContainer } from '@/components/layout/MainContainer'
 import { Button } from '@/components/ui/Button'
 import { APP_NAME, ROUTES } from '@/constants/app'
-import { useEmpresas } from '@/hooks/useEmpresas'
-import { useLevantamentos } from '@/hooks/useLevantamentos'
-import { useRelatorios } from '@/hooks/useRelatorios'
-import { contarItensPendentes } from '@/services/offline/sync-queue.service'
+import { useDashboardData } from '@/hooks/useDashboardData'
 import {
   ClipboardList, Building2, FileText, Plus,
   BarChart3, Activity,
@@ -21,24 +17,15 @@ import { useNavigate } from 'react-router-dom'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
-  const { data: empresas, status: empresasStatus } = useEmpresas()
-  const { data: levantamentos, status: levStatus } = useLevantamentos()
-  const { data: relatorios, status: relStatus } = useRelatorios()
-  const [pendingSync, setPendingSync] = useState(0)
+  const { data, isLoading, isError, error } = useDashboardData()
 
-  useEffect(() => {
-    contarItensPendentes().then((count) => {
-      setPendingSync(count)
-    }).catch(() => setPendingSync(0))
-  }, [])
+  const empresas = data?.empresas ?? []
+  const levantamentos = data?.levantamentos ?? []
+  const relatorios = data?.relatorios ?? []
+  const pendingSync = data?.pendingSync ?? 0
 
-  const loadingStats =
-    empresasStatus === 'loading' ||
-    levStatus === 'loading' ||
-    relStatus === 'loading'
-
-  const emAndamento = levStatus === 'success' ? levantamentos.filter((l) => l.status === 'em_andamento').length : 0
-  const concluidos = levStatus === 'success' ? levantamentos.filter((l) => l.status === 'concluido').length : 0
+  const emAndamento = levantamentos.filter((l) => l.status === 'em_andamento').length
+  const concluidos = levantamentos.filter((l) => l.status === 'concluido').length
 
   return (
     <>
@@ -55,8 +42,14 @@ export default function DashboardPage() {
             }}
           />
 
+          {isError && (
+            <Card className="p-4">
+              <p className="text-sm text-danger">{error instanceof Error ? error.message : 'Erro ao carregar dados'}</p>
+            </Card>
+          )}
+
           {/* Métricas principais */}
-          {loadingStats ? (
+          {isLoading ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
             </div>
@@ -64,7 +57,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <StatCard
                 title="Empresas"
-                value={empresasStatus === 'success' ? empresas.length : 0}
+                value={empresas.length}
                 description="Clientes cadastrados"
                 icon={<Building2 size={20} />}
                 variant="default"
@@ -86,7 +79,7 @@ export default function DashboardPage() {
               />
               <StatCard
                 title="Relatórios"
-                value={relStatus === 'success' ? relatorios.length : 0}
+                value={relatorios.length}
                 description="Documentos gerados"
                 icon={<FileText size={20} />}
                 variant="info"
@@ -166,7 +159,7 @@ export default function DashboardPage() {
                     Concluídos
                   </span>
                   <span className="text-xs font-semibold text-success">
-                    {loadingStats ? '—' : concluidos}
+                    {isLoading ? '—' : concluidos}
                   </span>
                 </li>
               </ul>
@@ -174,7 +167,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Levantamentos recentes */}
-          {levStatus === 'success' && levantamentos.length === 0 && (
+          {!isLoading && !isError && levantamentos.length === 0 && (
             <Card className="p-0">
               <EmptyState
                 title="Nenhum levantamento encontrado"
@@ -191,7 +184,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {levStatus === 'success' && levantamentos.length > 0 && (
+          {!isLoading && !isError && levantamentos.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">

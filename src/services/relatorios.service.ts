@@ -1,7 +1,12 @@
 import { isMockModeEnabled } from '@/lib/mock-mode'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { getClient, handleServiceError } from './base.service'
+import { getOfflineDB, nowISO } from '@/lib/offline-db'
 import { mapRelatorioRowToRelatorio } from '@/lib/mappers'
+import { isNetworkError } from '@/lib/network'
+import { excluirRelatorioOffline } from './offline/offline-relatorios.service'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type {
   Relatorio,
   RelatorioCreateInput,
@@ -11,23 +16,42 @@ import type {
 import type { RelatorioRow } from '@/types/database'
 import * as mockService from './mock-relatorios.service'
 
-export async function listarRelatorios(): Promise<ServiceResult<Relatorio[]>> {
-  if (isMockModeEnabled) return mockService.listarRelatorios()
+export async function listarRelatorios(
+  params?: PaginationParams
+): Promise<PaginatedServiceResult<Relatorio>> {
+  if (isMockModeEnabled) return mockService.listarRelatorios(params)
   try {
     const client = getClient()
 
-    const { data, error } = await client
+    const hasPagination = params?.page != null && params?.pageSize != null
+    let query = client
       .from('relatorios')
-      .select('*')
+      .select('*', hasPagination ? { count: 'exact' } : undefined)
       .is('deleted_at', 'null')
       .order('created_at', { ascending: false })
 
+    if (params?.page && params?.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize - 1
+      query = query.range(start, end)
+    }
+
+    const { data, error, count } = await query
+
     if (error) throw error
 
-    return {
-      data: (data ?? []).map(mapRelatorioRowToRelatorio),
-      error: null,
+    const relatorios = (data ?? []).map(mapRelatorioRowToRelatorio)
+
+    const result: PaginatedServiceResult<Relatorio> = { data: relatorios, error: null }
+    if (count !== null && params?.page && params?.pageSize) {
+      result.pagination = {
+        total: count,
+        page: params.page,
+        pageSize: params.pageSize,
+        totalPages: Math.ceil(count / params.pageSize),
+      }
     }
+    return result
   } catch (error) {
     return handleServiceError('Erro ao listar relatórios:', error)
   }
@@ -155,20 +179,40 @@ export async function atualizarRelatorio(
 
 export async function excluirRelatorio(id: string): Promise<ServiceResult<boolean>> {
   if (isMockModeEnabled) return mockService.excluirRelatorio(id)
-  try {
-    const client = getClient()
 
-    const { error } = await client
-      .from('relatorios')
-      .delete()
-      .eq('id', id)
+  if (navigator.onLine && isSupabaseConfigured) {
+    try {
+      const client = getClient()
 
-    if (error) throw error
+      const { error } = await client
+        .from('relatorios')
+        .delete()
+        .eq('id', id)
 
-    return { data: true, error: null }
-  } catch (error) {
-    return handleServiceError('Erro ao excluir relatório:', error)
+      if (error) throw error
+
+      const db = await getOfflineDB()
+      try {
+        const cached = await db.get('relatorios', id)
+        if (cached) {
+          cached.deleted = true
+          cached.updated_at = nowISO()
+          await db.put('relatorios', cached)
+        }
+      } catch {
+        // Non-critical: cache inconsistency resolved on next fetch
+      }
+
+      return { data: true, error: null }
+    } catch (error) {
+      if (isNetworkError(error)) {
+        return excluirRelatorioOffline(id)
+      }
+      return handleServiceError('Erro ao excluir relatório:', error)
+    }
   }
+
+  return excluirRelatorioOffline(id)
 }
 
 export async function atualizarStatusRelatorio(

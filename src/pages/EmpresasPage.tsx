@@ -1,4 +1,7 @@
 import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -9,8 +12,7 @@ import { SearchInput } from '@/components/ui/SearchInput'
 import { DataTable } from '@/components/ui/DataTable'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/hooks/useToast'
-import { useEmpresas } from '@/hooks/useEmpresas'
-import { excluirEmpresa } from '@/services/empresas.service'
+import { listarEmpresas, excluirEmpresa } from '@/services/empresas.service'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
 import { Plus, Pencil, Trash2, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -20,7 +22,14 @@ import type { Empresa } from '@/types/empresa'
 export default function EmpresasPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
-  const { data: empresas, status, error, refetch } = useEmpresas()
+  const { data: empresas = [], isLoading, isError, error, refetch } = useQuery({
+    queryKey: queryKeys.empresas.all,
+    queryFn: async () => {
+      const result = await listarEmpresas()
+      if (result.error) throw new Error(result.error)
+      return result.data ?? []
+    },
+  })
   const [search, setSearch] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -47,7 +56,8 @@ export default function EmpresasPage() {
       return
     }
     toast('Empresa excluída com sucesso', 'success')
-    refetch()
+    queryClient.invalidateQueries({ queryKey: queryKeys.empresas.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
   }
 
   const columns = [
@@ -103,26 +113,26 @@ export default function EmpresasPage() {
             }}
           />
 
-          {status !== 'loading' && (
+          {!isLoading && (
             <div className="max-w-md">
               <SearchInput value={search} onChange={setSearch} placeholder="Buscar por nome, fantasia ou CNPJ…" />
             </div>
           )}
 
-          {status === 'loading' && (
+          {isLoading && (
             <Card className="p-6">
               <Skeleton className="h-20 w-full rounded-lg" />
             </Card>
           )}
 
-          {status === 'error' && (
+          {isError && (
             <Card className="p-6">
-              <p className="text-sm text-danger mb-2">{error}</p>
-              <button type="button" onClick={refetch} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
+              <p className="text-sm text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar empresas'}</p>
+              <button type="button" onClick={() => refetch()} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
             </Card>
           )}
 
-          {status === 'success' && (
+          {!isLoading && !isError && (
             <DataTable
               columns={columns}
               data={filtered}

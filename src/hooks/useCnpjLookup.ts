@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
 import { consultarCnpj, validarCnpj, normalizarCnpj } from '@/services/cnpj.service'
-import type { CnpjErrorCode } from '@/services/cnpj.service'
 import { getCachedCnpj, setCachedCnpj } from '@/lib/cnpj-cache'
 import { buscarGrauRiscoPorCnae } from '@/data/cnae-grau-risco'
 import type { EmpresaReceita } from '@/services/cnpj.service'

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { buscarLevantamentoPorId, atualizarLevantamento, atualizarStatusLevantamento } from '@/services/levantamentos.service'
 import { ROUTES } from '@/constants/app'
 import { calcularPercentual } from '@/lib/wizard-progress'
@@ -112,6 +114,8 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
     }
 
     toast('Levantamento concluído com sucesso!', 'success')
+    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
     navigate(ROUTES.levantamentosDetalhe.replace(':id', levantamentoId))
   }, [levantamentoId, state.levantamento, navigate, toast])
 

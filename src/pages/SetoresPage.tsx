@@ -1,4 +1,7 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card, CardTitle } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -10,59 +13,60 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/hooks/useToast'
 import { ROUTES } from '@/constants/app'
 import { listarSetores, excluirSetor } from '@/services/setores.service'
-import { buscarEmpresaPorId } from '@/services/empresas.service'
+import { listarEmpresas } from '@/services/empresas.service'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
 import {
   Plus, Pencil, Trash2, Layers, Building2
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import type { Setor } from '@/types/empresa'
 
 export default function SetoresPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
-  const [setores, setSetores] = useState<Setor[]>([])
-  const [empresas, setEmpresas] = useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+
+  const setoresQuery = useQuery({
+    queryKey: queryKeys.setores.all,
+    queryFn: async () => {
+      const result = await listarSetores()
+      if (result.error) throw new Error(result.error)
+      return result.data ?? []
+    },
+  })
+
+  const empresasQuery = useQuery({
+    queryKey: queryKeys.empresas.all,
+    queryFn: async () => {
+      const result = await listarEmpresas()
+      if (result.error) throw new Error(result.error)
+      return result.data ?? []
+    },
+  })
+
+  const isLoading = setoresQuery.isLoading
+  const isError = setoresQuery.isError
+  const error = setoresQuery.error
+
+  const empresas: Record<string, string> = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const e of empresasQuery.data ?? []) {
+      map[e.id] = e.razao_social
+    }
+    return map
+  }, [empresasQuery.data])
+
   const [search, setSearch] = useState('')
   const [empresaFiltro, setEmpresaFiltro] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
-  const [retryKey, setRetryKey] = useState(0)
-
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      const setorResult = await listarSetores()
-      if (cancelled) return
-      setError(null)
-      if (setorResult.error) {
-        setError(setorResult.error)
-        setLoading(false)
-        return
-      }
-      setSetores(setorResult.data ?? [])
-      const empMap: Record<string, string> = {}
-      for (const s of setorResult.data ?? []) {
-        if (!empMap[s.empresa_id]) {
-          const e = await buscarEmpresaPorId(s.empresa_id)
-          if (e.data) empMap[s.empresa_id] = e.data.razao_social
-        }
-      }
-      setEmpresas(empMap)
-      setLoading(false)
-    })()
-    return () => { cancelled = true }
-  }, [retryKey])
 
   const empresaOptions = useMemo(() => {
+    const setores = setoresQuery.data ?? []
     const unique = [...new Set(setores.map(s => s.empresa_id))]
     return unique.map(id => ({ value: id, label: empresas[id] ?? id }))
-  }, [setores, empresas])
+  }, [setoresQuery.data, empresas])
 
   const filtered = useMemo(() => {
-    let result = setores
+    let result = setoresQuery.data ?? []
     if (empresaFiltro) {
       result = result.filter(s => s.empresa_id === empresaFiltro)
     }
@@ -74,7 +78,7 @@ export default function SetoresPage() {
       )
     }
     return result
-  }, [setores, search, empresaFiltro])
+  }, [setoresQuery.data, search, empresaFiltro])
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -87,10 +91,11 @@ export default function SetoresPage() {
       return
     }
     toast('Setor excluído com sucesso', 'success')
-    setRetryKey(k => k + 1)
+    queryClient.invalidateQueries({ queryKey: queryKeys.setores.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         <Header title="Setores" description="Carregando…" />
@@ -104,13 +109,13 @@ export default function SetoresPage() {
     )
   }
 
-  if (error) {
+  if (isError) {
     return (
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{error}</p>
-          <Button variant="secondary" className="mt-4" onClick={() => { setError(null); setRetryKey(k => k + 1) }}>
+          <p className="text-sm text-danger">{error instanceof Error ? error.message : 'Erro ao carregar setores'}</p>
+          <Button variant="secondary" className="mt-4" onClick={() => setoresQuery.refetch()}>
             Tentar novamente
           </Button>
         </MainContainer>

@@ -7,6 +7,7 @@ import {
   markSyncItemWithError,
   markConflict,
   getSyncQueueStats,
+  clearSyncedQueueItems,
 } from '@/services/offline/sync-queue.service'
 import { sortSyncQueue, canSyncItem } from '@/services/offline/sync-helpers'
 import { isNetworkError } from '@/lib/network'
@@ -108,6 +109,8 @@ async function processSyncItem(item: SyncQueueItem): Promise<boolean> {
         return await syncLevantamento(item)
       case 'evidencia':
         return await syncEvidencia(item)
+      case 'relatorio':
+        return await syncRelatorio(item)
       default:
         await markSyncItemWithError(item.id, `Entidade não suportada: ${item.entity}`)
         return false
@@ -498,28 +501,39 @@ async function syncLevantamentoDelete(
   return true
 }
 
+let processingQueue = false
+
 export async function processSyncQueue(): Promise<{ synced: number; errors: number }> {
-  const stats = await getSyncQueueStats()
-  if (stats.pending + stats.error === 0) return { synced: 0, errors: 0 }
+  if (processingQueue) return { synced: 0, errors: 0 }
+  processingQueue = true
 
-  let totalSynced = 0
-  let totalErrors = 0
-  let iterations = 0
-  const maxIterations = 20
+  try {
+    const stats = await getSyncQueueStats()
+    if (stats.pending + stats.error === 0) return { synced: 0, errors: 0 }
 
-  while (iterations < maxIterations) {
-    const currentStats = await getSyncQueueStats()
-    if (currentStats.pending + currentStats.error === 0) break
+    let totalSynced = 0
+    let totalErrors = 0
+    let iterations = 0
+    const maxIterations = 20
 
-    const result = await syncNextBatch(5)
-    totalSynced += result.synced
-    totalErrors += result.errors
-    iterations++
+    while (iterations < maxIterations) {
+      const currentStats = await getSyncQueueStats()
+      if (currentStats.pending + currentStats.error === 0) break
 
-    if (result.synced === 0 && result.errors > 0) break
+      const result = await syncNextBatch(5)
+      totalSynced += result.synced
+      totalErrors += result.errors
+      iterations++
+
+      if (result.synced === 0 && result.errors > 0) break
+    }
+
+    await clearSyncedQueueItems()
+
+    return { synced: totalSynced, errors: totalErrors }
+  } finally {
+    processingQueue = false
   }
-
-  return { synced: totalSynced, errors: totalErrors }
 }
 
 export async function cacheEmpresaLocalmente(empresa: Empresa): Promise<void> {
@@ -730,6 +744,99 @@ async function syncEvidencia(item: SyncQueueItem): Promise<boolean> {
   }
 }
 
+async function syncRelatorio(item: SyncQueueItem): Promise<boolean> {
+  const db = await getOfflineDB()
+  const local = await db.get('relatorios', item.entity_id)
+  if (!local) {
+    await markSyncItemWithError(item.id, 'Registro local não encontrado.')
+    return false
+  }
+
+  const client = getClient()
+  const { data: userData } = await client.auth.getUser()
+  if (!userData?.user) {
+    await markSyncItemWithError(item.id, 'Usuário não autenticado.')
+    return false
+  }
+
+  const levantamentoRemoteId = await resolveLevantamentoRemoteId(local.levantamento_id)
+
+  switch (item.operation) {
+    case 'create': {
+      const { remote_id: _ri, cached_at: _ca, source: _sr, sync_status: _ss, dirty: _d, deleted: _dl, ...payload } = local
+      const { data, error } = await client
+        .from('relatorios')
+        .insert({
+          ...payload,
+          levantamento_id: levantamentoRemoteId ?? local.levantamento_id,
+          user_id: userData.user.id,
+        })
+        .select('*')
+        .single()
+
+      if (error) throw error
+
+      local.remote_id = data.id
+      local.sync_status = 'synced' as const
+      local.dirty = false
+      local.updated_at = nowISO()
+      await db.put('relatorios', local)
+      await markSyncItemAsSynced(item.id)
+      return true
+    }
+
+    case 'update': {
+      if (!local.remote_id) {
+        await markSyncItemWithError(item.id, 'Relatório não possui remote_id. Sincronize primeiro como create.')
+        return false
+      }
+      const { remote_id: _ri2, cached_at: _ca2, source: _sr2, sync_status: _ss2, dirty: _d2, deleted: _dl2, id: _id, created_at: _ca3, user_id: _uid, ...updatePayload } = local
+      const { data, error } = await client
+        .from('relatorios')
+        .update(updatePayload)
+        .eq('id', local.remote_id)
+        .select('*')
+        .single()
+
+      if (error) throw error
+      if (!data) {
+        await markConflict(item.id, 'Relatório remoto não encontrado para atualização. Possível conflito (registro excluído ou sem permissão).')
+        return false
+      }
+
+      local.last_synced_at = nowISO()
+      local.sync_status = 'synced' as const
+      local.dirty = false
+      local.updated_at = nowISO()
+      await db.put('relatorios', local)
+      await markSyncItemAsSynced(item.id)
+      return true
+    }
+
+    case 'delete': {
+      if (local.remote_id) {
+        const { error } = await client
+          .from('relatorios')
+          .delete()
+          .eq('id', local.remote_id)
+
+        if (error) throw error
+      }
+
+      local.deleted = true
+      local.updated_at = nowISO()
+      local.sync_status = 'synced' as const
+      await db.put('relatorios', local)
+      await markSyncItemAsSynced(item.id)
+      return true
+    }
+
+    default:
+      await markSyncItemWithError(item.id, `Operação desconhecida: ${item.operation}`)
+      return false
+  }
+}
+
 async function resolveLevantamentoRemoteId(localLevantamentoId: string): Promise<string | null> {
   if (!localLevantamentoId.startsWith('local_')) return localLevantamentoId
   const db = await getOfflineDB()
@@ -743,6 +850,7 @@ function getEntityLabel(entity: string): string {
     setor: 'setor',
     levantamento: 'levantamento',
     evidencia: 'evidência fotográfica',
+    relatorio: 'relatório',
   }
   return labels[entity] ?? entity
 }

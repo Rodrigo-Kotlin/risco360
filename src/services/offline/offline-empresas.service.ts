@@ -92,13 +92,49 @@ export async function atualizarEmpresaOffline(id: string, input: Partial<Empresa
 export async function excluirEmpresaOffline(id: string): Promise<ServiceResult<boolean>> {
   try {
     const db = await getOfflineDB()
+
     const existing = await db.get('empresas', id)
-    if (existing) {
-      existing.deleted = true
-      existing.updated_at = nowISO()
-      await db.put('empresas', existing)
-      await adicionarSyncAposSalvar('empresas', id, 'delete', { id })
+    if (!existing) {
+      return { data: false, error: 'Empresa não encontrada' }
     }
+
+    existing.deleted = true
+    existing.updated_at = nowISO()
+    await db.put('empresas', existing)
+    await adicionarSyncAposSalvar('empresas', id, 'delete', { id })
+
+    const setorIndex = db.transaction('setores').store.index('empresa_id')
+    const setores = await setorIndex.getAll(id)
+    for (const setor of setores) {
+      if (setor.deleted) continue
+
+      setor.deleted = true
+      setor.updated_at = nowISO()
+      await db.put('setores', setor)
+      await adicionarSyncAposSalvar('setores', setor.id, 'delete', { id: setor.id })
+
+      const levIndex = db.transaction('levantamentos').store.index('setor_id')
+      const levantamentos = await levIndex.getAll(setor.id)
+      for (const lev of levantamentos) {
+        if (lev.deleted) continue
+
+        lev.deleted = true
+        lev.updated_at = nowISO()
+        await db.put('levantamentos', lev)
+        await adicionarSyncAposSalvar('levantamentos', lev.id, 'delete', { id: lev.id })
+
+        const relIndex = db.transaction('relatorios').store.index('levantamento_id')
+        const relatorios = await relIndex.getAll(lev.id)
+        for (const rel of relatorios) {
+          if (rel.deleted) continue
+          rel.deleted = true
+          rel.updated_at = nowISO()
+          await db.put('relatorios', rel)
+          await adicionarSyncAposSalvar('relatorios', rel.id, 'delete', { id: rel.id })
+        }
+      }
+    }
+
     return { data: true, error: null }
   } catch (error) {
     return { data: null, error: String(error) }

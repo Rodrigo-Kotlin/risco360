@@ -1,6 +1,7 @@
 import { getMockData, setMockData } from './mock-storage.service'
 import { mockUserId } from '@/data/mock/mock-user'
 import type { ServiceResult } from '@/types/common'
+import type { PaginationParams, PaginatedServiceResult } from '@/types/pagination'
 import type { Relatorio, RelatorioCreateInput } from '@/types/relatorio'
 
 function list(): Relatorio[] {
@@ -15,7 +16,9 @@ function now(): string {
   return new Date().toISOString()
 }
 
-export async function listarRelatorios(): Promise<ServiceResult<Relatorio[]>> {
+export async function listarRelatorios(
+  _params?: PaginationParams
+): Promise<PaginatedServiceResult<Relatorio>> {
   return { data: list(), error: null }
 }
 

@@ -1,4 +1,7 @@
 import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -9,8 +12,7 @@ import { DataTable } from '@/components/ui/DataTable'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/hooks/useToast'
-import { useRelatorios } from '@/hooks/useRelatorios'
-import { excluirRelatorio } from '@/services/relatorios.service'
+import { listarRelatorios, excluirRelatorio } from '@/services/relatorios.service'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Download, Trash2 } from 'lucide-react'
 import type { Relatorio, StatusRelatorio } from '@/types/relatorio'
@@ -34,7 +36,14 @@ const tipoLabel: Record<string, string> = {
 
 export default function RelatoriosPage() {
   const { toast } = useToast()
-  const { data: relatorios, status, error, refetch } = useRelatorios()
+  const { data: relatorios = [], isLoading, isError, error, refetch } = useQuery({
+    queryKey: queryKeys.relatorios.all,
+    queryFn: async () => {
+      const result = await listarRelatorios()
+      if (result.error) throw new Error(result.error)
+      return result.data ?? []
+    },
+  })
   const [search, setSearch] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -58,7 +67,8 @@ export default function RelatoriosPage() {
     setDeleteId(null)
     if (result.error) { toast(result.error, 'error'); return }
     toast('Relatório excluído', 'success')
-    refetch()
+    queryClient.invalidateQueries({ queryKey: queryKeys.relatorios.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
   }
 
   const formatoData = (d: string) => new Date(d).toLocaleDateString('pt-BR')
@@ -107,13 +117,13 @@ export default function RelatoriosPage() {
             description="Acesse e gerencie relatórios dos levantamentos"
           />
 
-          {status !== 'loading' && (
+          {!isLoading && (
             <div className="max-w-md">
               <SearchInput value={search} onChange={setSearch} placeholder="Buscar por empresa, tipo ou modelo…" />
             </div>
           )}
 
-          {status === 'loading' && (
+          {isLoading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-white border border-border-light rounded-xl p-5 space-y-3">
@@ -125,7 +135,7 @@ export default function RelatoriosPage() {
             </div>
           )}
 
-          {status === 'success' && (
+          {!isLoading && !isError && (
             <DataTable
               columns={columns}
               data={filtered}
@@ -135,10 +145,10 @@ export default function RelatoriosPage() {
             />
           )}
 
-          {status === 'error' && (
+          {isError && (
             <Card className="p-6">
-              <p className="text-sm text-danger mb-2">{error}</p>
-              <button type="button" onClick={refetch} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
+              <p className="text-sm text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar relatórios'}</p>
+              <button type="button" onClick={() => refetch()} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
             </Card>
           )}
         </div>

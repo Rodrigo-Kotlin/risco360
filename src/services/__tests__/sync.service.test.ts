@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { getOfflineDB, closeOfflineDB, clearAllData, nowISO } from '@/lib/offline-db'
-import { enqueueSyncOperation } from '@/services/offline/sync-queue.service'
+import { enqueueSyncOperation, getSyncQueueStats } from '@/services/offline/sync-queue.service'
 import { isNetworkError } from '@/lib/network'
 
 const mockGetUser = vi.fn().mockResolvedValue({ data: { user: { id: 'test-user-id' } }, error: null })
@@ -34,10 +34,12 @@ function makeMockFrom() {
 const mockFromEmpresas = makeMockFrom()
 const mockFromSetores = makeMockFrom()
 const mockFromEvidencias = makeMockFrom()
+const mockFromRelatorios = makeMockFrom()
 const mockFrom = vi.fn((table: string) => {
   if (table === 'empresas') return mockFromEmpresas
   if (table === 'setores') return mockFromSetores
   if (table === 'evidencias') return mockFromEvidencias
+  if (table === 'relatorios') return mockFromRelatorios
   return makeMockFrom()
 })
 
@@ -148,6 +150,33 @@ async function seedSetorOffline(overrides: Record<string, unknown> = {}) {
   return entry
 }
 
+async function seedRelatorioOffline(overrides: Record<string, unknown> = {}) {
+  const db = await getOfflineDB()
+  const id = (overrides.id as string) ?? 'local_relatorio_test-1'
+  const entry = {
+    id,
+    remote_id: null,
+    created_at: nowISO(),
+    updated_at: nowISO(),
+    cached_at: nowISO(),
+    source: 'local' as const,
+    sync_status: 'pending' as const,
+    dirty: true,
+    deleted: false,
+    levantamento_id: 'local_lev_test-1',
+    empresa_nome: null,
+    tipo: 'completo',
+    modelo: null,
+    status: 'gerado',
+    arquivo_url: null,
+    metadados: {},
+    user_id: 'offline_user',
+    ...overrides,
+  }
+  await db.add('relatorios', entry)
+  return entry
+}
+
 async function seedEvidenciaOffline(overrides: Record<string, unknown> = {}) {
   const db = await getOfflineDB()
   const id = (overrides.id as string) ?? 'local_evidencia_test-1'
@@ -186,6 +215,37 @@ async function seedEvidenciaOffline(overrides: Record<string, unknown> = {}) {
 }
 
 describe('sync.service', () => {
+  describe('processSyncQueue', () => {
+    it('não executa concorrentemente (mutex)', async () => {
+      const { processSyncQueue } = await import('../sync.service')
+      await seedEmpresaOffline()
+      await enqueueSyncOperation('empresa', 'local_empresa_test-1', 'create', { razao_social: 'Empresa Teste' })
+      mockFromEmpresas.single.mockResolvedValue({
+        data: { id: 'remote-emp-1', razao_social: 'Empresa Teste' },
+        error: null,
+      })
+      const [result1, result2] = await Promise.all([
+        processSyncQueue(),
+        processSyncQueue(),
+      ])
+      expect(result1.synced + result2.synced).toBe(1)
+      expect(result1.errors + result2.errors).toBe(0)
+    })
+
+    it('limpa itens sincronizados da fila ao final', async () => {
+      const { processSyncQueue } = await import('../sync.service')
+      await seedEmpresaOffline()
+      await enqueueSyncOperation('empresa', 'local_empresa_test-1', 'create', { razao_social: 'Empresa Teste' })
+      mockFromEmpresas.single.mockResolvedValue({
+        data: { id: 'remote-emp-1', razao_social: 'Empresa Teste' },
+        error: null,
+      })
+      await processSyncQueue()
+      const stats = await getSyncQueueStats()
+      expect(stats.synced).toBe(0)
+      expect(stats.total).toBe(0)
+    })
+  })
   beforeEach(async () => {
     vi.clearAllMocks()
   })
@@ -523,6 +583,57 @@ describe('sync.service', () => {
       const updated = await db.get('evidencias', 'local_evidencia_del_1')
       expect(updated?.deleted).toBe(true)
       expect(updated?.sync_status).toBe('synced')
+    })
+  })
+
+  describe('syncRelatorio', () => {
+    it('sincroniza relatorio create com sucesso', async () => {
+      const { syncNextBatch } = await import('../sync.service')
+      await seedRelatorioOffline({ id: 'local_relatorio_sync_1' })
+      await enqueueSyncOperation('relatorio', 'local_relatorio_sync_1', 'create', { tipo: 'completo' })
+
+      mockFromRelatorios.single.mockResolvedValue({
+        data: { id: 'remote-relatorio-1', tipo: 'completo' },
+        error: null,
+      })
+
+      const result = await syncNextBatch(5)
+      expect(result.synced).toBe(1)
+      expect(result.errors).toBe(0)
+
+      const db = await getOfflineDB()
+      const updated = await db.get('relatorios', 'local_relatorio_sync_1')
+      expect(updated?.sync_status).toBe('synced')
+      expect(updated?.remote_id).toBe('remote-relatorio-1')
+    })
+
+    it('sincroniza relatorio delete com remote_id', async () => {
+      const { syncNextBatch } = await import('../sync.service')
+      await seedRelatorioOffline({ id: 'local_relatorio_del_1', remote_id: 'remote-relatorio-del-1' })
+      await enqueueSyncOperation('relatorio', 'local_relatorio_del_1', 'delete', { id: 'local_relatorio_del_1' })
+
+      const result = await syncNextBatch(5)
+      expect(result.synced).toBe(1)
+
+      const db = await getOfflineDB()
+      const updated = await db.get('relatorios', 'local_relatorio_del_1')
+      expect(updated?.deleted).toBe(true)
+      expect(updated?.sync_status).toBe('synced')
+    })
+
+    it('marca erro para entidade relatorio desconhecida (não alcançado pois case existe)', async () => {
+      const { syncNextBatch } = await import('../sync.service')
+      await seedRelatorioOffline({ id: 'local_relatorio_err_1' })
+      await enqueueSyncOperation('relatorio', 'local_relatorio_err_1', 'create', { tipo: 'completo' })
+
+      mockFromRelatorios.single.mockResolvedValue({
+        data: null,
+        error: { message: 'Erro simulado', code: '42501' },
+      })
+
+      const result = await syncNextBatch(5)
+      expect(result.synced).toBe(0)
+      expect(result.errors).toBe(1)
     })
   })
 

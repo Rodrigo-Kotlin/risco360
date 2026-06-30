@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Header } from '@/components/layout/Header'
@@ -86,6 +88,8 @@ export default function SetorFormPage() {
       setLoading(false)
       if (result.error) { toast(result.error, 'error'); return }
       toast('Setor atualizado com sucesso', 'success')
+      queryClient.invalidateQueries({ queryKey: queryKeys.setores.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
       navigate(ROUTES.setoresDetalhe.replace(':setorId', setorId))
     } else {
       const input: SetorCreateInput = {
@@ -100,6 +104,8 @@ export default function SetorFormPage() {
       setLoading(false)
       if (result.error) { toast(result.error, 'error'); return }
       toast('Setor cadastrado com sucesso', 'success')
+      queryClient.invalidateQueries({ queryKey: queryKeys.setores.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
       navigate(ROUTES.setoresDetalhe.replace(':setorId', result.data!.id))
     }
   }

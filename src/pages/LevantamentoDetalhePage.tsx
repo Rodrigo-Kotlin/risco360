@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -81,6 +83,8 @@ export default function LevantamentoDetalhePage() {
     setUpdatingStatus(false)
     if (result.error) { toast(result.error, 'error'); return }
     toast(`Status atualizado para "${statusLabel[next]}"`, 'success')
+    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
     load()
   }
 

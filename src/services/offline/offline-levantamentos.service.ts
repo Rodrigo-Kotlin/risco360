@@ -138,6 +138,16 @@ export async function excluirLevantamentoOffline(id: string): Promise<ServiceRes
       existing.updated_at = nowISO()
       await db.put('levantamentos', existing)
       await adicionarSyncAposSalvar('levantamentos', id, 'delete', { id })
+
+      const relIndex = db.transaction('relatorios').store.index('levantamento_id')
+      const relatorios = await relIndex.getAll(id)
+      for (const rel of relatorios) {
+        if (rel.deleted) continue
+        rel.deleted = true
+        rel.updated_at = nowISO()
+        await db.put('relatorios', rel)
+        await adicionarSyncAposSalvar('relatorios', rel.id, 'delete', { id: rel.id })
+      }
     }
     return { data: true, error: null }
   } catch (error) {

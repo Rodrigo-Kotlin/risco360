@@ -1,4 +1,7 @@
 import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { Button } from '@/components/ui/Button'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
@@ -13,8 +16,7 @@ import { FilterBar } from '@/components/ui/FilterBar'
 import { DataTable } from '@/components/ui/DataTable'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/hooks/useToast'
-import { useLevantamentos } from '@/hooks/useLevantamentos'
-import { excluirLevantamento } from '@/services/levantamentos.service'
+import { listarLevantamentos, excluirLevantamento } from '@/services/levantamentos.service'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
 import { Trash2, Eye, Copy, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -40,7 +42,14 @@ const statusBadge = (status: StatusLevantamento) => {
 export default function LevantamentosPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
-  const { data: levantamentos, status, error, refetch } = useLevantamentos()
+  const { data: levantamentos = [], isLoading, isError, error, refetch } = useQuery({
+    queryKey: queryKeys.levantamentos.all,
+    queryFn: async () => {
+      const result = await listarLevantamentos()
+      if (result.error) throw new Error(result.error)
+      return result.data ?? []
+    },
+  })
   const [search, setSearch] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [filterTipo, setFilterTipo] = useState<TipoLevantamento | ''>('')
@@ -73,7 +82,8 @@ export default function LevantamentosPage() {
     setDeleteId(null)
     if (result.error) { toast(result.error, 'error'); return }
     toast('Levantamento excluído com sucesso', 'success')
-    refetch()
+    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
   }
 
   const handleDuplicate = async (id: string) => {
@@ -83,7 +93,8 @@ export default function LevantamentosPage() {
     setDuplicating(null)
     if (result.error) { toast(result.error, 'error'); return }
     toast('Levantamento duplicado com sucesso', 'success')
-    refetch()
+    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
   }
 
   const activeFilters = [
@@ -148,7 +159,7 @@ export default function LevantamentosPage() {
             }}
           />
 
-          {status !== 'loading' && (
+          {!isLoading && (
             <FilterBar
               activeFilters={activeFilters}
               onToggle={() => setShowFilters(!showFilters)}
@@ -157,7 +168,7 @@ export default function LevantamentosPage() {
             </FilterBar>
           )}
 
-          {showFilters && status !== 'loading' && (
+          {showFilters && !isLoading && (
             <Card className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -189,20 +200,20 @@ export default function LevantamentosPage() {
             </Card>
           )}
 
-          {status === 'loading' && (
+          {isLoading && (
             <Card className="p-6">
               <Skeleton className="h-20 w-full rounded-lg" />
             </Card>
           )}
 
-          {status === 'error' && (
+          {isError && (
             <Card className="p-6">
-              <p className="text-sm text-danger mb-2">{error}</p>
-              <button type="button" onClick={refetch} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
+              <p className="text-sm text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar levantamentos'}</p>
+              <button type="button" onClick={() => refetch()} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
             </Card>
           )}
 
-          {status === 'success' && (
+          {!isLoading && !isError && (
             <DataTable
               columns={columns}
               data={filtered}
