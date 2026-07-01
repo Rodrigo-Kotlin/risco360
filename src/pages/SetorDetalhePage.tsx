@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { queryClient } from '@/lib/query-client'
+import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -7,13 +9,14 @@ import { Header } from '@/components/layout/Header'
 import { MainContainer } from '@/components/layout/MainContainer'
 import { Button } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ROUTES } from '@/constants/app'
-import { buscarSetorPorId } from '@/services/setores.service'
+import { buscarSetorPorId, excluirSetor } from '@/services/setores.service'
 import { abrirOuCriarFormularioSetorial, listarLevantamentosPorSetor, buscarFormularioSetorialPorSetor } from '@/services/levantamentos.service'
 import { buscarEmpresaPorId } from '@/services/empresas.service'
 import { useToast } from '@/hooks/useToast'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
-import { ArrowLeft, ClipboardList, Plus, AlertTriangle, CheckCircle2, Building2, User, MapPin, Eye } from 'lucide-react'
+import { ArrowLeft, ClipboardList, Plus, AlertTriangle, CheckCircle2, Building2, User, MapPin, Eye, Pencil, Trash2 } from 'lucide-react'
 import type { Setor } from '@/types/empresa'
 import type { Empresa } from '@/types/empresa'
 import type { Levantamento } from '@/types/levantamento'
@@ -29,6 +32,8 @@ export default function SetorDetalhePage() {
   const [formularioSetorial, setFormularioSetorial] = useState<Levantamento | null>(null)
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -87,6 +92,19 @@ export default function SetorDetalhePage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!setorId) return
+    setDeleting(true)
+    const result = await excluirSetor(setorId)
+    setDeleting(false)
+    setDeleteOpen(false)
+    if (result.error) { toast(result.error, 'error'); return }
+    toast('Setor excluído com sucesso', 'success')
+    queryClient.invalidateQueries({ queryKey: queryKeys.setores.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
+    navigate(empresa ? ROUTES.empresasDetalhe.replace(':id', empresa.id) : ROUTES.setores)
+  }
+
   if (loading) {
     return (
       <>
@@ -132,9 +150,17 @@ export default function SetorDetalhePage() {
               { label: setor.nome },
             ]}
             secondaryActions={
-              <Button variant="secondary" onClick={() => navigate(empresa ? ROUTES.empresasDetalhe.replace(':id', empresa.id) : ROUTES.setores)}>
-                <ArrowLeft size={16} /> Voltar
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" onClick={() => navigate(ROUTES.setoresEditar.replace(':setorId', setor.id))}>
+                  <Pencil size={16} /> Editar
+                </Button>
+                <Button variant="danger" onClick={() => setDeleteOpen(true)}>
+                  <Trash2 size={16} /> Excluir
+                </Button>
+                <Button variant="secondary" onClick={() => navigate(empresa ? ROUTES.empresasDetalhe.replace(':id', empresa.id) : ROUTES.setores)}>
+                  <ArrowLeft size={16} /> Voltar
+                </Button>
+              </div>
             }
           />
 
@@ -260,6 +286,17 @@ export default function SetorDetalhePage() {
           </div>
         </div>
       </MainContainer>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+        title="Excluir setor"
+        description="Tem certeza que deseja excluir este setor? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+        loading={deleting}
+      />
     </>
   )
 }
