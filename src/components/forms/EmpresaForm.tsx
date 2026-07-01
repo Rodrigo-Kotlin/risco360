@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef, useEffect, type FormEvent } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -10,6 +12,7 @@ import { Save, Loader2, Search, CheckCircle2, AlertCircle, WifiOff } from 'lucid
 import { useCnpjLookup } from '@/hooks/useCnpjLookup'
 import { obterDescricaoGrauRisco } from '@/data/cnae-grau-risco'
 import { normalizarCnpj } from '@/services/cnpj.service'
+import { EmpresaSchema, type EmpresaFormData } from '@/lib/validation/schemas/empresa'
 import type { Empresa, EmpresaCreateInput, EmpresaUpdateInput } from '@/types/empresa'
 
 const UF_OPTIONS = [
@@ -40,71 +43,72 @@ interface EmpresaFormProps {
 
 export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: EmpresaFormProps) {
   const isEditing = !!initialData
-
-  const [razao_social, setRazaoSocial] = useState(initialData?.razao_social ?? '')
-  const [nome_fantasia, setNomeFantasia] = useState(initialData?.nome_fantasia ?? '')
-  const [cnpj, setCnpj] = useState(initialData?.cnpj ?? '')
-  const [cnae, setCnae] = useState(initialData?.cnae ?? '')
-  const [grau_risco, setGrauRisco] = useState(initialData?.grau_risco ?? '')
-  const [endereco, setEndereco] = useState(initialData?.endereco ?? '')
-  const [numero, setNumero] = useState(initialData?.numero ?? '')
-  const [bairro, setBairro] = useState(initialData?.bairro ?? '')
-  const [cidade, setCidade] = useState(initialData?.cidade ?? '')
-  const [uf, setUf] = useState(initialData?.uf ?? '')
-  const [cep, setCep] = useState(initialData?.cep ?? '')
-  const [responsavel, setResponsavel] = useState(initialData?.responsavel ?? '')
-  const [telefone, setTelefone] = useState(initialData?.telefone ?? '')
-  const [email, setEmail] = useState(initialData?.email ?? '')
-  const [observacoes, setObservacoes] = useState(initialData?.observacoes ?? '')
-  const [cnae_principal, setCnaePrincipal] = useState(initialData?.cnae_principal ?? '')
-  const [cnae_principal_descricao, setCnaePrincipalDescricao] = useState(initialData?.cnae_principal_descricao ?? '')
-  const [grau_risco_nr4, setGrauRiscoNr4] = useState<number | null>(initialData?.grau_risco_nr4 ?? null)
-
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const { loading: cnpjLoading, error: cnpjError, empresa: cnpjEmpresa, buscar: buscarCnpj, limpar: limparCnpj } = useCnpjLookup()
   const autoFilledRef = useRef<Set<string>>(new Set())
   const lastCnpjRef = useRef<string>('')
 
-  const validate = (): boolean => {
-    const errs: Record<string, string> = {}
-    if (!razao_social.trim()) errs.razao_social = 'Razão social é obrigatória'
-    setErrors(errs)
-    return Object.keys(errs).length === 0
-  }
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<EmpresaFormData>({
+    resolver: zodResolver(EmpresaSchema),
+    defaultValues: {
+      razao_social: initialData?.razao_social ?? '',
+      nome_fantasia: initialData?.nome_fantasia ?? '',
+      cnpj: initialData?.cnpj ?? '',
+      cnae: initialData?.cnae ?? '',
+      grau_risco: initialData?.grau_risco ?? '',
+      endereco: initialData?.endereco ?? '',
+      numero: initialData?.numero ?? '',
+      bairro: initialData?.bairro ?? '',
+      cidade: initialData?.cidade ?? '',
+      uf: initialData?.uf ?? '',
+      cep: initialData?.cep ?? '',
+      responsavel: initialData?.responsavel ?? '',
+      telefone: initialData?.telefone ?? '',
+      email: initialData?.email ?? '',
+      observacoes: initialData?.observacoes ?? '',
+      cnae_principal: initialData?.cnae_principal ?? '',
+      cnae_principal_descricao: initialData?.cnae_principal_descricao ?? '',
+    },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
+
+  const cnpjValue = watch('cnpj')
+  const { loading: cnpjLoading, error: cnpjError, empresa: cnpjEmpresa, buscar: buscarCnpj, limpar: limparCnpj } = useCnpjLookup()
 
   const preencherAutomaticamente = useCallback(() => {
     if (!cnpjEmpresa) return
 
-    const fields: Array<{ setter: (v: string) => void; value: string; key: string }> = [
-      { setter: setRazaoSocial, value: cnpjEmpresa.razao_social, key: 'razao_social' },
-      { setter: setNomeFantasia, value: cnpjEmpresa.nome_fantasia, key: 'nome_fantasia' },
-      { setter: setEndereco, value: cnpjEmpresa.endereco, key: 'endereco' },
-      { setter: setNumero, value: cnpjEmpresa.numero, key: 'numero' },
-      { setter: setBairro, value: cnpjEmpresa.bairro, key: 'bairro' },
-      { setter: setCidade, value: cnpjEmpresa.cidade, key: 'cidade' },
-      { setter: setUf, value: cnpjEmpresa.uf, key: 'uf' },
-      { setter: setCep, value: cnpjEmpresa.cep, key: 'cep' },
-      { setter: setCnae, value: cnpjEmpresa.cnae_principal, key: 'cnae' },
-      { setter: setCnaePrincipal, value: cnpjEmpresa.cnae_principal, key: 'cnae_principal' },
-      { setter: setCnaePrincipalDescricao, value: cnpjEmpresa.cnae_principal_descricao, key: 'cnae_principal_descricao' },
+    const fields: Array<[keyof EmpresaFormData, string]> = [
+      ['razao_social', cnpjEmpresa.razao_social],
+      ['nome_fantasia', cnpjEmpresa.nome_fantasia ?? ''],
+      ['endereco', cnpjEmpresa.endereco ?? ''],
+      ['numero', cnpjEmpresa.numero ?? ''],
+      ['bairro', cnpjEmpresa.bairro ?? ''],
+      ['cidade', cnpjEmpresa.cidade ?? ''],
+      ['uf', cnpjEmpresa.uf ?? ''],
+      ['cep', cnpjEmpresa.cep ?? ''],
+      ['cnae', cnpjEmpresa.cnae_principal ?? ''],
+      ['cnae_principal', cnpjEmpresa.cnae_principal ?? ''],
+      ['cnae_principal_descricao', cnpjEmpresa.cnae_principal_descricao ?? ''],
     ]
 
-    for (const { setter, value, key } of fields) {
+    for (const [key, value] of fields) {
       if (!autoFilledRef.current.has(key)) {
-        setter(value)
+        setValue(key, value)
         autoFilledRef.current.add(key)
       }
     }
 
     if (cnpjEmpresa.grau_risco_nr4 !== null && !autoFilledRef.current.has('grau_risco')) {
-      setGrauRisco(String(cnpjEmpresa.grau_risco_nr4))
+      setValue('grau_risco', String(cnpjEmpresa.grau_risco_nr4))
       autoFilledRef.current.add('grau_risco')
     }
-    if (cnpjEmpresa.grau_risco_nr4 !== null && !autoFilledRef.current.has('grau_risco_nr4')) {
-      setGrauRiscoNr4(cnpjEmpresa.grau_risco_nr4)
-      autoFilledRef.current.add('grau_risco_nr4')
-    }
-  }, [cnpjEmpresa])
+  }, [cnpjEmpresa, setValue])
 
   useEffect(() => {
     if (cnpjEmpresa) {
@@ -112,75 +116,72 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
     }
   }, [cnpjEmpresa, preencherAutomaticamente])
 
-  const handleCnpjChange = useCallback((value: string) => {
-    setCnpj(value)
-
-    const limpo = normalizarCnpj(value)
+  useEffect(() => {
+    const limpo = normalizarCnpj(cnpjValue ?? '')
 
     if (limpo.length === 14 && limpo !== lastCnpjRef.current) {
       lastCnpjRef.current = limpo
       autoFilledRef.current = new Set()
-      buscarCnpj(value)
+      buscarCnpj(cnpjValue ?? '')
     } else if (limpo.length < 14 && limpo !== lastCnpjRef.current) {
       lastCnpjRef.current = limpo
       limparCnpj()
     }
-  }, [buscarCnpj, limparCnpj])
+  }, [cnpjValue, buscarCnpj, limparCnpj])
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!validate()) return
-
-    const data: EmpresaCreateInput = {
-      razao_social: razao_social.trim(),
-      nome_fantasia: nome_fantasia.trim() || undefined,
-      cnpj: cnpj.trim() || undefined,
-      cnae: cnae.trim() || undefined,
-      grau_risco: grau_risco || undefined,
-      endereco: endereco.trim() || undefined,
-      numero: numero.trim() || undefined,
-      bairro: bairro.trim() || undefined,
-      cidade: cidade.trim() || undefined,
-      uf: uf || undefined,
-      cep: cep.trim() || undefined,
-      responsavel: responsavel.trim() || undefined,
-      telefone: telefone.trim() || undefined,
-      email: email.trim() || undefined,
-      observacoes: observacoes.trim() || undefined,
-      cnae_principal: cnae_principal.trim() || undefined,
-      cnae_principal_descricao: cnae_principal_descricao.trim() || undefined,
+  const onSubmitForm = async (data: EmpresaFormData) => {
+    const payload: EmpresaCreateInput = {
+      razao_social: data.razao_social.trim(),
+      nome_fantasia: data.nome_fantasia?.trim() || undefined,
+      cnpj: data.cnpj?.trim() || undefined,
+      cnae: data.cnae?.trim() || undefined,
+      grau_risco: data.grau_risco || undefined,
+      endereco: data.endereco?.trim() || undefined,
+      numero: data.numero?.trim() || undefined,
+      bairro: data.bairro?.trim() || undefined,
+      cidade: data.cidade?.trim() || undefined,
+      uf: data.uf || undefined,
+      cep: data.cep?.trim() || undefined,
+      responsavel: data.responsavel?.trim() || undefined,
+      telefone: data.telefone?.trim() || undefined,
+      email: data.email?.trim() || undefined,
+      observacoes: data.observacoes?.trim() || undefined,
+      cnae_principal: data.cnae_principal?.trim() || undefined,
+      cnae_principal_descricao: data.cnae_principal_descricao?.trim() || undefined,
       cnaes_secundarios: cnpjEmpresa?.cnaes_secundarios,
-      grau_risco_nr4: grau_risco_nr4,
+      grau_risco_nr4: cnpjEmpresa?.grau_risco_nr4 ?? null,
     }
 
-    await onSubmit(data)
+    await onSubmit(payload)
   }
 
+  const cnpjRegister = register('cnpj')
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6" noValidate>
       <FormSection title="Dados da empresa" description="Informações cadastrais">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Razão social"
-            value={razao_social}
-            onChange={(e) => setRazaoSocial(e.target.value)}
-            error={errors.razao_social}
+            error={errors.razao_social?.message}
             required
             placeholder="Nome completo da empresa"
+            {...register('razao_social')}
           />
           <Input
             label="Nome fantasia"
-            value={nome_fantasia}
-            onChange={(e) => setNomeFantasia(e.target.value)}
             placeholder="Nome fantasia"
+            {...register('nome_fantasia')}
           />
           <div className="space-y-1">
             <Input
               label="CNPJ"
-              value={cnpj}
-              onChange={(e) => handleCnpjChange(e.target.value)}
               placeholder="00.000.000/0001-00"
               icon={cnpjLoading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+              {...cnpjRegister}
+              onChange={(e) => {
+                cnpjRegister.onChange(e)
+              }}
             />
             {cnpjLoading && (
               <p className="text-body-small text-text-muted flex items-center gap-1">
@@ -203,35 +204,32 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
           </div>
           <Input
             label="CNAE"
-            value={cnae}
-            onChange={(e) => setCnae(e.target.value)}
             placeholder="CNAE principal"
+            {...register('cnae')}
           />
           <Select
             label="Grau de risco"
-            value={grau_risco}
-            onChange={(e) => setGrauRisco(e.target.value)}
             options={GRAU_RISCO_OPTIONS}
             placeholder="Selecione…"
+            error={errors.grau_risco?.message}
+            {...register('grau_risco')}
           />
           <Input
             label="E-mail"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="contato@empresa.com"
+            error={errors.email?.message}
+            {...register('email')}
           />
           <Input
             label="Telefone"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
             placeholder="(00) 00000-0000"
+            {...register('telefone')}
           />
           <Input
             label="Responsável"
-            value={responsavel}
-            onChange={(e) => setResponsavel(e.target.value)}
             placeholder="Nome do contato"
+            {...register('responsavel')}
           />
         </div>
       </FormSection>
@@ -278,50 +276,43 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Logradouro"
-            value={endereco}
-            onChange={(e) => setEndereco(e.target.value)}
             placeholder="Rua, Avenida…"
+            {...register('endereco')}
           />
           <Input
             label="Número"
-            value={numero}
-            onChange={(e) => setNumero(e.target.value)}
             placeholder="Nº"
+            {...register('numero')}
           />
           <Input
             label="Bairro"
-            value={bairro}
-            onChange={(e) => setBairro(e.target.value)}
             placeholder="Bairro"
+            {...register('bairro')}
           />
           <Input
             label="Cidade"
-            value={cidade}
-            onChange={(e) => setCidade(e.target.value)}
             placeholder="Cidade"
+            {...register('cidade')}
           />
           <Select
             label="UF"
-            value={uf}
-            onChange={(e) => setUf(e.target.value)}
             options={UF_OPTIONS}
             placeholder="Selecione…"
+            {...register('uf')}
           />
           <Input
             label="CEP"
-            value={cep}
-            onChange={(e) => setCep(e.target.value)}
             placeholder="00.000-000"
+            {...register('cep')}
           />
         </div>
       </FormSection>
 
       <FormSection title="Observações" description="Informações adicionais">
         <Textarea
-          value={observacoes}
-          onChange={(e) => setObservacoes(e.target.value)}
           placeholder="Observações sobre a empresa…"
           rows={3}
+          {...register('observacoes')}
         />
       </FormSection>
 

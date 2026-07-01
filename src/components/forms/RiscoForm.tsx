@@ -1,4 +1,6 @@
-import { useState, useRef, type FormEvent } from 'react'
+import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -8,6 +10,7 @@ import { NivelRiscoBadge } from '@/components/forms/NivelRiscoBadge'
 import { BibliotecaRiscoSelector } from '@/components/forms/BibliotecaRiscoSelector'
 import { calcularNivelRisco } from '@/lib/risk-calculator'
 import { generateId } from '@/lib/utils'
+import { RiscoSchema, type RiscoFormData } from '@/lib/validation/schemas/risco'
 import { Save, Loader2, X, Calculator, BookOpen } from 'lucide-react'
 import type { RiscoOcupacional, CategoriaRisco, MeioPropagacao } from '@/types/risco'
 import type { BibliotecaTecnicaItem } from '@/types/biblioteca'
@@ -42,8 +45,8 @@ const MEIO_PROPAGACAO_OPTIONS: { value: MeioPropagacao; label: string }[] = [
   { value: 'parenteral', label: 'Parenteral' },
   { value: 'percepcao', label: 'Percepção' },
   { value: 'posto_de_trabalho', label: 'Posto de trabalho' },
-  { value: 'respiratoria', label: 'Respiratória' },
   { value: 'sobrecarga_biomecanica', label: 'Sobrecarga biomecânica' },
+  { value: 'respiratoria', label: 'Respiratória' },
   { value: 'sonora', label: 'Sonora' },
 ]
 
@@ -69,48 +72,68 @@ function normalizeCategoria(val: string | null | undefined): CategoriaRisco {
 }
 
 export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoFormProps) {
-  const [codigo, setCodigo] = useState(initial?.codigo ?? '')
-  const [categoria, setCategoria] = useState<CategoriaRisco>(initial?.categoria ?? 'fisico')
-  const [agente, setAgente] = useState(initial?.agente ?? '')
-  const [descricao, setDescricao] = useState(initial?.descricao ?? '')
-  const [fonteGeradora, setFonteGeradora] = useState(initial?.fonte_geradora ?? '')
-  const [meiosPropagacao, setMeiosPropagacao] = useState<MeioPropagacao[]>(initial?.meios_propagacao ?? [])
-  const [caracterizacao, setCaracterizacao] = useState(initial?.caracterizacao ?? '')
-  const [danoPossivel, setDanoPossivel] = useState(initial?.dano_possivel ?? '')
-  const [fonteAvaliacao, setFonteAvaliacao] = useState(initial?.fonte_avaliacao ?? '')
-  const [probabilidade, setProbabilidade] = useState(initial?.probabilidade?.toString() ?? '')
-  const [severidade, setSeveridade] = useState(initial?.severidade?.toString() ?? '')
-  const [sugestoesExposicao, setSugestoesExposicao] = useState(initial?.sugestoes_exposicao ?? '')
-  const [meioPropagacaoLabel, setMeioPropagacaoLabel] = useState(initial?.meio_propagacao_label ?? '')
-  const [sinalizacao, setSinalizacao] = useState(initial?.sinalizacao ?? '')
-  const [acoesRecomendadas, setAcoesRecomendadas] = useState(initial?.acoes_recomendadas?.join('\n') ?? '')
-  const [observacoes, setObservacoes] = useState(initial?.observacoes ?? '')
-  const bibliotecaItemIdRef = useRef<string | null>(initial?.biblioteca_item_id ?? null)
-  const bibliotecaTituloRef = useRef<string | null>(initial?.biblioteca_titulo ?? null)
+  const [bibliotecaModalOpen, setBibliotecaModalOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [bibliotecaItemId, setBibliotecaItemId] = useState<string | null>(initial?.biblioteca_item_id ?? null)
   const [bibliotecaTitulo, setBibliotecaTitulo] = useState<string | null>(initial?.biblioteca_titulo ?? null)
   const [medidasControle, setMedidasControle] = useState(initial?.medidas_controle ?? [])
   const [epis, setEpis] = useState(initial?.epis ?? [])
-  const [bibliotecaModalOpen, setBibliotecaModalOpen] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const bibliotecaItemIdRef = useRef<string | null>(initial?.biblioteca_item_id ?? null)
+  const bibliotecaTituloRef = useRef<string | null>(initial?.biblioteca_titulo ?? null)
 
-  const probNum = parseFloat(probabilidade)
-  const sevNum = parseFloat(severidade)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    watch,
+    formState: { errors },
+  } = useForm<RiscoFormData>({
+    resolver: zodResolver(RiscoSchema) as never,
+    defaultValues: {
+      codigo: initial?.codigo ?? '',
+      categoria: initial?.categoria ?? 'fisico',
+      agente: initial?.agente ?? '',
+      descricao: initial?.descricao ?? '',
+      fonte_geradora: initial?.fonte_geradora ?? '',
+      meios_propagacao: initial?.meios_propagacao ?? [],
+      caracterizacao: initial?.caracterizacao ?? '',
+      dano_possivel: initial?.dano_possivel ?? '',
+      fonte_avaliacao: initial?.fonte_avaliacao ?? '',
+      probabilidade: initial?.probabilidade?.toString() ?? '',
+      severidade: initial?.severidade?.toString() ?? '',
+      sugestoes_exposicao: initial?.sugestoes_exposicao ?? '',
+      meio_propagacao_label: initial?.meio_propagacao_label ?? '',
+      sinalizacao: initial?.sinalizacao ?? '',
+      acoes_recomendadas: initial?.acoes_recomendadas?.join('\n') ?? '',
+      observacoes: initial?.observacoes ?? '',
+    },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
+
+  const meiosPropagacao: string[] = watch('meios_propagacao') ?? []
+  const probStr = watch('probabilidade')
+  const sevStr = watch('severidade')
+  const probNum = parseFloat(probStr ?? '')
+  const sevNum = parseFloat(sevStr ?? '')
   const nivelCalculado = (!isNaN(probNum) && !isNaN(sevNum)) ? calcularNivelRisco(probNum, sevNum) : undefined
 
   const toggleMeioPropagacao = (value: MeioPropagacao) => {
-    setMeiosPropagacao((prev) =>
-      prev.includes(value) ? prev.filter((m) => m !== value) : [...prev, value]
-    )
+    const current: string[] = getValues('meios_propagacao') ?? []
+    const next = current.includes(value)
+      ? current.filter((m) => m !== value)
+      : [...current, value]
+    setValue('meios_propagacao', next)
   }
 
   const applyBibliotecaItem = (item: BibliotecaTecnicaItem) => {
-    setCategoria(normalizeCategoria(item.categoria))
-    if (item.perigo && !agente) setAgente(item.perigo)
-    if (item.descricao && !descricao) setDescricao(item.descricao)
-    if (item.fonte_geradora && !fonteGeradora) setFonteGeradora(item.fonte_geradora)
+    setValue('categoria', normalizeCategoria(item.categoria))
+    if (item.perigo && !getValues('agente')) setValue('agente', item.perigo)
+    if (item.descricao && !getValues('descricao')) setValue('descricao', item.descricao)
+    if (item.fonte_geradora && !getValues('fonte_geradora')) setValue('fonte_geradora', item.fonte_geradora)
     if (item.meios_propagacao && item.meios_propagacao.length > 0 && meiosPropagacao.length === 0) {
-      const mapped: MeioPropagacao[] = []
+      const mapped: string[] = []
       for (const mp of item.meios_propagacao) {
         const mpLower = mp.toLowerCase().replace(/[^a-z0-9_]/g, '_')
         const found = MEIO_PROPAGACAO_OPTIONS.find(
@@ -118,15 +141,15 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
         )
         if (found) mapped.push(found.value)
       }
-      if (mapped.length > 0) setMeiosPropagacao(mapped)
+      if (mapped.length > 0) setValue('meios_propagacao', mapped)
     }
-    if (item.danos_possiveis && item.danos_possiveis.length > 0 && !danoPossivel) {
-      setDanoPossivel(item.danos_possiveis.join(', '))
+    if (item.danos_possiveis && item.danos_possiveis.length > 0 && !getValues('dano_possivel')) {
+      setValue('dano_possivel', item.danos_possiveis.join(', '))
     }
-    if (item.fonte && !fonteAvaliacao) setFonteAvaliacao(item.fonte)
-    if (item.sugestao_exposicao && !sugestoesExposicao) setSugestoesExposicao(item.sugestao_exposicao)
-    if (item.acoes_recomendadas && item.acoes_recomendadas.length > 0 && !acoesRecomendadas.trim()) {
-      setAcoesRecomendadas(item.acoes_recomendadas.join('\n'))
+    if (item.fonte && !getValues('fonte_avaliacao')) setValue('fonte_avaliacao', item.fonte)
+    if (item.sugestao_exposicao && !getValues('sugestoes_exposicao')) setValue('sugestoes_exposicao', item.sugestao_exposicao)
+    if (item.acoes_recomendadas && item.acoes_recomendadas.length > 0 && !getValues('acoes_recomendadas')?.trim()) {
+      setValue('acoes_recomendadas', item.acoes_recomendadas.join('\n'))
     }
     if (item.medidas_controle && item.medidas_controle.length > 0 && medidasControle.length === 0) {
       setMedidasControle(item.medidas_controle)
@@ -141,33 +164,32 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
     setBibliotecaModalOpen(false)
   }
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+  const onSubmitForm = async (data: RiscoFormData) => {
     setSaving(true)
     try {
-      const prob = probNum
-      const sev = sevNum
+      const prob = parseFloat(data.probabilidade ?? '')
+      const sev = parseFloat(data.severidade ?? '')
       await onSave({
         id: initial?.id ?? generateId(),
-        codigo: codigo || null,
-        categoria,
-        agente,
-        descricao: descricao || null,
-        fonte_geradora: fonteGeradora || null,
-        meios_propagacao: meiosPropagacao,
+        codigo: data.codigo || null,
+        categoria: data.categoria,
+        agente: data.agente,
+        descricao: data.descricao || null,
+        fonte_geradora: data.fonte_geradora || null,
+        meios_propagacao: data.meios_propagacao as MeioPropagacao[],
         nivel_risco: (!isNaN(prob) && !isNaN(sev)) ? calcularNivelRisco(prob, sev) : (initial?.nivel_risco ?? 'medio'),
-        caracterizacao: caracterizacao || null,
-        dano_possivel: danoPossivel || null,
+        caracterizacao: data.caracterizacao || null,
+        dano_possivel: data.dano_possivel || null,
         medidas_controle: medidasControle,
         epis: epis,
-        fonte_avaliacao: fonteAvaliacao || null,
+        fonte_avaliacao: data.fonte_avaliacao || null,
         probabilidade: isNaN(prob) ? null : prob,
         severidade: isNaN(sev) ? null : sev,
-        sugestoes_exposicao: sugestoesExposicao || null,
-        meio_propagacao_label: meioPropagacaoLabel || null,
-        sinalizacao: sinalizacao || null,
-        acoes_recomendadas: acoesRecomendadas.split('\n').map((s) => s.trim()).filter(Boolean),
-        observacoes: observacoes || null,
+        sugestoes_exposicao: data.sugestoes_exposicao || null,
+        meio_propagacao_label: data.meio_propagacao_label || null,
+        sinalizacao: data.sinalizacao || null,
+        acoes_recomendadas: (data.acoes_recomendadas ?? '').split('\n').map((s) => s.trim()).filter(Boolean),
+        observacoes: data.observacoes || null,
         biblioteca_item_id: bibliotecaItemIdRef.current,
         biblioteca_titulo: bibliotecaTituloRef.current,
       })
@@ -177,7 +199,7 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4" noValidate>
       {bibliotecaItens && bibliotecaItens.length > 0 && !initial && (
         <div className="flex items-start gap-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
           <BookOpen size={16} className="text-primary-600 mt-0.5" />
@@ -223,22 +245,24 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
 
       <FormSection title={initial ? 'Editar risco' : 'Novo risco'}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Código" value={codigo} onChange={(e) => setCodigo(e.target.value)}
-            placeholder="Ex: R001"
+          <Input label="Código" placeholder="Ex: R001"
+            {...register('codigo')}
           />
-          <Select label="Categoria" value={categoria} onChange={(e) => setCategoria(e.target.value as CategoriaRisco)}
-            options={CATEGORIA_OPTIONS} required
+          <Select label="Categoria" options={CATEGORIA_OPTIONS} required
+            error={errors.categoria?.message}
+            {...register('categoria')}
           />
-          <Input label="Agente" value={agente} onChange={(e) => setAgente(e.target.value)}
-            placeholder="Ex: Ruído" required
+          <Input label="Agente" placeholder="Ex: Ruído" required
+            error={errors.agente?.message}
+            {...register('agente')}
           />
-          <Input label="Fonte geradora" value={fonteGeradora} onChange={(e) => setFonteGeradora(e.target.value)}
-            placeholder="Ex: Prensa hidráulica"
+          <Input label="Fonte geradora" placeholder="Ex: Prensa hidráulica"
+            {...register('fonte_geradora')}
           />
         </div>
 
-        <Textarea label="Descrição" value={descricao} onChange={(e) => setDescricao(e.target.value)}
-          rows={2} placeholder="Descrição do risco…"
+        <Textarea label="Descrição" rows={2} placeholder="Descrição do risco…"
+          {...register('descricao')}
         />
 
         <div className="space-y-2">
@@ -262,29 +286,27 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Caracterização" value={caracterizacao} onChange={(e) => setCaracterizacao(e.target.value)}
-            placeholder="Caracterização qualitativa"
+          <Input label="Caracterização" placeholder="Caracterização qualitativa"
+            {...register('caracterizacao')}
           />
-          <Input label="Dano possível" value={danoPossivel} onChange={(e) => setDanoPossivel(e.target.value)}
-            placeholder="Ex: Perda auditiva"
+          <Input label="Dano possível" placeholder="Ex: Perda auditiva"
+            {...register('dano_possivel')}
           />
-          <Input label="Fonte da avaliação" value={fonteAvaliacao}
-            onChange={(e) => setFonteAvaliacao(e.target.value)}
-            placeholder="Ex: NR-15, NHO 01"
+          <Input label="Fonte da avaliação" placeholder="Ex: NR-15, NHO 01"
+            {...register('fonte_avaliacao')}
           />
-          <Input label="Meio de propagação (label)" value={meioPropagacaoLabel}
-            onChange={(e) => setMeioPropagacaoLabel(e.target.value)}
-            placeholder="Descrição livre"
+          <Input label="Meio de propagação (label)" placeholder="Descrição livre"
+            {...register('meio_propagacao_label')}
           />
-          <Input label="Sinalização" value={sinalizacao} onChange={(e) => setSinalizacao(e.target.value)}
-            placeholder="Ex: Placa de alerta"
+          <Input label="Sinalização" placeholder="Ex: Placa de alerta"
+            {...register('sinalizacao')}
           />
           <div className="flex items-end gap-2">
             <Input label="Probabilidade (1-5)" type="number" min={1} max={5}
-              value={probabilidade} onChange={(e) => setProbabilidade(e.target.value)}
+              {...register('probabilidade')}
             />
             <Input label="Severidade (1-5)" type="number" min={1} max={5}
-              value={severidade} onChange={(e) => setSeveridade(e.target.value)}
+              {...register('severidade')}
             />
           </div>
         </div>
@@ -297,18 +319,17 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
           </div>
         )}
 
-        <Input label="Sugestões de exposição" value={sugestoesExposicao}
-          onChange={(e) => setSugestoesExposicao(e.target.value)}
-          placeholder="Ex: Limite de tolerância NR-15"
+        <Input label="Sugestões de exposição" placeholder="Ex: Limite de tolerância NR-15"
+          {...register('sugestoes_exposicao')}
         />
 
-        <Textarea label="Ações recomendadas (uma por linha)" value={acoesRecomendadas}
-          onChange={(e) => setAcoesRecomendadas(e.target.value)}
-          rows={3} placeholder="Ação 1&#10;Ação 2&#10;Ação 3"
+        <Textarea label="Ações recomendadas (uma por linha)" rows={3}
+          placeholder="Ação 1&#10;Ação 2&#10;Ação 3"
+          {...register('acoes_recomendadas')}
         />
 
-        <Textarea label="Observações" value={observacoes} onChange={(e) => setObservacoes(e.target.value)}
-          rows={2} placeholder="Observações…"
+        <Textarea label="Observações" rows={2} placeholder="Observações…"
+          {...register('observacoes')}
         />
       </FormSection>
 

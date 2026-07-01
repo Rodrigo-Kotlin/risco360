@@ -15,4 +15,15 @@ export const MSG = {
   nome: {
     obrigatorio: 'Nome é obrigatório.',
   },
+  empresa: {
+    razaoSocial: 'Razão social é obrigatória.',
+    emailInvalido: 'E-mail corporativo inválido.',
+  },
+  risco: {
+    agente: 'Agente é obrigatório.',
+    categoria: 'Categoria é obrigatória.',
+    probabilidade: 'Probabilidade deve estar entre 1 e 5.',
+    severidade: 'Severidade deve estar entre 1 e 5.',
+    bibliotecaItem: 'Item da biblioteca não encontrado.',
+  },
 } as const
