@@ -1,0 +1,6 @@
+export type { IEmpresaService } from './empresa-service'
+export type { ISetorService } from './setor-service'
+export type { ILevantamentoService } from './levantamento-service'
+export type { IRelatorioService } from './relatorio-service'
+export type { IBibliotecaTecnicaService } from './biblioteca-service'
+export type { IProfileService } from './profile-service'
