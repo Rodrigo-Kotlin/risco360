@@ -6,76 +6,13 @@ import { Button } from '@/components/ui/Button'
 import { Save, Loader2, ArrowLeft, ArrowRight, Plus, X, GripVertical } from 'lucide-react'
 import { CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES, SEGURANCA_EMERGENCIA_ITENS } from '@/constants/formulario-options'
 import { generateId, ensureArray } from '@/lib/utils'
-import type { SegurancaEquipamentos, ItemQuantificado, ItemInventarioAmbiente } from '@/types/levantamento'
+import type { SegurancaEquipamentos, ItemInventarioAmbiente } from '@/types/levantamento'
 
 interface Step04SegurancaEquipamentosProps {
   data: SegurancaEquipamentos | null | undefined
   onSave: (data: SegurancaEquipamentos, nextStep?: number) => Promise<boolean>
   saving: boolean
   onPrevious?: () => void
-}
-
-function ItensComQuantidade({ itens, onChange, label, placeholder }: {
-  itens: ItemQuantificado[]
-  onChange: (itens: ItemQuantificado[]) => void
-  label: string
-  placeholder?: string
-}) {
-  const [newNome, setNewNome] = useState('')
-
-  const add = () => {
-    if (newNome.trim()) {
-      onChange([...itens, { id: generateId(), nome: newNome.trim(), quantidade: null, observacao: null }])
-      setNewNome('')
-    }
-  }
-
-  const update = (id: string, campo: 'quantidade' | 'observacao', valor: string | number | null) => {
-    onChange(itens.map((i) => i.id === id ? { ...i, [campo]: valor } : i))
-  }
-
-  const remove = (id: string) => {
-    onChange(itens.filter((i) => i.id !== id))
-  }
-
-  return (
-    <div className="space-y-3">
-      <p className="text-label-large text-text-primary">{label}</p>
-      {itens.length > 0 && (
-        <div className="space-y-2">
-          {itens.map((item) => (
-            <div key={item.id} className="flex flex-wrap items-start gap-2 p-2 bg-surface-muted rounded-lg">
-              <div className="flex-1 min-w-[120px]">
-                <p className="text-label-large text-text-primary">{item.nome}</p>
-              </div>
-              <Input type="number" min="0" value={item.quantidade ?? ''}
-                onChange={(e) => update(item.id, 'quantidade', e.target.value ? parseInt(e.target.value, 10) : null)}
-                placeholder="Qtd" className="w-20"
-              />
-              <Input value={item.observacao ?? ''}
-                onChange={(e) => update(item.id, 'observacao', e.target.value || null)}
-                placeholder="Observação" className="flex-1 min-w-[120px]"
-              />
-              <button type="button" onClick={() => remove(item.id)}
-                className="text-text-muted hover:text-danger transition-colors p-1"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="flex gap-2">
-        <Input value={newNome} onChange={(e) => setNewNome(e.target.value)}
-          placeholder={placeholder ?? 'Adicionar item…'}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
-        />
-        <Button type="button" variant="secondary" size="icon" onClick={add} disabled={!newNome.trim()} className="min-h-[48px] w-12 h-12">
-          <Plus size={16} />
-        </Button>
-      </div>
-    </div>
-  )
 }
 
 function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
@@ -151,15 +88,6 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
           ))}
         </div>
       )}
-      <div className="flex gap-2">
-        <Input value={customNome} onChange={(e) => setCustomNome(e.target.value)}
-          placeholder="Adicionar customizado…"
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
-        />
-        <Button type="button" variant="secondary" size="icon" onClick={addCustom} disabled={!customNome.trim()} className="min-h-[48px] w-12 h-12">
-          <Plus size={16} />
-        </Button>
-      </div>
     </div>
   )
 }
@@ -238,7 +166,7 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
 
   return (
     <div className="space-y-6">
-      <FormSection title="Segurança, mobiliários e equipamentos">
+      <FormSection title="Sistemas de incêndio e emergência">
         <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
           onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
           tipo="incendio_emergencia" label="Sistemas de incêndio e emergência"
@@ -252,12 +180,6 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
         <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
           onChange={(v) => set('maquinas_equipamentos_itens', v)}
           tipo="maquina_equipamento" label="Máquinas / equipamentos"
-        />
-        <hr className="border-border" />
-        <ItensComQuantidade itens={form.ferramentas_itens.map((i) => ({ id: i.id, nome: i.nome, quantidade: i.quantidade, observacao: i.observacao }))}
-          onChange={(v) => set('ferramentas_itens', v.map((i) => ({ ...i, tipo: 'ferramenta' as const })))}
-          label="Ferramentas utilizadas"
-          placeholder="Ex: Chaves, alicates…"
         />
       </FormSection>
 
