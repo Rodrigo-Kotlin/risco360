@@ -165,17 +165,21 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
 
   return (
     <div className="space-y-6">
-      <FormSection title="Sistemas de Incêndio e Emergência">
+      <FormSection title="Sistema de Incêndio e Emergência">
         <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
           onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
           tipo="incendio_emergencia"
         />
-        <hr className="border-border" />
+      </FormSection>
+
+      <FormSection title="Mobiliário">
         <ItensInventarioChips opcoes={MOBILIARIO_OPCOES} itens={form.mobiliario_itens}
           onChange={(v) => set('mobiliario_itens', v)}
           tipo="mobiliario"
         />
-        <hr className="border-border" />
+      </FormSection>
+
+      <FormSection title="Máquinas e Equipamentos">
         <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
           onChange={(v) => set('maquinas_equipamentos_itens', v)}
           tipo="maquina_equipamento"
