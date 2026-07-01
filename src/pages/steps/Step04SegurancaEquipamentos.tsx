@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { FormSection } from '@/components/ui/FormSection'
-import { Select } from '@/components/ui/Select'
-import { Textarea } from '@/components/ui/Textarea'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { Save, Loader2, ArrowLeft, ArrowRight, Plus, X, GripVertical } from 'lucide-react'
-import { GES_OPCOES, CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES, SEGURANCA_EMERGENCIA_ITENS } from '@/constants/formulario-options'
+import { CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES, SEGURANCA_EMERGENCIA_ITENS } from '@/constants/formulario-options'
 import { generateId, ensureArray } from '@/lib/utils'
 import type { SegurancaEquipamentos, ItemQuantificado, ItemInventarioAmbiente } from '@/types/levantamento'
 
@@ -240,50 +238,27 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
 
   return (
     <div className="space-y-6">
-      <FormSection title="Segurança e emergência">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-4">
-            <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
-              onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
-              tipo="incendio_emergencia" label="Sistemas de incêndio e emergência"
-            />
-          </Card>
-          <div className="space-y-4">
-            <Select label="É possível estabelecer GES?" value={form.possui_ges ?? ''}
-              onChange={(e) => set('possui_ges', e.target.value || null)}
-              options={GES_OPCOES} placeholder="Selecione…"
-            />
-            {form.possui_ges === 'sim' && (
-              <Textarea label="Descrição do GES" value={form.descricao_ges ?? ''}
-                onChange={(e) => set('descricao_ges', e.target.value || null)}
-                rows={4} placeholder="Descreva o Grupo Especial de Segurança estabelecido…"
-              />
-            )}
-          </div>
-        </div>
-      </FormSection>
-
-      <FormSection title="Mobiliários">
-        <Card className="p-4">
-          <ItensInventarioChips opcoes={MOBILIARIO_OPCOES} itens={form.mobiliario_itens}
-            onChange={(v) => set('mobiliario_itens', v)}
-            tipo="mobiliario" label="Mobiliários encontrados"
-          />
-        </Card>
-      </FormSection>
-
-      <FormSection title="Máquinas, equipamentos e ferramentas">
-        <Card className="p-4 space-y-6">
-          <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
-            onChange={(v) => set('maquinas_equipamentos_itens', v)}
-            tipo="maquina_equipamento" label="Máquinas / equipamentos"
-          />
-          <ItensComQuantidade itens={form.ferramentas_itens.map((i) => ({ id: i.id, nome: i.nome, quantidade: i.quantidade, observacao: i.observacao }))}
-            onChange={(v) => set('ferramentas_itens', v.map((i) => ({ ...i, tipo: 'ferramenta' as const })))}
-            label="Ferramentas utilizadas"
-            placeholder="Ex: Chaves, alicates…"
-          />
-        </Card>
+      <FormSection title="Segurança, mobiliários e equipamentos">
+        <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
+          onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
+          tipo="incendio_emergencia" label="Sistemas de incêndio e emergência"
+        />
+        <hr className="border-border" />
+        <ItensInventarioChips opcoes={MOBILIARIO_OPCOES} itens={form.mobiliario_itens}
+          onChange={(v) => set('mobiliario_itens', v)}
+          tipo="mobiliario" label="Mobiliários encontrados"
+        />
+        <hr className="border-border" />
+        <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
+          onChange={(v) => set('maquinas_equipamentos_itens', v)}
+          tipo="maquina_equipamento" label="Máquinas / equipamentos"
+        />
+        <hr className="border-border" />
+        <ItensComQuantidade itens={form.ferramentas_itens.map((i) => ({ id: i.id, nome: i.nome, quantidade: i.quantidade, observacao: i.observacao }))}
+          onChange={(v) => set('ferramentas_itens', v.map((i) => ({ ...i, tipo: 'ferramenta' as const })))}
+          label="Ferramentas utilizadas"
+          placeholder="Ex: Chaves, alicates…"
+        />
       </FormSection>
 
       <FormSection title="Layout e condição do posto">
@@ -297,13 +272,6 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
             options={CONDICAO_POSTOS_OPCOES} placeholder="Selecione…"
           />
         </div>
-      </FormSection>
-
-      <FormSection title="Observações">
-        <Textarea value={form.observacoes ?? ''}
-          onChange={(e) => set('observacoes', e.target.value || null)}
-          rows={3} placeholder="Observações sobre segurança e equipamentos…"
-        />
       </FormSection>
 
       <div className="space-y-3 pt-2 border-t border-border">

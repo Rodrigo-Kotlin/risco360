@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { FormSection } from '@/components/ui/FormSection'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
-import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { Save, Loader2, ArrowLeft, ArrowRight } from 'lucide-react'
 import { OPCOES_SIM_NAO, OPCOES_ILUMINACAO_ARTIFICIAL, OPCOES_VENTILACAO_ARTIFICIAL } from '@/constants/formulario-options'
@@ -124,13 +123,6 @@ export function Step03IluminacaoVentilacao({ data, onSave, saving, onPrevious }:
         <Select label="Conforto térmico observado" value={form.conforto_termico ?? ''}
           onChange={(e) => set('conforto_termico', e.target.value || null)}
           options={CONFORTO_TERMICO_OPCOES} placeholder="Selecione…"
-        />
-      </FormSection>
-
-      <FormSection title="Observações">
-        <Textarea value={form.observacoes ?? ''}
-          onChange={(e) => set('observacoes', e.target.value || null)}
-          rows={3} placeholder="Observações sobre iluminação, ventilação e conforto…"
         />
       </FormSection>
 

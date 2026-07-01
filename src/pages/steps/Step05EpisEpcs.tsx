@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Plus, Trash2, Pencil, ImageIcon, AlertCircle, Loader2, Shield, ShieldCheck, Camera, FileText, X, Maximize2 } from 'lucide-react'
+import { Plus, Trash2, Pencil, ImageIcon, AlertCircle, Loader2, Shield, ShieldCheck, Camera, X, Maximize2 } from 'lucide-react'
 import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import { cn } from '@/lib/utils'
 import type { EpisEpcsEvidencias, EpisItem, EpcItem, EvidenciaItem } from '@/types/levantamento'
@@ -376,13 +376,12 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
   )
 }
 
-type TabId = 'epis' | 'epcs' | 'evidencias' | 'observacoes'
+type TabId = 'epis' | 'epcs' | 'evidencias'
 
 const TABS: { id: TabId; label: string; icon: typeof Shield; count?: number }[] = [
   { id: 'epis', label: 'EPIs', icon: Shield },
   { id: 'epcs', label: 'EPCs', icon: ShieldCheck },
   { id: 'evidencias', label: 'Evidências', icon: Camera },
-  { id: 'observacoes', label: 'Observações', icon: FileText },
 ]
 
 export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisEpcsProps) {
@@ -399,7 +398,6 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
     epis: safeEpisItems(form.epis).length,
     epcs: safeEpcItems(form.epcs).length,
     evidencias: safeEvidenciaItems(form.evidencias).length,
-    observacoes: (form.observacoes?.length ?? 0) > 0 ? 1 : 0,
   }
 
   return (
@@ -454,15 +452,6 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
       <div role="tabpanel" id="panel-evidencias" hidden={activeTab !== 'evidencias'}>
         {activeTab === 'evidencias' && (
           <EvidenciasSection items={form.evidencias} onChange={(evidencias) => setForm((prev) => ({ ...prev, evidencias }))} />
-        )}
-      </div>
-
-      <div role="tabpanel" id="panel-observacoes" hidden={activeTab !== 'observacoes'}>
-        {activeTab === 'observacoes' && (
-          <Textarea value={form.observacoes ?? ''}
-            onChange={(e) => setForm((prev) => ({ ...prev, observacoes: e.target.value || null }))}
-            rows={4} placeholder="Observações sobre EPIs, EPCs e evidências…"
-          />
         )}
       </div>
 

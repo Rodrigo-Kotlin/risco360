@@ -151,7 +151,7 @@ export function Step07PerigosRiscosAep({
             onChange={(e) => setAe('fatores_psicossociais', e.target.value || null)}
             rows={2} placeholder="Estresse, assédio, pressão…" />
         </div>
-        <Card className="p-4 mt-4">
+        <div className="p-4 mt-4 border border-border rounded-lg">
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={aeForm.necessidade_aet_complementar === true}
               onChange={(e) => setAe('necessidade_aet_complementar', e.target.checked)}
@@ -161,7 +161,7 @@ export function Step07PerigosRiscosAep({
               <p className="text-label-medium text-text-muted">Avaliação Ergonômica do Trabalho detalhada</p>
             </div>
           </label>
-        </Card>
+        </div>
         <div className="space-y-4 mt-4">
           <Textarea label="Justificativa técnica" value={aeForm.justificativa_tecnica ?? ''}
             onChange={(e) => setAe('justificativa_tecnica', e.target.value || null)}
