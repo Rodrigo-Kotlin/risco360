@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Save, Loader2, ArrowLeft, ArrowRight, Plus, X, GripVertical } from 'lucide-react'
-import { GES_OPCOES, CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES } from '@/constants/formulario-options'
+import { GES_OPCOES, CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES, SEGURANCA_EMERGENCIA_ITENS } from '@/constants/formulario-options'
 import { generateId, ensureArray } from '@/lib/utils'
 import type { SegurancaEquipamentos, ItemQuantificado, ItemInventarioAmbiente } from '@/types/levantamento'
 
@@ -102,10 +102,6 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
     onChange(itens.map((i) => i.id === id ? { ...i, quantidade } : i))
   }
 
-  const updateObs = (id: string, observacao: string | null) => {
-    onChange(itens.map((i) => i.id === id ? { ...i, observacao } : i))
-  }
-
   const remove = (id: string) => {
     onChange(itens.filter((i) => i.id !== id))
   }
@@ -148,10 +144,6 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
                 onChange={(e) => updateQtd(item.id, e.target.value ? parseInt(e.target.value, 10) : null)}
                 placeholder="Qtd" className="w-20"
               />
-              <Input value={item.observacao ?? ''}
-                onChange={(e) => updateObs(item.id, e.target.value || null)}
-                placeholder="Observação" className="flex-1 min-w-[140px]"
-              />
               <button type="button" onClick={() => remove(item.id)}
                 className="text-text-muted hover:text-danger transition-colors p-1"
               >
@@ -178,8 +170,8 @@ function converterItensAntigos(itemNomes: string[], tipo: ItemInventarioAmbiente
   return itemNomes.map((nome) => ({ id: generateId(), nome, quantidade: null, observacao: null, tipo }))
 }
 
-function converterStringArrayParaItens(arr: string[]): ItemQuantificado[] {
-  return arr.map((nome) => ({ id: generateId(), nome, quantidade: null, observacao: null }))
+function converterStringArrayParaItens(arr: string[]): ItemInventarioAmbiente[] {
+  return arr.map((nome) => ({ id: generateId(), nome, quantidade: null, observacao: null, tipo: 'incendio_emergencia' as const }))
 }
 
 export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }: Step04SegurancaEquipamentosProps) {
@@ -251,10 +243,9 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
       <FormSection title="Segurança e emergência">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="p-4">
-            <ItensComQuantidade itens={form.sistema_incendio_emergencia_itens}
+            <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
               onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
-              label="Sistemas de incêndio e emergência"
-              placeholder="Ex: Extintor, Hidrante…"
+              tipo="incendio_emergencia" label="Sistemas de incêndio e emergência"
             />
           </Card>
           <div className="space-y-4">
@@ -272,16 +263,17 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
         </div>
       </FormSection>
 
-      <FormSection title="Mobiliários, máquinas e equipamentos">
-        <Card className="p-4 space-y-6">
+      <FormSection title="Mobiliários">
+        <Card className="p-4">
           <ItensInventarioChips opcoes={MOBILIARIO_OPCOES} itens={form.mobiliario_itens}
             onChange={(v) => set('mobiliario_itens', v)}
             tipo="mobiliario" label="Mobiliários encontrados"
           />
-          <Textarea label="Observações sobre mobiliário" value={form.mobiliario_observacao ?? ''}
-            onChange={(e) => set('mobiliario_observacao', e.target.value || null)}
-            rows={2} placeholder="Condições dos móveis, adaptações, necessidades…"
-          />
+        </Card>
+      </FormSection>
+
+      <FormSection title="Máquinas, equipamentos e ferramentas">
+        <Card className="p-4 space-y-6">
           <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
             onChange={(v) => set('maquinas_equipamentos_itens', v)}
             tipo="maquina_equipamento" label="Máquinas / equipamentos"

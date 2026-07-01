@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import type { SegurancaEquipamentos, PontoMedicaoQuantitativa, ItemQuantificado, ItemInventarioAmbiente } from '@/types/levantamento'
 
-function converterStringArrayParaItens(arr: string[]): ItemQuantificado[] {
-  return arr.map((nome) => ({ id: `conv_${nome}`, nome, quantidade: null, observacao: null }))
+function converterStringArrayParaItens(arr: string[]): ItemInventarioAmbiente[] {
+  return arr.map((nome) => ({ id: `conv_${nome}`, nome, quantidade: null, observacao: null, tipo: 'incendio_emergencia' as const }))
 }
 
 function converterItensAntigos(itemNomes: string[], tipo: ItemInventarioAmbiente['tipo']): ItemInventarioAmbiente[] {
@@ -150,8 +150,8 @@ describe('SegurancaEquipamentos — novos campos de itens', () => {
 describe('normalização — dados parciais (simula IndexedDB antigo)', () => {
   const ensureArray = <T>(v: T[] | undefined | null): T[] => Array.isArray(v) ? v : []
 
-  function converterStringArrayParaItens(arr: string[]): ItemQuantificado[] {
-    return arr.map((nome) => ({ id: `conv_${nome}`, nome, quantidade: null, observacao: null }))
+  function converterStringArrayParaItens(arr: string[]): ItemInventarioAmbiente[] {
+    return arr.map((nome) => ({ id: `conv_${nome}`, nome, quantidade: null, observacao: null, tipo: 'incendio_emergencia' as const }))
   }
 
   function converterItensAntigos(itemNomes: string[], tipo: ItemInventarioAmbiente['tipo']): ItemInventarioAmbiente[] {

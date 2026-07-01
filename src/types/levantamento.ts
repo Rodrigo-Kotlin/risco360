@@ -50,12 +50,12 @@ export interface ItemInventarioAmbiente {
   nome: string
   quantidade: number | null
   observacao: string | null
-  tipo: 'mobiliario' | 'maquina_equipamento' | 'ferramenta'
+  tipo: 'mobiliario' | 'maquina_equipamento' | 'ferramenta' | 'incendio_emergencia'
 }
 
 export interface SegurancaEquipamentos {
   sistema_incendio_emergencia: string[]
-  sistema_incendio_emergencia_itens: ItemQuantificado[]
+  sistema_incendio_emergencia_itens: ItemInventarioAmbiente[]
   possui_ges: string | null
   descricao_ges: string | null
   mobiliarios: string[]
