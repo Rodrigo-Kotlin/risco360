@@ -65,7 +65,9 @@ export default function SetorDetalhePage() {
   }
 
   const handleCriarOuContinuar = async () => {
-    if (!setorId || !empresaId || !setor) return
+    if (!setorId || !setor) return
+    const effectiveEmpresaId = empresa?.id ?? setor.empresa_id ?? empresaId
+    if (!effectiveEmpresaId) return
     if (formularioSetorial) {
       navigate(ROUTES.levantamentosEditar.replace(':id', formularioSetorial.id))
       return
@@ -75,7 +77,7 @@ export default function SetorDetalhePage() {
       tipo: 'LPR_AEP',
       setor_id: setorId,
       setor_nome: setor.nome,
-      empresa_id: empresa?.id ?? empresaId ?? '',
+      empresa_id: effectiveEmpresaId,
     })
     setCreating(false)
     if (result.error) { toast(result.error, 'error'); return }
