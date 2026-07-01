@@ -26,8 +26,8 @@ describe('NAV_ITEMS', () => {
     expect(DRAWER_NAV_ITEMS.some(i => i.label === 'Dashboard')).toBe(true)
   })
 
-  it('contém Dashboard no BOTTOM_NAV_ITEMS', () => {
-    expect(BOTTOM_NAV_ITEMS.some(i => i.label === 'Dashboard')).toBe(true)
+  it('BOTTOM_NAV_ITEMS tem 4 itens', () => {
+    expect(BOTTOM_NAV_ITEMS.length).toBe(4)
   })
 
   it('contém Levantamentos no BOTTOM_NAV_ITEMS', () => {

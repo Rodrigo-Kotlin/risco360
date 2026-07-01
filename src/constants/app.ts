@@ -6,7 +6,6 @@ export const APP_DESCRIPTION = 'Sistema de Gestão de Riscos Ocupacionais'
 export const APP_VERSION = '1.0.0-beta'
 
 export const BOTTOM_NAV_ITEMS = [
-  { label: 'Dashboard',     href: ROUTES.dashboard,     icon: 'LayoutDashboard' },
   { label: 'Empresas',      href: ROUTES.empresas,      icon: 'Building2' },
   { label: 'Levantamentos', href: ROUTES.levantamentos, icon: 'ClipboardList' },
   { label: 'Setores',       href: ROUTES.setores,       icon: 'Layers' },

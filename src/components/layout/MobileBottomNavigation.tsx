@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { BOTTOM_NAV_ITEMS } from '@/constants/app'
 import { NavLink } from 'react-router-dom'
 import {
-  Building2, FileText, Layers, LayoutDashboard, ClipboardList,
+  Building2, FileText, Layers, ClipboardList,
   type LucideIcon
 } from 'lucide-react'
 
@@ -10,7 +10,6 @@ const iconMap: Record<string, LucideIcon> = {
   Building2,
   Layers,
   FileText,
-  LayoutDashboard,
   ClipboardList,
 }
 
