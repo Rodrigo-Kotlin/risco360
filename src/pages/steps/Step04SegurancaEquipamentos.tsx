@@ -20,7 +20,7 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
   itens: ItemInventarioAmbiente[]
   onChange: (itens: ItemInventarioAmbiente[]) => void
   tipo: ItemInventarioAmbiente['tipo']
-  label: string
+  label?: string
 }) {
   const [customNome, setCustomNome] = useState('')
 
@@ -50,17 +50,16 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
 
   return (
     <div className="space-y-3">
-      <p className="text-label-large text-text-primary">{label}</p>
+      {label && <p className="text-label-large text-text-primary">{label}</p>}
       <div className="flex flex-wrap gap-2">
         {opcoes.map((opt) => {
           const selected = itens.some((i) => i.nome === opt.label)
           return (
             <button key={opt.value} type="button" onClick={() => toggleChip(opt.label)}
-              className={`px-3 py-3 text-label-medium font-medium rounded-full border transition-colors min-h-[48px] ${
-                selected
+              className={`px-3 py-3 text-label-medium font-medium rounded-full border transition-colors min-h-[48px] ${selected
                   ? 'bg-primary-50 border-primary-500 text-primary-700'
                   : 'bg-white border-border text-text-secondary hover:border-text-muted'
-              }`}
+                }`}
             >
               {opt.label}
             </button>
@@ -166,30 +165,30 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
 
   return (
     <div className="space-y-6">
-      <FormSection title="Sistemas de incêndio e emergência">
+      <FormSection title="Sistemas de Incêndio e Emergência">
         <ItensInventarioChips opcoes={SEGURANCA_EMERGENCIA_ITENS} itens={form.sistema_incendio_emergencia_itens}
           onChange={(v) => set('sistema_incendio_emergencia_itens', v)}
-          tipo="incendio_emergencia" label="Sistemas de incêndio e emergência"
+          tipo="incendio_emergencia"
         />
         <hr className="border-border" />
         <ItensInventarioChips opcoes={MOBILIARIO_OPCOES} itens={form.mobiliario_itens}
           onChange={(v) => set('mobiliario_itens', v)}
-          tipo="mobiliario" label="Mobiliários encontrados"
+          tipo="mobiliario"
         />
         <hr className="border-border" />
         <ItensInventarioChips opcoes={MAQUINAS_EQUIPAMENTOS_OPCOES} itens={form.maquinas_equipamentos_itens}
           onChange={(v) => set('maquinas_equipamentos_itens', v)}
-          tipo="maquina_equipamento" label="Máquinas / equipamentos"
+          tipo="maquina_equipamento"
         />
       </FormSection>
 
-      <FormSection title="Layout e condição do posto">
+      <FormSection title="Layout e Condição do Posto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select label="Layout do posto" value={form.layout_posto ?? ''}
+          <Select aria-label="Layout do posto" value={form.layout_posto ?? ''}
             onChange={(e) => set('layout_posto', e.target.value || null)}
             options={LAYOUT_POSTO_OPCOES} placeholder="Selecione…"
           />
-          <Select label="Condição dos postos de trabalho" value={form.condicao_postos ?? ''}
+          <Select aria-label="Condição dos postos de trabalho" value={form.condicao_postos ?? ''}
             onChange={(e) => set('condicao_postos', e.target.value || null)}
             options={CONDICAO_POSTOS_OPCOES} placeholder="Selecione…"
           />
