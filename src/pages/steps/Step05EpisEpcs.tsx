@@ -335,6 +335,11 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
             </div>
             <div className="mt-1.5 space-y-1">
               <p className="text-label-medium font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
+              {(ev.data || ev.hora) && (
+                <p className="text-label-medium text-text-muted">
+                  {ev.data} {ev.hora}
+                </p>
+              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   {ev.upload_status === 'error' && <span className="text-label-medium text-danger">Erro</span>}
