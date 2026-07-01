@@ -4,7 +4,7 @@ import { queryClient } from '@/lib/query-client'
 import { queryKeys } from '@/lib/query-keys'
 import { buscarLevantamentoPorId, atualizarLevantamento, atualizarStatusLevantamento } from '@/services/levantamentos.service'
 import { ROUTES } from '@/constants/app'
-import { calcularPercentual } from '@/lib/wizard-progress'
+import { calcularPercentual, calcularProximoPasso } from '@/lib/wizard-progress'
 import { useToast } from '@/hooks/useToast'
 import type { Levantamento, LevantamentoUpdateInput } from '@/types/levantamento'
 import type { CaracteristicasFisicas, IluminacaoVentilacaoConforto, SegurancaEquipamentos, EpisEpcsEvidencias } from '@/types/levantamento'
@@ -40,10 +40,13 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       setState((prev) => ({ ...prev, loading: false, error: result.error }))
       return
     }
+    const lev = result.data
+    const initialStep = lev?.status === 'concluido' ? 1 : calcularProximoPasso(lev!)
     setState((prev) => ({
       ...prev,
-      levantamento: result.data,
+      levantamento: lev,
       loading: false,
+      currentStep: initialStep,
     }))
   }, [levantamentoId])
 

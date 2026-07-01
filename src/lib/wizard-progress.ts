@@ -48,3 +48,41 @@ export function calcularPercentual(lev: Levantamento): number {
 
   return Math.min(100, total)
 }
+
+export function calcularProximoPasso(lev: Levantamento): number {
+  if (!(lev.empresa_nome && lev.setor_nome && lev.data_levantamento)) return 1
+
+  const hasCaracteristicas = Object.values(lev.caracteristicas_fisicas ?? {}).some(
+    (v) => v !== null && v !== undefined && v !== ''
+  )
+  if (!hasCaracteristicas) return 2
+
+  const hasIluminacao = Object.values(lev.iluminacao_ventilacao_conforto ?? {}).some(
+    (v) => v !== null && v !== undefined && v !== ''
+  )
+  if (!hasIluminacao) return 3
+
+  const seg = lev.seguranca_equipamentos
+  const hasSeguranca = !!(
+    (seg?.sistema_incendio_emergencia ?? []).length > 0 ||
+    (seg?.sistema_incendio_emergencia_itens ?? []).length > 0 ||
+    seg?.possui_ges ||
+    (seg?.mobiliarios ?? []).length > 0 ||
+    (seg?.mobiliario_itens ?? []).length > 0 ||
+    (seg?.maquinas_equipamentos ?? []).length > 0 ||
+    (seg?.maquinas_equipamentos_itens ?? []).length > 0 ||
+    (seg?.ferramentas ?? []).length > 0 ||
+    (seg?.ferramentas_itens ?? []).length > 0
+  )
+  if (!hasSeguranca) return 4
+
+  if ((lev.epis_epcs_evidencias?.epis ?? []).length === 0) return 5
+
+  if ((lev.medicoes ?? []).length === 0 && (lev.pontos_medicao ?? []).length === 0) return 6
+
+  if ((lev.riscos ?? []).length === 0) return 7
+
+  if (!(lev.parecer?.conclusao || lev.assinatura_tecnico?.nome)) return 8
+
+  return 1
+}
