@@ -51,7 +51,7 @@ export function MobileBottomNavigation() {
                       />
                     )}
                     {Icon && <Icon size={20} aria-hidden="true" />}
-                    <span className="text-[10px] font-medium">{item.label}</span>
+                    <span className="text-label-medium">{item.label}</span>
                   </>
                 )}
               </NavLink>

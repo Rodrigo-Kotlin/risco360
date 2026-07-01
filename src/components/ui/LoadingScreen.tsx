@@ -12,7 +12,7 @@ export function LoadingScreen({ message = 'Carregando Risco360…', className }:
       className
     )}>
       <div className="w-10 h-10 border-[3px] border-primary-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Carregando" />
-      <p className="text-sm text-text-secondary">{message}</p>
+      <p className="text-body-medium text-text-secondary">{message}</p>
     </div>
   )
 }

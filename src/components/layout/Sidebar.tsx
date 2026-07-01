@@ -49,7 +49,7 @@ export function Sidebar({ className }: SidebarProps) {
                   to={item.href}
                   end
                   className={({ isActive }) => cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                    'flex items-center gap-3 px-3 py-3 rounded-lg text-label-large transition-colors',
                     isActive
                       ? 'bg-primary-50 text-primary-500 border-l-2 border-primary-500 rounded-l-none'
                       : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
@@ -67,11 +67,11 @@ export function Sidebar({ className }: SidebarProps) {
       {pendingCount > 0 && (
         <NavLink
           to={ROUTES.sincronizacao}
-          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/20 text-xs font-medium text-warning hover:bg-warning/20 transition-colors"
+          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/20 text-label-medium text-warning hover:bg-warning/20 transition-colors"
         >
           <CloudOff size={14} />
           <span className="flex-1">Sincronização</span>
-          <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-warning text-white text-[10px] font-bold leading-none">
+          <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-warning text-white text-label-medium font-bold leading-none">
             {pendingCount}
           </span>
         </NavLink>
@@ -79,7 +79,7 @@ export function Sidebar({ className }: SidebarProps) {
       {pendingCount === 0 && (
         <NavLink
           to={ROUTES.sincronizacao}
-          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-text-muted hover:bg-surface-muted hover:text-text-secondary transition-colors"
+          className="mx-3 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg text-label-medium text-text-muted hover:bg-surface-muted hover:text-text-secondary transition-colors"
         >
           <Cloud size={14} />
           <span>Sincronização</span>
@@ -88,7 +88,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="px-3 py-3 border-t border-border-light shrink-0">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
           <div className="w-2 h-2 rounded-full bg-success" aria-hidden="true" />
-          <span className="text-xs text-text-muted">v1.0.0-beta</span>
+          <span className="text-label-medium text-text-muted">v1.0.0-beta</span>
         </div>
       </div>
     </aside>

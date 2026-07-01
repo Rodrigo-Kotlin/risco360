@@ -65,7 +65,7 @@ export default function EmpresasPage() {
       render: (item: Empresa) => (
         <div>
           <p className="font-medium text-text-primary">{item.razao_social}</p>
-          {item.nome_fantasia && <p className="text-xs text-text-muted">{item.nome_fantasia}</p>}
+          {item.nome_fantasia && <p className="text-body-small text-text-muted">{item.nome_fantasia}</p>}
         </div>
       )
     },
@@ -127,8 +127,8 @@ export default function EmpresasPage() {
 
           {isError && (
             <Card className="p-6">
-              <p className="text-sm text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar empresas'}</p>
-              <button type="button" onClick={() => refetch()} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
+              <p className="text-body-medium text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar empresas'}</p>
+              <button type="button" onClick={() => refetch()} className="text-label-large text-primary-600 hover:text-primary-700 underline min-h-[48px]">Tentar novamente</button>
             </Card>
           )}
 

@@ -40,29 +40,29 @@ export function Step01Identificacao({ levantamento, onSave, saving }: Step01Iden
           <div className="flex items-center gap-3">
             <Building2 size={20} className="text-primary-600 shrink-0" />
             <div>
-              <p className="text-xs text-text-muted">Empresa / Cliente</p>
-              <p className="text-sm font-medium text-text-primary">{levantamento.empresa_nome ?? '—'}</p>
+              <p className="text-label-medium text-text-muted">Empresa / Cliente</p>
+              <p className="text-label-large text-text-primary">{levantamento.empresa_nome ?? '—'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Hash size={20} className="text-primary-600 shrink-0" />
             <div>
-              <p className="text-xs text-text-muted">CNPJ</p>
-              <p className="text-sm font-medium text-text-primary">{levantamento.cnpj ?? '—'}</p>
+              <p className="text-label-medium text-text-muted">CNPJ</p>
+              <p className="text-label-large text-text-primary">{levantamento.cnpj ?? '—'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <FileText size={20} className="text-primary-600 shrink-0" />
             <div>
-              <p className="text-xs text-text-muted">Setor / Departamento</p>
-              <p className="text-sm font-medium text-text-primary">{levantamento.setor_nome ?? levantamento.setor ?? '—'}</p>
+              <p className="text-label-medium text-text-muted">Setor / Departamento</p>
+              <p className="text-label-large text-text-primary">{levantamento.setor_nome ?? levantamento.setor ?? '—'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Calendar size={20} className="text-primary-600 shrink-0" />
             <div>
-              <p className="text-xs text-text-muted">Data do levantamento</p>
-              <p className="text-sm font-medium text-text-primary">{dataLevantamento || today}</p>
+              <p className="text-label-medium text-text-muted">Data do levantamento</p>
+              <p className="text-label-large text-text-primary">{dataLevantamento || today}</p>
             </div>
           </div>
         </div>

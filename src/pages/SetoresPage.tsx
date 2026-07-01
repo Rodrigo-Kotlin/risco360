@@ -114,7 +114,7 @@ export default function SetoresPage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{error instanceof Error ? error.message : 'Erro ao carregar setores'}</p>
+          <p className="text-body-medium text-danger">{error instanceof Error ? error.message : 'Erro ao carregar setores'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => setoresQuery.refetch()}>
             Tentar novamente
           </Button>
@@ -146,7 +146,7 @@ export default function SetoresPage() {
               <select
                 value={empresaFiltro}
                 onChange={(e) => setEmpresaFiltro(e.target.value)}
-                className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-text-primary"
+                className="min-h-[48px] rounded-lg border border-border bg-card px-3 text-body-medium text-text-primary"
               >
                 <option value="">Todas as empresas</option>
                 {empresaOptions.map(op => (
@@ -158,7 +158,7 @@ export default function SetoresPage() {
 
           {filtered.length === 0 ? (
             <Card className="p-5">
-              <p className="text-sm text-text-muted">
+              <p className="text-body-medium text-text-muted">
                 {search || empresaFiltro
                   ? 'Nenhum setor encontrado com os filtros atuais.'
                   : 'Nenhum setor cadastrado.'}
@@ -175,7 +175,7 @@ export default function SetoresPage() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Layers size={16} className="text-text-muted shrink-0" />
-                      <CardTitle className="text-sm">{setor.nome}</CardTitle>
+                      <CardTitle className="text-body-medium">{setor.nome}</CardTitle>
                     </div>
                     <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                       <SyncStatusChip sync_status={setor.sync_status} />
@@ -188,9 +188,9 @@ export default function SetoresPage() {
                     </div>
                   </div>
                   {setor.descricao && (
-                    <p className="text-xs text-text-secondary mb-2 line-clamp-2">{setor.descricao}</p>
+                    <p className="text-body-small text-text-secondary mb-2 line-clamp-2">{setor.descricao}</p>
                   )}
-                  <div className="mt-auto flex items-center gap-1.5 text-xs text-text-muted">
+                  <div className="mt-auto flex items-center gap-1.5 text-label-medium text-text-muted">
                     <Building2 size={12} />
                     <span className="truncate">{empresas[setor.empresa_id] ?? 'Empresa'}</span>
                   </div>

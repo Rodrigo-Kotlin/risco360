@@ -136,15 +136,15 @@ export function Step03IluminacaoVentilacao({ data, onSave, saving, onPrevious }:
 
       <div className="flex flex-col gap-3 pt-2 border-t border-border">
         <div className="flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
             <ArrowLeft size={16} /> Anterior
           </Button>
-          <Button onClick={async () => { await handleSave(4) }} disabled={saving}>
+          <Button onClick={async () => { await handleSave(4) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>
         </div>
-        <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving} className="w-full">
+        <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving} className="w-full min-h-[48px]">
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Salvar rascunho
         </Button>

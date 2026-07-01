@@ -28,7 +28,7 @@ export function EmptyState({ icon, title, description, action, secondaryAction, 
       </div>
       <h3 className="text-base font-semibold text-text-primary">{title}</h3>
       {description && (
-        <p className="mt-1 text-sm text-text-secondary max-w-sm leading-relaxed">{description}</p>
+        <p className="mt-1 text-body-medium text-text-secondary max-w-sm leading-relaxed">{description}</p>
       )}
       {(action || secondaryAction) && (
         <div className="mt-5 flex items-center gap-3">

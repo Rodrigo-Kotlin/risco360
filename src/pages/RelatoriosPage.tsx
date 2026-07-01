@@ -78,7 +78,7 @@ export default function RelatoriosPage() {
       render: (item: Relatorio) => (
         <div>
           <p className="font-medium text-text-primary">{tipoLabel[item.tipo] ?? item.tipo}</p>
-          {item.empresa_nome && <p className="text-xs text-text-muted">{item.empresa_nome}</p>}
+          {item.empresa_nome && <p className="text-body-small text-text-muted">{item.empresa_nome}</p>}
         </div>
       )
     },
@@ -94,10 +94,10 @@ export default function RelatoriosPage() {
     { key: 'actions' as string, header: 'Ações', sortable: false,
       render: (item: Relatorio) => (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" disabled={!item.arquivo_url} aria-label="Download">
+          <Button variant="ghost" size="icon" disabled={!item.arquivo_url} aria-label="Download" className="w-12 h-12">
             <Download size={16} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="text-danger hover:text-danger" aria-label="Excluir">
+          <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="w-12 h-12 text-danger hover:text-danger" aria-label="Excluir">
             <Trash2 size={16} />
           </Button>
         </div>
@@ -147,8 +147,8 @@ export default function RelatoriosPage() {
 
           {isError && (
             <Card className="p-6">
-              <p className="text-sm text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar relatórios'}</p>
-              <button type="button" onClick={() => refetch()} className="text-sm text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
+              <p className="text-body-medium text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar relatórios'}</p>
+              <button type="button" onClick={() => refetch()} className="min-h-[48px] text-label-large text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
             </Card>
           )}
         </div>

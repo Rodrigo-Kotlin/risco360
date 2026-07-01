@@ -88,7 +88,7 @@ export default function EmpresaFormPage() {
         <Header title="Erro" description="Não foi possível carregar os dados" />
         <MainContainer>
           <div className="space-y-4">
-            <p className="text-sm text-danger">{fetchError}</p>
+            <p className="text-body-medium text-danger">{fetchError}</p>
             <Button variant="secondary" onClick={() => navigate(ROUTES.empresas)}>
               <ArrowLeft size={16} /> Voltar
             </Button>

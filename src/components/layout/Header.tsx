@@ -39,7 +39,7 @@ export function Header({ title, description, className }: HeaderProps) {
     )}>
       <div className="flex items-center gap-3 min-w-0">
         <button type="button" onClick={toggleDrawer}
-          className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors"
+          className="lg:hidden w-12 h-12 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-muted hover:text-text-primary transition-colors"
           aria-label="Abrir menu">
           <Menu size={20} />
         </button>
@@ -49,16 +49,16 @@ export function Header({ title, description, className }: HeaderProps) {
         {title && (
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm md:text-base font-semibold text-text-primary truncate">{title}</h2>
+              <h2 className="text-label-large md:text-title-medium font-semibold text-text-primary truncate">{title}</h2>
               {isMockModeEnabled && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-label-medium font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
                   <Beaker size={10} />
                   Mock Dev
                 </span>
               )}
             </div>
             {description && (
-              <p className="text-[11px] text-text-muted truncate hidden sm:block">{description}</p>
+              <p className="text-label-medium text-text-muted truncate hidden sm:block">{description}</p>
             )}
           </div>
         )}
@@ -66,11 +66,11 @@ export function Header({ title, description, className }: HeaderProps) {
 
       <div className="flex items-center gap-1 md:gap-2">
         {isOnline ? (
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-[11px] text-success font-medium bg-success/5 rounded-md">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-success font-medium bg-success/5 rounded-md">
             <Wifi size={12} /> Online
           </span>
         ) : (
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-[11px] text-warning font-medium bg-warning/5 rounded-md">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-warning font-medium bg-warning/5 rounded-md">
             <WifiOff size={12} /> Offline
           </span>
         )}
@@ -79,10 +79,10 @@ export function Header({ title, description, className }: HeaderProps) {
           align="right"
           trigger={
             <span className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-muted transition-colors cursor-pointer">
-              <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-label-medium font-bold">
                 {avatarInitial}
               </div>
-              <span className="hidden sm:block text-sm text-text-secondary">{displayName}</span>
+              <span className="hidden sm:block text-body-medium text-text-secondary">{displayName}</span>
             </span>
           }
           items={[

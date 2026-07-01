@@ -86,14 +86,14 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
       {isMockModeEnabled && (
         <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
           <Beaker size={14} className="text-warning" />
-          <span className="text-xs text-warning font-medium">Modo mock ativo para desenvolvimento</span>
+          <span className="text-label-medium text-warning font-medium">Modo mock ativo para desenvolvimento</span>
         </div>
       )}
 
       {isSupabaseConfigured && !isMockModeEnabled && (
         <div className="flex items-center justify-center gap-1.5 mb-4 pb-4 border-b border-border-light">
           <CheckCircle2 size={14} className="text-success" />
-          <span className="text-xs text-success font-medium">Servidor configurado</span>
+          <span className="text-label-medium text-success font-medium">Servidor configurado</span>
         </div>
       )}
 
@@ -128,7 +128,7 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-[38px] text-text-muted hover:text-text-secondary transition-colors"
+            className="absolute right-3 top-[38px] text-text-muted hover:text-text-secondary transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
             tabIndex={-1}
             aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
           >
@@ -147,7 +147,7 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
         )}
 
         {error && (
-          <p className="text-xs text-danger text-center" role="alert">{error}</p>
+          <p className="text-body-small text-danger text-center" role="alert">{error}</p>
         )}
 
         <Button type="submit" className="w-full h-11" loading={isLoading}>
@@ -160,7 +160,7 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
           <button
             type="button"
             onClick={onResetPasswordRequested}
-            className="text-xs text-text-muted hover:text-primary-500 transition-colors"
+            className="text-label-medium text-text-muted hover:text-primary-500 transition-colors min-h-[48px]"
           >
             Esqueci minha senha
           </button>
@@ -168,13 +168,13 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
       )}
 
       <div className="mt-5 pt-4 border-t border-border-light">
-        <p className="text-xs text-text-muted text-center">
+        <p className="text-label-medium text-text-muted text-center">
           {isRegister ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
         </p>
         <button
           type="button"
           onClick={toggleAuthMode}
-          className="block mx-auto mt-1 text-sm text-primary-500 hover:text-primary-600 font-medium"
+          className="block mx-auto mt-1 text-label-large text-primary-500 hover:text-primary-600 font-medium min-h-[48px]"
           aria-label={isRegister ? 'Ir para login' : 'Ir para cadastro'}
         >
           {isRegister ? 'Fazer login' : 'Criar conta'}
@@ -233,7 +233,7 @@ function ResetPasswordForm({ onBackToLogin }: ResetPasswordFormProps) {
         <button
           type="button"
           onClick={onBackToLogin}
-          className="flex items-center justify-center gap-1.5 mx-auto text-sm text-primary-500 hover:text-primary-600 font-medium"
+          className="flex items-center justify-center gap-1.5 mx-auto text-label-large text-primary-500 hover:text-primary-600 font-medium min-h-[48px]"
         >
           <ArrowLeft size={16} />
           Voltar ao login
@@ -262,13 +262,13 @@ export default function LoginPage() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-warning/10 text-warning mb-5">
           <ServerCrash size={28} />
         </div>
-        <h1 className="text-xl font-bold text-text-primary">{APP_NAME}</h1>
-        <p className="mt-1 text-sm text-text-secondary mb-6">
+        <h1 className="text-headline-small font-bold text-text-primary">{APP_NAME}</h1>
+        <p className="mt-1 text-body-medium text-text-secondary mb-6">
           Plataforma de gestão de riscos ocupacionais
         </p>
         <div className="bg-card border border-border-light rounded-xl p-6 shadow-card text-center space-y-3">
-          <p className="text-sm font-medium text-warning">Servidor não configurado</p>
-          <p className="text-xs text-text-muted leading-relaxed">
+          <p className="text-label-large text-warning">Servidor não configurado</p>
+          <p className="text-body-small text-text-muted leading-relaxed">
             Configure as variáveis de ambiente{' '}
             <code className="text-primary-500 bg-primary-50 px-1 rounded">VITE_SUPABASE_URL</code> e{' '}
             <code className="text-primary-500 bg-primary-50 px-1 rounded">VITE_SUPABASE_ANON_KEY</code>.
@@ -284,8 +284,8 @@ export default function LoginPage() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-500 text-white mb-5">
           <Mail size={28} />
         </div>
-        <h1 className="text-xl font-bold text-text-primary">Recuperar senha</h1>
-        <p className="mt-1 text-sm text-text-secondary mb-6">
+        <h1 className="text-headline-small font-bold text-text-primary">Recuperar senha</h1>
+        <p className="mt-1 text-body-medium text-text-secondary mb-6">
           Receba um link para redefinir sua senha
         </p>
         <ResetPasswordForm onBackToLogin={() => setPageMode('auth')} />
@@ -297,21 +297,21 @@ export default function LoginPage() {
     <div className="text-center">
       <div className="flex flex-col items-center gap-1 mb-5">
         <Logo size="lg" />
-        <p className="text-sm text-text-secondary">Plataforma de gestão de riscos ocupacionais</p>
+        <p className="text-body-medium text-text-secondary">Plataforma de gestão de riscos ocupacionais</p>
       </div>
 
       <AuthForm onResetPasswordRequested={() => setPageMode('resetPassword')} />
 
       {isMockModeEnabled && (
         <div className="mt-4 bg-white border border-border-light rounded-xl p-4 shadow-card text-left">
-          <p className="text-xs text-text-muted text-center mb-2">
+          <p className="text-label-medium text-text-muted text-center mb-2">
             Credenciais de desenvolvimento
           </p>
           <div className="space-y-1">
-            <p className="text-xs text-text-secondary text-center">
+            <p className="text-body-small text-text-secondary text-center">
               <span className="font-medium">Usuário:</span> {MOCK_USER_EMAIL}
             </p>
-            <p className="text-xs text-text-secondary text-center">
+            <p className="text-body-small text-text-secondary text-center">
               <span className="font-medium">Senha:</span> {MOCK_USER_PASSWORD}
             </p>
           </div>

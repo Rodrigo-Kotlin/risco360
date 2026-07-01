@@ -44,6 +44,22 @@
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
+  --text-display-large: 57px;
+  --text-display-medium: 45px;
+  --text-display-small: 36px;
+  --text-headline-large: 32px;
+  --text-headline-medium: 28px;
+  --text-headline-small: 24px;
+  --text-title-large: 22px;
+  --text-title-medium: 16px;
+  --text-title-small: 14px;
+  --text-body-large: 16px;
+  --text-body-medium: 14px;
+  --text-body-small: 12px;
+  --text-label-large: 14px;
+  --text-label-medium: 12px;
+  --text-label-small: 11px;
+
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;

@@ -35,10 +35,10 @@ export function Step05PerigosRiscos({ riscos, onSave, saving, onPrevious }: Step
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
+        <p className="text-body-medium text-text-secondary">
           {items.length} risco(s) identificado(s)
         </p>
-        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm">
+        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm" className="min-h-[48px]">
           <Plus size={14} /> Novo risco
         </Button>
       </div>
@@ -70,15 +70,15 @@ export function Step05PerigosRiscos({ riscos, onSave, saving, onPrevious }: Step
       </Modal>
 
       <div className="flex items-center justify-between pt-2 border-t border-border">
-        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
           <ArrowLeft size={16} /> Anterior
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving}>
+          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar
           </Button>
-          <Button onClick={async () => { await onSave(items, 6) }} disabled={saving}>
+          <Button onClick={async () => { await onSave(items, 6) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>

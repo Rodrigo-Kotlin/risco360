@@ -56,10 +56,10 @@ export function Step07Controles({ controles, riscos, onSave, saving, onPrevious 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
+        <p className="text-body-medium text-text-secondary">
           {items.length} aç(ão/ões) de controle registrada(s)
         </p>
-        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm">
+        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm" className="min-h-[48px]">
           <Plus size={14} /> Novo plano de ação
         </Button>
       </div>
@@ -83,11 +83,11 @@ export function Step07Controles({ controles, riscos, onSave, saving, onPrevious 
                   <div className="flex items-center gap-2 shrink-0">
                     <Button variant="ghost" size="icon"
                       onClick={() => { setEditing(item); setModalOpen(true) }}
-                      aria-label="Editar ação">
+                      aria-label="Editar ação" className="min-h-[48px] w-12 h-12">
                       <Pencil size={14} />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}
-                      aria-label="Excluir ação">
+                      aria-label="Excluir ação" className="min-h-[48px] w-12 h-12">
                       <Trash2 size={14} />
                     </Button>
                   </div>
@@ -97,12 +97,12 @@ export function Step07Controles({ controles, riscos, onSave, saving, onPrevious 
                   <Badge>{STATUS_LABEL[item.status] ?? item.status}</Badge>
                   {item.tipo_controle && <Badge>{item.tipo_controle}</Badge>}
                 </div>
-                {item.responsavel && (
-                  <p className="text-sm text-text-secondary">Responsável: {item.responsavel}</p>
-                )}
-                {item.prazo && (
-                  <p className="text-sm text-text-secondary">Prazo: {item.prazo}</p>
-                )}
+                  {item.responsavel && (
+                    <p className="text-body-medium text-text-secondary">Responsável: {item.responsavel}</p>
+                  )}
+                  {item.prazo && (
+                    <p className="text-body-medium text-text-secondary">Prazo: {item.prazo}</p>
+                  )}
               </div>
             </Card>
           ))}
@@ -116,15 +116,15 @@ export function Step07Controles({ controles, riscos, onSave, saving, onPrevious 
       </Modal>
 
       <div className="flex items-center justify-between pt-2 border-t border-border">
-        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
           <ArrowLeft size={16} /> Anterior
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving}>
+          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar
           </Button>
-          <Button onClick={async () => { await onSave(items, 8) }} disabled={saving}>
+          <Button onClick={async () => { await onSave(items, 8) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>

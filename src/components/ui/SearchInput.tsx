@@ -50,7 +50,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={(e) => setLocal(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'w-full h-10 pl-9 pr-8 rounded-xl border border-border-light bg-white text-sm',
+            'w-full h-10 min-h-[48px] pl-9 pr-8 rounded-xl border border-border-light bg-white text-body-medium',
             'placeholder:text-text-muted',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-primary-500',
             'transition-all',
@@ -62,7 +62,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors min-w-[48px] min-h-[48px]"
             aria-label="Limpar pesquisa"
           >
             <X size={14} />

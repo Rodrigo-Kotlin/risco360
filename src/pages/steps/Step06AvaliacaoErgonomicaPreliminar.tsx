@@ -109,8 +109,8 @@ export function Step06AvaliacaoErgonomicaPreliminar({
               className="mt-1 h-4 w-4 rounded border-border text-brand-600 focus:ring-primary-500"
             />
             <div>
-              <p className="text-sm font-medium text-text-primary">Necessidade de AET complementar</p>
-              <p className="text-xs text-text-muted">Marque se for necessária uma Avaliação Ergonômica do Trabalho detalhada</p>
+              <p className="text-label-large text-text-primary">Necessidade de AET complementar</p>
+              <p className="text-label-medium text-text-muted">Marque se for necessária uma Avaliação Ergonômica do Trabalho detalhada</p>
             </div>
           </label>
         </Card>
@@ -127,15 +127,15 @@ export function Step06AvaliacaoErgonomicaPreliminar({
       </FormSection>
 
       <div className="flex items-center justify-between pt-2 border-t border-border">
-        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
           <ArrowLeft size={16} /> Anterior
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving}>
+          <Button variant="secondary" onClick={async () => { await handleSave() }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar
           </Button>
-          <Button onClick={async () => { await handleSave(7) }} disabled={saving}>
+          <Button onClick={async () => { await handleSave(7) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>

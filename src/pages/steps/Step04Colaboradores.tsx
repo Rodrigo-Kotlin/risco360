@@ -35,10 +35,10 @@ export function Step04Colaboradores({ colaboradores, onSave, saving, onPrevious 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
+        <p className="text-body-medium text-text-secondary">
           {items.length} colaborador(es) registrado(s)
         </p>
-        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm">
+        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }} size="sm" className="min-h-[48px]">
           <Plus size={14} /> Novo colaborador
         </Button>
       </div>
@@ -61,16 +61,16 @@ export function Step04Colaboradores({ colaboradores, onSave, saving, onPrevious 
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setModalOpen(true) }}
-                      aria-label="Editar colaborador">
+                      aria-label="Editar colaborador" className="min-h-[48px] w-12 h-12">
                       <Pencil size={14} />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}
-                      aria-label="Excluir colaborador">
+                      aria-label="Excluir colaborador" className="min-h-[48px] w-12 h-12">
                       <Trash2 size={14} />
                     </Button>
                   </div>
                 </CardHeader>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-body-medium">
                   {item.funcao && <div><span className="text-text-muted">Função:</span> {item.funcao}</div>}
                   {item.setor && <div><span className="text-text-muted">Setor:</span> {item.setor}</div>}
                   {item.jornada && <div><span className="text-text-muted">Jornada:</span> {item.jornada}</div>}
@@ -89,15 +89,15 @@ export function Step04Colaboradores({ colaboradores, onSave, saving, onPrevious 
       </Modal>
 
       <div className="flex items-center justify-between pt-2 border-t border-border">
-        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+        <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
           <ArrowLeft size={16} /> Anterior
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving}>
+          <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar
           </Button>
-          <Button onClick={async () => { await onSave(items, 5) }} disabled={saving}>
+          <Button onClick={async () => { await onSave(items, 5) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>

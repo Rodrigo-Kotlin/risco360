@@ -11,5 +11,5 @@ const nivelMap: Record<NivelRisco, 'riskLow' | 'riskMedium' | 'riskHigh' | 'risk
 }
 
 export function NivelRiscoBadge({ nivel }: { nivel: NivelRisco }) {
-  return <Badge variant={nivelMap[nivel]}>{NIVEL_RISCO_LABEL[nivel]}</Badge>
+  return <Badge variant={nivelMap[nivel]} className="min-h-[48px]">{NIVEL_RISCO_LABEL[nivel]}</Badge>
 }

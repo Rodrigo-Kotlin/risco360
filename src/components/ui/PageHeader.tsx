@@ -25,7 +25,7 @@ export function PageHeader({ title, description, breadcrumb, action, secondaryAc
   return (
     <div className={cn('space-y-3', className)}>
       {breadcrumb && breadcrumb.length > 0 && (
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-text-muted">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-label-medium text-text-muted">
           {breadcrumb.map((item, index) => (
             <span key={item.label} className="flex items-center gap-1.5">
               {index > 0 && <ChevronRight size={12} aria-hidden="true" />}
@@ -41,9 +41,9 @@ export function PageHeader({ title, description, breadcrumb, action, secondaryAc
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl md:text-2xl font-bold text-text-primary">{title}</h1>
+          <h1 className="text-headline-small md:text-headline-medium font-bold text-text-primary">{title}</h1>
           {description && (
-            <p className="mt-0.5 text-sm text-text-secondary">{description}</p>
+            <p className="mt-0.5 text-body-medium text-text-secondary">{description}</p>
           )}
         </div>
 

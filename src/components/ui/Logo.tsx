@@ -9,7 +9,7 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: { box: 'w-8 h-8', icon: 18, text: 'text-sm' },
+  sm: { box: 'w-8 h-8', icon: 18, text: 'text-label-large' },
   md: { box: 'w-10 h-10', icon: 22, text: 'text-base' },
   lg: { box: 'w-14 h-14', icon: 28, text: 'text-2xl' },
 }

@@ -249,12 +249,12 @@ export default function ConfiguracoesPage() {
                 </div>
                 <div className="flex-1">
                   <CardTitle>Status do Supabase</CardTitle>
-                  <p className="text-xs text-text-secondary mt-0.5">Conexão com banco de dados</p>
+                  <p className="text-body-small text-text-secondary mt-0.5">Conexão com banco de dados</p>
                 </div>
                 <Badge variant={supabaseVariant}>{supabaseStatus}</Badge>
               </div>
             </CardHeader>
-            <div className="px-5 pb-5 space-y-2 text-xs text-text-secondary">
+            <div className="px-5 pb-5 space-y-2 text-body-small text-text-secondary">
               <div className="flex items-center gap-2">
                 {isSupabaseConfigured ? <CheckCircle2 size={14} className="text-success shrink-0" /> : <XCircle size={14} className="text-danger shrink-0" />}
                 <span>Supabase: <span className="font-medium">{supabaseStatus}</span></span>
@@ -289,13 +289,13 @@ export default function ConfiguracoesPage() {
                   </div>
                   <div className="flex-1">
                     <CardTitle>Modo mock de desenvolvimento</CardTitle>
-                    <p className="text-xs text-text-secondary mt-0.5">Dados locais para teste</p>
+                    <p className="text-body-small text-text-secondary mt-0.5">Dados locais para teste</p>
                   </div>
                   <Badge variant="warning">Ativado</Badge>
                 </div>
               </CardHeader>
               <div className="px-5 pb-5 space-y-3">
-                <div className="bg-surface-muted rounded-lg p-3 text-sm space-y-1">
+                <div className="bg-surface-muted rounded-lg p-3 text-body-medium space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-text-secondary">Usuário mockado</span>
                     <span className="font-medium text-text-primary">{MOCK_USER_EMAIL}</span>
@@ -331,7 +331,7 @@ export default function ConfiguracoesPage() {
                     <LogOut size={14} /> Sair da conta mockada
                   </Button>
                 </div>
-                <p className="text-xs text-text-muted">
+                    <p className="text-body-small text-text-muted">
                   Os dados mockados são armazenados apenas no navegador (localStorage) e não afetam o Supabase.
                 </p>
               </div>
@@ -346,7 +346,7 @@ export default function ConfiguracoesPage() {
                 </div>
                 <div className="flex-1">
                   <CardTitle>Dados offline (IndexedDB)</CardTitle>
-                  <p className="text-xs text-text-secondary mt-0.5">Armazenamento local persistente</p>
+                  <p className="text-body-small text-text-secondary mt-0.5">Armazenamento local persistente</p>
                 </div>
                 <Badge variant={offlineStatus.available ? 'success' : 'warning'}>
                   {offlineStatus.available ? 'Disponível' : 'Indisponível'}
@@ -361,7 +361,7 @@ export default function ConfiguracoesPage() {
                 </div>
               ) : (
                 <>
-                  <div className="bg-surface-muted rounded-lg p-3 text-sm space-y-1.5">
+                  <div className="bg-surface-muted rounded-lg p-3 text-body-medium space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-text-secondary">Empresas locais</span>
                       <span className="font-medium">{offlineCounts.empresas}</span>
@@ -426,7 +426,7 @@ export default function ConfiguracoesPage() {
                     <div className="border-t border-border pt-1.5 mt-1.5">
                       <div className="flex items-center justify-between">
                         <span className="text-text-secondary">Status do IndexedDB</span>
-                        <span className="font-medium text-xs">
+                        <span className="font-medium text-label-medium">
                           {offlineStatus.available ? offlineStatus.dbName : 'Indisponível'}
                           {offlineStatus.available && ` v${offlineStatus.version}`}
                         </span>
@@ -444,11 +444,11 @@ export default function ConfiguracoesPage() {
                       <div className="border-t border-border pt-1.5 mt-1.5">
                         <div className="flex items-center justify-between">
                           <span className="text-text-secondary">Sincronização remota</span>
-                          <span className="font-medium text-xs text-success">Ativa (empresas/setores/levantamentos)</span>
+                          <span className="font-medium text-label-medium text-success">Ativa (empresas/setores/levantamentos)</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-text-secondary">Escrita offline empresas</span>
-                          <span className="font-medium text-xs">
+                          <span className="font-medium text-label-medium">
                             <Badge variant={dataProviderStatus.supportsOfflineWrites ? 'success' : 'muted'}>
                               {dataProviderStatus.supportsOfflineWrites ? 'Ativa' : 'Apenas leitura'}
                             </Badge>
@@ -456,7 +456,7 @@ export default function ConfiguracoesPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-text-secondary">Escrita offline setores</span>
-                          <span className="font-medium text-xs">
+                          <span className="font-medium text-label-medium">
                             <Badge variant={dataProviderStatus.supportsOfflineWrites ? 'success' : 'muted'}>
                               {dataProviderStatus.supportsOfflineWrites ? 'Ativa' : 'Apenas leitura'}
                             </Badge>
@@ -464,7 +464,7 @@ export default function ConfiguracoesPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-text-secondary">Escrita offline levantamentos</span>
-                          <span className="font-medium text-xs">
+                          <span className="font-medium text-label-medium">
                             <Badge variant={dataProviderStatus.supportsOfflineWrites ? 'success' : 'muted'}>
                               {dataProviderStatus.supportsOfflineWrites ? 'Ativa' : 'Apenas leitura'}
                             </Badge>
@@ -472,11 +472,11 @@ export default function ConfiguracoesPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-text-secondary">Escrita offline evidências</span>
-                          <span className="font-medium text-xs">
+                          <span className="font-medium text-label-medium">
                             <Badge variant="success">Ativa</Badge>
                           </span>
                         </div>
-                        <p className="text-xs text-text-muted mt-2">
+                        <p className="text-body-small text-text-muted mt-2">
                           Sincronização ativa para empresas, setores, levantamentos e evidências fotográficas.
                         </p>
                       </div>
@@ -510,17 +510,17 @@ export default function ConfiguracoesPage() {
                     </Button>
                   </div>
                   {syncMessage && (
-                    <p className="text-xs text-text-secondary">{syncMessage}</p>
+                    <p className="text-body-small text-text-secondary">{syncMessage}</p>
                   )}
                   {failedItems.length > 0 && (
                     <div className="bg-danger/5 border border-danger/20 rounded-lg p-3 space-y-2">
-                      <p className="text-xs font-medium text-danger flex items-center gap-1">
+                      <p className="text-label-medium font-medium text-danger flex items-center gap-1">
                         <AlertTriangle size={12} />
                         Itens com erro ({failedItems.length})
                       </p>
                       <div className="max-h-32 overflow-y-auto space-y-1">
                         {failedItems.map(item => (
-                          <div key={item.id} className="text-xs text-text-secondary flex items-start gap-2">
+                          <div key={item.id} className="text-body-small text-text-secondary flex items-start gap-2">
                             <AlertCircle size={10} className="shrink-0 mt-0.5 text-danger" />
                             <span className="flex-1 break-words">
                               <strong>{item.entity}:</strong> {item.last_error ?? 'Erro desconhecido'}
@@ -531,7 +531,7 @@ export default function ConfiguracoesPage() {
                       </div>
                     </div>
                   )}
-                  <p className="text-xs text-text-muted">
+                <p className="text-body-small text-text-muted">
                     Os dados offline são armazenados no IndexedDB do navegador e persistem mesmo após fechar o navegador.
                   </p>
                 </>
@@ -553,7 +553,7 @@ export default function ConfiguracoesPage() {
                     </div>
                   </CardHeader>
                   <CardTitle>{section.title}</CardTitle>
-                  <p className="text-xs text-text-secondary mt-1">{section.description}</p>
+                  <p className="text-body-small text-text-secondary mt-1">{section.description}</p>
                 </Card>
               )
             })}

@@ -118,7 +118,7 @@ export default function LevantamentoDetalhePage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{error ?? 'Levantamento não encontrado'}</p>
+          <p className="text-body-medium text-danger">{error ?? 'Levantamento não encontrado'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.levantamentos)}>
             <ArrowLeft size={16} /> Voltar
           </Button>
@@ -189,26 +189,26 @@ export default function LevantamentoDetalhePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="p-4">
-              <p className="text-xs text-text-muted mb-1">Status</p>
+              <p className="text-label-medium text-text-muted mb-1">Status</p>
               <div className="flex items-center gap-2">
                 {statusBadge(levantamento.status)}
                 <SyncStatusChip sync_status={levantamento.sync_status} />
               </div>
             </Card>
             <Card className="p-4">
-              <p className="text-xs text-text-muted mb-1">Progresso</p>
+              <p className="text-label-medium text-text-muted mb-1">Progresso</p>
               <div className="flex items-center gap-2">
                 <ProgressBar value={levantamento.percentual} className="flex-1" />
-                <span className="text-sm font-medium text-text-primary">{levantamento.percentual}%</span>
+                <span className="text-body-medium text-text-primary">{levantamento.percentual}%</span>
               </div>
             </Card>
             <Card className="p-4">
-              <p className="text-xs text-text-muted mb-1">Tipo</p>
-              <p className="text-sm font-medium text-text-primary">{levantamento.tipo}</p>
+              <p className="text-label-medium text-text-muted mb-1">Tipo</p>
+              <p className="text-body-medium text-text-primary">{levantamento.tipo}</p>
             </Card>
             <Card className="p-4">
-              <p className="text-xs text-text-muted mb-1">Relatórios</p>
-              <p className="text-sm font-medium text-text-primary">{relatorios.length}</p>
+              <p className="text-label-medium text-text-muted mb-1">Relatórios</p>
+              <p className="text-body-medium text-text-primary">{relatorios.length}</p>
             </Card>
           </div>
 
@@ -219,8 +219,8 @@ export default function LevantamentoDetalhePage() {
                 <div key={label} className="flex items-start gap-2.5">
                   <Icon size={16} className="shrink-0 mt-0.5 text-text-muted" />
                   <div className="min-w-0">
-                    <p className="text-xs text-text-muted">{label}</p>
-                    <p className="text-sm text-text-primary truncate">{value ?? <span className="text-text-muted">—</span>}</p>
+                    <p className="text-label-medium text-text-muted">{label}</p>
+                    <p className="text-body-medium text-text-primary truncate">{value ?? <span className="text-text-muted">—</span>}</p>
                   </div>
                 </div>
               ))}
@@ -232,38 +232,38 @@ export default function LevantamentoDetalhePage() {
               <CardTitle className="mb-4">Resumo técnico</CardTitle>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-surface-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-text-primary">{riscos.length}</p>
-                  <p className="text-xs text-text-muted">Riscos</p>
+                  <p className="text-headline-small font-bold text-text-primary">{riscos.length}</p>
+                  <p className="text-label-medium text-text-muted">Riscos</p>
                 </div>
                 <div className="p-3 bg-red-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-danger">{criticos}</p>
-                  <p className="text-xs text-danger">Críticos</p>
+                  <p className="text-headline-small font-bold text-danger">{criticos}</p>
+                  <p className="text-label-medium text-danger">Críticos</p>
                 </div>
                 <div className="p-3 bg-orange-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-orange-700">{altos}</p>
-                  <p className="text-xs text-orange-700">Altos</p>
+                  <p className="text-headline-small font-bold text-orange-700">{altos}</p>
+                  <p className="text-label-medium text-orange-700">Altos</p>
                 </div>
                 <div className="p-3 bg-surface-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-text-primary">{controles.length}</p>
-                  <p className="text-xs text-text-muted">Ações</p>
+                  <p className="text-headline-small font-bold text-text-primary">{controles.length}</p>
+                  <p className="text-label-medium text-text-muted">Ações</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
                 <div className="p-3 bg-surface-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-text-primary">{medicoes.length}</p>
-                  <p className="text-xs text-text-muted">Medições</p>
+                  <p className="text-headline-small font-bold text-text-primary">{medicoes.length}</p>
+                  <p className="text-label-medium text-text-muted">Medições</p>
                 </div>
                 <div className="p-3 bg-surface-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-text-primary">{colaboradores.length}</p>
-                  <p className="text-xs text-text-muted">Colaboradores</p>
+                  <p className="text-headline-small font-bold text-text-primary">{colaboradores.length}</p>
+                  <p className="text-label-medium text-text-muted">Colaboradores</p>
                 </div>
                 <div className="p-3 bg-surface-muted rounded-lg text-center col-span-2">
-                  <p className="text-xs text-text-muted">Resumo dos riscos identificados</p>
+                  <p className="text-body-small text-text-muted">Resumo dos riscos identificados</p>
                 </div>
               </div>
               <div className="space-y-2 mt-4">
                 {riscos.slice(0, 10).map((r) => (
-                  <div key={r.id} className="flex items-center justify-between text-sm">
+                  <div key={r.id} className="flex items-center justify-between text-body-medium">
                     <div className="flex items-center gap-2 min-w-0">
                       <AlertTriangle size={14} className="shrink-0 text-text-muted" />
                       <span className="truncate text-text-primary">{r.agente}</span>
@@ -272,7 +272,7 @@ export default function LevantamentoDetalhePage() {
                   </div>
                 ))}
                 {riscos.length > 10 && (
-                  <p className="text-xs text-text-muted mt-1">+ {riscos.length - 10} riscos adicionais</p>
+                  <p className="text-body-small text-text-muted mt-1">+ {riscos.length - 10} riscos adicionais</p>
                 )}
               </div>
             </Card>
@@ -281,15 +281,15 @@ export default function LevantamentoDetalhePage() {
           {levantamento.observacoes && (
             <Card className="p-5">
               <CardTitle className="mb-2">Observações</CardTitle>
-              <p className="text-sm text-text-secondary whitespace-pre-wrap">{levantamento.observacoes}</p>
+              <p className="text-body-medium text-text-secondary whitespace-pre-wrap">{levantamento.observacoes}</p>
             </Card>
           )}
 
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-text-primary">Relatórios</h3>
-                <p className="text-xs text-text-muted">Relatórios gerados para este levantamento</p>
+                <h3 className="text-title-small font-semibold text-text-primary">Relatórios</h3>
+                <p className="text-body-small text-text-muted">Relatórios gerados para este levantamento</p>
               </div>
             </div>
             <DataTable

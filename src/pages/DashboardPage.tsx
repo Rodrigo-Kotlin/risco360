@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
           {isError && (
             <Card className="p-4">
-              <p className="text-sm text-danger">{error instanceof Error ? error.message : 'Erro ao carregar dados'}</p>
+              <p className="text-body-medium text-danger">{error instanceof Error ? error.message : 'Erro ao carregar dados'}</p>
             </Card>
           )}
 
@@ -102,7 +102,7 @@ export default function DashboardPage() {
                   <ClipboardList size={16} className="shrink-0" />
                   <span>
                     <span className="block font-medium">Novo levantamento</span>
-                    <span className="block text-xs text-text-muted font-normal">Iniciar formulário LPR + AEP</span>
+                    <span className="block text-body-small text-text-muted font-normal">Iniciar formulário LPR + AEP</span>
                   </span>
                 </Button>
                 <Button
@@ -113,7 +113,7 @@ export default function DashboardPage() {
                   <Building2 size={16} className="shrink-0" />
                   <span>
                     <span className="block font-medium">Nova empresa</span>
-                    <span className="block text-xs text-text-muted font-normal">Cadastrar cliente</span>
+                    <span className="block text-body-small text-text-muted font-normal">Cadastrar cliente</span>
                   </span>
                 </Button>
                 <Button
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                   <Activity size={16} className="shrink-0" />
                   <span>
                     <span className="block font-medium">Meus levantamentos</span>
-                    <span className="block text-xs text-text-muted font-normal">Ver todos os formulários</span>
+                    <span className="block text-body-small text-text-muted font-normal">Ver todos os formulários</span>
                   </span>
                 </Button>
                 <Button
@@ -135,7 +135,7 @@ export default function DashboardPage() {
                   <BarChart3 size={16} className="shrink-0" />
                   <span>
                     <span className="block font-medium">Relatórios</span>
-                    <span className="block text-xs text-text-muted font-normal">Acessar documentos gerados</span>
+                    <span className="block text-body-small text-text-muted font-normal">Acessar documentos gerados</span>
                   </span>
                 </Button>
               </div>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.configuracoes)}
-                  className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                  className="flex items-center gap-1 text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[48px]"
                 >
                   Ver detalhes <ArrowRight size={12} />
                 </button>
@@ -178,14 +178,14 @@ export default function DashboardPage() {
           {!isLoading && !isError && levantamentos.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                <h2 className="text-title-small font-semibold text-text-primary flex items-center gap-2">
                   <Activity size={16} />
                   Levantamentos recentes
                 </h2>
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.levantamentos)}
-                  className="text-xs text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                  className="text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[48px]"
                 >
                   Ver todos
                 </button>
@@ -213,7 +213,7 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-text-primary truncate">{lev.codigo ?? 'Sem código'}</p>
-                          <p className="text-xs text-text-secondary truncate">{lev.empresa_nome ?? 'Sem empresa'}{lev.setor_nome ? ` — ${lev.setor_nome}` : ''}</p>
+                          <p className="text-body-small text-text-secondary truncate">{lev.empresa_nome ?? 'Sem empresa'}{lev.setor_nome ? ` — ${lev.setor_nome}` : ''}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <div className="hidden sm:flex items-center gap-1">
@@ -223,9 +223,9 @@ export default function DashboardPage() {
                                 style={{ width: `${lev.percentual ?? 0}%` }}
                               />
                             </div>
-                            <span className="text-xs text-text-muted tabular-nums">{lev.percentual ?? 0}%</span>
+                            <span className="text-label-medium text-text-muted tabular-nums">{lev.percentual ?? 0}%</span>
                           </div>
-                          <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${statusColors[lev.status] ?? 'text-text-muted bg-surface-muted'}`}>
+                          <span className={`text-label-medium font-medium px-2 py-0.5 rounded-full ${statusColors[lev.status] ?? 'text-text-muted bg-surface-muted'}`}>
                             {statusLabels[lev.status] ?? lev.status}
                           </span>
                         </div>
@@ -261,42 +261,42 @@ function SyncStatusContent() {
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm text-text-secondary">
+        <span className="flex items-center gap-2 text-label-large text-text-secondary">
           <CheckCircle2 size={14} className="text-success" />
           Sincronizados
         </span>
-        <span className="text-sm font-semibold text-success">{metrics?.synced ?? 0}</span>
+        <span className="text-title-small font-semibold text-success">{metrics?.synced ?? 0}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm text-text-secondary">
+        <span className="flex items-center gap-2 text-label-large text-text-secondary">
           <CloudOff size={14} className={isPending ? 'text-warning' : 'text-text-muted'} />
           Pendentes
         </span>
-        <span className={`text-sm font-semibold ${isPending ? 'text-warning' : 'text-text-muted'}`}>
+        <span className={`text-title-small font-semibold ${isPending ? 'text-warning' : 'text-text-muted'}`}>
           {metrics?.pending ?? 0}
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm text-text-secondary">
+        <span className="flex items-center gap-2 text-label-large text-text-secondary">
           <AlertTriangle size={14} className={hasIssues ? 'text-danger' : 'text-text-muted'} />
           Falhas
         </span>
-        <span className={`text-sm font-semibold ${hasIssues ? 'text-danger' : 'text-text-muted'}`}>
+        <span className={`text-title-small font-semibold ${hasIssues ? 'text-danger' : 'text-text-muted'}`}>
           {(metrics?.failed ?? 0) + (metrics?.conflicts ?? 0)}
         </span>
       </div>
       {hasIssues && (
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 text-sm text-text-secondary">
+          <span className="flex items-center gap-2 text-label-large text-text-secondary">
             <RefreshCw size={14} className="text-warning" />
             Conflitos
           </span>
-          <span className="text-sm font-semibold text-warning">{metrics?.conflicts ?? 0}</span>
+          <span className="text-title-small font-semibold text-warning">{metrics?.conflicts ?? 0}</span>
         </div>
       )}
       {metrics?.lastSyncAt && (
         <div className="pt-2 mt-2 border-t border-border-light">
-          <p className="text-[11px] text-text-muted">
+          <p className="text-label-medium text-text-muted">
             Última sincronização:{' '}
             {new Date(metrics.lastSyncAt).toLocaleString('pt-BR')}
           </p>
@@ -304,7 +304,7 @@ function SyncStatusContent() {
       )}
       {!metrics?.lastSyncAt && hasSynced && (
         <div className="pt-2 mt-2 border-t border-border-light">
-          <p className="text-[11px] text-text-muted">Nenhuma sincronização registrada</p>
+          <p className="text-label-medium text-text-muted">Nenhuma sincronização registrada</p>
         </div>
       )}
     </div>

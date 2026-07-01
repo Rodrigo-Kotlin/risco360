@@ -14,9 +14,9 @@ export function FormSection({ title, description, children, actions, className }
     <section className={cn('bg-card border border-border rounded-xl p-4 md:p-5', className)}>
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
+          <h3 className="text-title-small font-semibold text-text-primary">{title}</h3>
           {description && (
-            <p className="mt-0.5 text-xs text-text-secondary">{description}</p>
+            <p className="mt-0.5 text-body-small text-text-secondary">{description}</p>
           )}
         </div>
         {actions && (

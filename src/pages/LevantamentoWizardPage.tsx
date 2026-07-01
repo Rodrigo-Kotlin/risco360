@@ -77,7 +77,7 @@ function WizardStepperDesktop({
                 disabled={!isClickable}
                 onClick={() => isClickable && onStepClick(step.number)}
                 className={cn(
-                  'flex items-center gap-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-2 text-label-large min-h-[48px] transition-colors',
                   isCurrent && 'text-primary-500',
                   isCompleted && 'text-success',
                   !isCurrent && !isCompleted && 'text-text-muted',
@@ -87,7 +87,7 @@ function WizardStepperDesktop({
                 aria-current={isCurrent ? 'step' : undefined}
               >
                 <span className={cn(
-                  'flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold border-2 transition-all shrink-0',
+                  'flex items-center justify-center w-7 h-7 rounded-full text-label-medium font-bold border-2 transition-all shrink-0',
                   isCurrent && 'border-primary-500 bg-primary-50 text-primary-500',
                   isCompleted && 'border-success bg-success text-white',
                   !isCurrent && !isCompleted && 'border-border-light bg-white text-text-muted'
@@ -129,14 +129,14 @@ function WizardStepperMobile({
   return (
     <div className="sm:hidden space-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-text-secondary">
+        <p className="text-label-medium font-medium text-text-secondary">
           <span className="text-primary-600 font-bold">Passo {currentStep}</span>
           {' '}de {totalSteps}
         </p>
-        <p className="text-xs font-semibold text-primary-600 tabular-nums">{percentual}%</p>
+        <p className="text-label-medium font-semibold text-primary-600 tabular-nums">{percentual}%</p>
       </div>
       <ProgressBar value={percentual} size="sm" />
-      <p className="text-xs text-text-muted truncate">{stepLabel}</p>
+      <p className="text-label-medium text-text-muted truncate">{stepLabel}</p>
     </div>
   )
 }
@@ -188,7 +188,7 @@ export default function LevantamentoWizardPage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{wizard.error ?? 'Levantamento não encontrado'}</p>
+          <p className="text-body-medium text-danger">{wizard.error ?? 'Levantamento não encontrado'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.levantamentos)}>
             <ArrowLeft size={16} /> Voltar
           </Button>
@@ -342,7 +342,7 @@ export default function LevantamentoWizardPage() {
 
           {/* Contexto do levantamento */}
           {(lev.empresa_nome || lev.setor_nome) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2.5 bg-surface-muted rounded-xl text-xs text-text-secondary">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2.5 bg-surface-muted rounded-xl text-label-medium text-text-secondary">
               {lev.empresa_nome && (
                 <span className="flex items-center gap-1.5">
                   <Building2 size={13} className="shrink-0 text-text-muted" />
@@ -363,7 +363,7 @@ export default function LevantamentoWizardPage() {
           )}
 
           {lev.status === 'concluido' && (
-            <div className="flex items-center gap-2 p-3 bg-info-light border border-blue-200 rounded-xl text-sm text-blue-700">
+            <div className="flex items-center gap-2 p-3 bg-info-light border border-blue-200 rounded-xl text-body-medium text-blue-700">
               <Info size={16} className="shrink-0" />
               Este levantamento já foi concluído. As alterações serão salvas, mas não alteram o status.
             </div>

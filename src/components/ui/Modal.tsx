@@ -60,13 +60,13 @@ export function Modal({ open, onClose, title, description, children, footer, cla
       >
         <div className="flex items-start justify-between gap-4 px-5 pt-5 pb-3">
           <div className="min-w-0">
-            {title && <h2 id="modal-title" className="text-base font-semibold text-text-primary">{title}</h2>}
-            {description && <p id="modal-description" className="mt-0.5 text-sm text-text-secondary">{description}</p>}
+            {title && <h2 id="modal-title" className="text-title-medium font-semibold text-text-primary">{title}</h2>}
+            {description && <p id="modal-description" className="mt-0.5 text-body-medium text-text-secondary">{description}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-muted transition-colors"
+            className="shrink-0 w-8 h-8 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg hover:bg-surface-muted transition-colors"
             aria-label="Fechar"
           >
             <X size={18} aria-hidden="true" />

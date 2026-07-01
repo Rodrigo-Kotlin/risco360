@@ -34,11 +34,11 @@ export function BibliotecaRiscoSelector({ items, onSelect, onClose }: Biblioteca
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, perigo, categoria..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-border bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full pl-9 pr-3 py-2 text-body-medium rounded-lg border border-border bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             autoFocus
           />
         </div>
-        <Button type="button" variant="ghost" size="icon" onClick={onClose} aria-label="Fechar">
+        <Button type="button" variant="ghost" size="icon" onClick={onClose} aria-label="Fechar" className="w-12 h-12">
           <X size={16} />
         </Button>
       </div>
@@ -46,7 +46,7 @@ export function BibliotecaRiscoSelector({ items, onSelect, onClose }: Biblioteca
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-8 text-text-muted">
           <AlertCircle size={24} />
-          <p className="text-sm">Nenhum item encontrado</p>
+          <p className="text-body-medium">Nenhum item encontrado</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
@@ -62,26 +62,26 @@ export function BibliotecaRiscoSelector({ items, onSelect, onClose }: Biblioteca
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <BookOpen size={14} className="text-primary-600 shrink-0" />
-                    <p className="text-sm font-medium text-text-primary truncate">{item.titulo}</p>
+                    <p className="text-title-small font-medium text-text-primary truncate">{item.titulo}</p>
                   </div>
                   {item.perigo && (
-                    <p className="text-xs text-text-muted mt-0.5">
+                    <p className="text-body-small text-text-muted mt-0.5">
                       Perigo: {item.perigo}
                     </p>
                   )}
                   {item.risco && (
-                    <p className="text-xs text-text-muted">
+                    <p className="text-body-small text-text-muted">
                       Risco: {item.risco}
                     </p>
                   )}
                   <div className="flex flex-wrap gap-1 mt-1">
                     {item.categoria && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-muted text-text-secondary uppercase">
+                      <span className="text-label-medium px-1.5 py-0.5 rounded-full bg-surface-muted text-text-secondary uppercase">
                         {item.categoria}
                       </span>
                     )}
                     {item.tipo_risco && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-muted text-text-secondary">
+                      <span className="text-label-medium px-1.5 py-0.5 rounded-full bg-surface-muted text-text-secondary">
                         {item.tipo_risco}
                       </span>
                     )}
@@ -96,7 +96,7 @@ export function BibliotecaRiscoSelector({ items, onSelect, onClose }: Biblioteca
         </div>
       )}
 
-      <p className="text-xs text-text-muted text-center">
+      <p className="text-body-small text-text-muted text-center">
         {filtered.length} de {items.length} item(ns)
       </p>
     </div>

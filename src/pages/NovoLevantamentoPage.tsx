@@ -142,7 +142,7 @@ export default function NovoLevantamentoPage() {
               <div className="space-y-6">
                 {!hasParams && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+                    <div className="flex items-center gap-2 text-title-small font-semibold text-text-primary">
                       <Building2 size={16} /> Selecione empresa e setor
                     </div>
                     <Select
@@ -166,39 +166,39 @@ export default function NovoLevantamentoPage() {
                 )}
 
                 <div className="bg-surface-muted rounded-lg p-4 space-y-3">
-                  <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                  <h4 className="text-title-small font-semibold text-text-primary flex items-center gap-2">
                     <Layers size={16} /> Dados do levantamento
                   </h4>
                   {(empresa || selectedEmpresaId) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-medium">
                       <div>
-                        <p className="text-xs text-text-muted">Empresa</p>
+                        <p className="text-label-medium text-text-muted">Empresa</p>
                         <p className="font-medium text-text-primary">
                           {empresa?.razao_social ?? empresas.find((e) => e.value === selectedEmpresaId)?.label?.split(' (')[0] ?? '—'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-text-muted">CNPJ</p>
+                        <p className="text-label-medium text-text-muted">CNPJ</p>
                         <p className="text-text-primary">{empresa?.cnpj ?? '—'}</p>
                       </div>
                     </div>
                   )}
                   {(setor || selectedSetorId) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-medium">
                       <div>
-                        <p className="text-xs text-text-muted">Setor</p>
+                        <p className="text-label-medium text-text-muted">Setor</p>
                         <p className="font-medium text-text-primary">
                           {setor?.nome ?? setores.find((s) => s.value === selectedSetorId)?.label ?? '—'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-text-muted">Tipo</p>
+                        <p className="text-label-medium text-text-muted">Tipo</p>
                         <p className="text-text-primary">LPR + AEP - Levantamento Setorial Integrado</p>
                       </div>
                     </div>
                   )}
                   {!hasParams && !selectedEmpresaId && (
-                    <p className="text-sm text-text-muted">Selecione uma empresa e setor acima para continuar.</p>
+                    <p className="text-body-medium text-text-muted">Selecione uma empresa e setor acima para continuar.</p>
                   )}
                 </div>
 

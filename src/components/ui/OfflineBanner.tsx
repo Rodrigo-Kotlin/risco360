@@ -39,7 +39,7 @@ export function OfflineBanner() {
       <div
         className={cn(
           'flex items-center justify-center gap-2 flex-wrap text-center',
-          'bg-warning text-white px-4 py-2 text-sm font-medium',
+          'bg-warning text-white px-4 py-2 text-body-medium font-medium',
           'animate-slide-up'
         )}
         role="alert"
@@ -47,7 +47,7 @@ export function OfflineBanner() {
         <WifiOff size={16} aria-hidden="true" />
         <span className="text-center">{getOfflineMessage()}</span>
         {pendingCount > 0 && (
-          <span className="ml-2 text-warning-100 text-xs">
+          <span className="ml-2 text-warning-100 text-label-medium">
             ({pendingCount} pendente{pendingCount !== 1 ? 's' : ''})
           </span>
         )}
@@ -60,7 +60,7 @@ export function OfflineBanner() {
       <div
         className={cn(
           'flex items-center justify-center gap-2 flex-wrap text-center',
-          'bg-success text-white px-4 py-2 text-sm font-medium',
+          'bg-success text-white px-4 py-2 text-body-medium font-medium',
           'animate-slide-up'
         )}
         role="alert"
@@ -81,7 +81,7 @@ export function OfflineBanner() {
       <div
         className={cn(
           'flex items-center justify-center gap-2',
-          'bg-surface-muted text-text-secondary px-4 py-2 text-sm border-t',
+          'bg-surface-muted text-text-secondary px-4 py-2 text-body-medium border-t',
           'animate-slide-up'
         )}
         role="alert"

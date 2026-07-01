@@ -69,10 +69,10 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-text-secondary">{items.length} ponto(s) de medição registrado(s)</p>
-          <p className="text-xs text-text-muted">Registre medições quantitativas por ponto avaliado</p>
+          <p className="text-body-medium text-text-secondary">{items.length} ponto(s) de medição registrado(s)</p>
+          <p className="text-label-medium text-text-muted">Registre medições quantitativas por ponto avaliado</p>
         </div>
-        <Button onClick={openNew} size="sm">
+        <Button onClick={openNew} size="sm" className="min-h-[48px]">
           <Plus size={14} /> Novo ponto
         </Button>
       </div>
@@ -94,19 +94,19 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
                     <CardTitle>{item.ponto_local || 'Ponto'}</CardTitle>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Button variant="ghost" size="icon" onClick={() => handleDuplicate(item)} aria-label="Duplicar">
+                    <Button variant="ghost" size="icon" onClick={() => handleDuplicate(item)} aria-label="Duplicar" className="min-h-[48px] w-12 h-12">
                       <Copy size={14} />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(item)} aria-label="Editar">
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(item)} aria-label="Editar" className="min-h-[48px] w-12 h-12">
                       <Pencil size={14} />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} aria-label="Excluir">
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} aria-label="Excluir" className="min-h-[48px] w-12 h-12">
                       <Trash2 size={14} />
                     </Button>
                   </div>
                 </CardHeader>
                 {hasAnyMedicao(item) ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-body-medium">
                     {item.ruido_dba != null && (
                       <div>
                         <span className="text-text-muted">Ruído:</span>{' '}
@@ -145,10 +145,10 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-text-muted italic">Não medido</p>
+                  <p className="text-body-medium text-text-muted italic">Não medido</p>
                 )}
                 {item.observacoes && (
-                  <p className="text-sm text-text-secondary mt-2 line-clamp-2">{item.observacoes}</p>
+                  <p className="text-body-medium text-text-secondary mt-2 line-clamp-2">{item.observacoes}</p>
                 )}
               </div>
             </Card>
@@ -175,15 +175,15 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
 
       <div className="flex flex-col gap-2 pt-2 border-t border-border">
         <div className="flex items-center justify-between">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
             <ArrowLeft size={16} /> Anterior
           </Button>
-          <Button onClick={async () => { await onSave(items, 7) }} disabled={saving}>
+          <Button onClick={async () => { await onSave(items, 7) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>
         </div>
-        <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving} className="w-full">
+        <Button variant="secondary" onClick={async () => { await onSave(items) }} disabled={saving} className="w-full min-h-[48px]">
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Salvar rascunho
         </Button>

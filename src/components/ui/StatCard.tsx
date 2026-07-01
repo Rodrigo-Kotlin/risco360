@@ -53,17 +53,17 @@ export function StatCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-text-secondary uppercase tracking-wide truncate">{title}</p>
-          <p className="mt-1.5 text-2xl font-bold text-text-primary tabular-nums">{value}</p>
+          <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide truncate">{title}</p>
+          <p className="mt-1.5 text-headline-small font-bold text-text-primary tabular-nums">{value}</p>
           {description && (
-            <p className="mt-0.5 text-xs text-text-muted">{description}</p>
+            <p className="mt-0.5 text-body-small text-text-muted">{description}</p>
           )}
           {trend && trendValue && (
             <div className="mt-2 flex items-center gap-1">
               {trend === 'up' && <TrendingUp size={14} className="text-success" aria-hidden="true" />}
               {trend === 'down' && <TrendingDown size={14} className="text-danger" aria-hidden="true" />}
               <span className={cn(
-                'text-xs font-medium',
+                'text-label-medium font-medium',
                 trend === 'up' && 'text-success',
                 trend === 'down' && 'text-danger',
                 trend === 'neutral' && 'text-text-muted'

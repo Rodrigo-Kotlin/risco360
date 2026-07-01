@@ -46,7 +46,7 @@ export function DropdownMenu({ trigger, items, align = 'left', className }: Drop
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1"
+        className="inline-flex items-center gap-1 min-h-[48px]"
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -74,7 +74,7 @@ export function DropdownMenu({ trigger, items, align = 'left', className }: Drop
                 }
               }}
               className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left',
+                'w-full flex items-center gap-2.5 px-3 py-3 text-sm transition-colors text-left min-h-[48px]',
                 item.variant === 'danger'
                   ? 'text-danger hover:bg-red-50'
                   : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary',

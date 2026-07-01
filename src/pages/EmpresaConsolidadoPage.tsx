@@ -55,7 +55,7 @@ export default function EmpresaConsolidadoPage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{error ?? 'Dados não encontrados'}</p>
+          <p className="text-body-medium text-danger">{error ?? 'Dados não encontrados'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.empresas)}>
             <ArrowLeft size={16} /> Voltar
           </Button>
@@ -123,8 +123,8 @@ export default function EmpresaConsolidadoPage() {
               <div className="flex items-start gap-3">
                 <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-warning">Atenção: pendências de sincronização</p>
-                  <p className="text-xs text-text-muted mt-1">
+                  <p className="text-label-large text-warning">Atenção: pendências de sincronização</p>
+                  <p className="text-body-small text-text-muted mt-1">
                     {pendentes.length} setor(es) com formulário pendente ou em rascunho.
                     Os dados exportados refletem apenas o que foi preenchido até o momento.
                   </p>
@@ -138,11 +138,11 @@ export default function EmpresaConsolidadoPage() {
               <div className="flex items-center gap-3">
                 <Building2 size={20} className="text-primary-600" />
                 <div>
-                  <p className="text-xs text-text-muted">Setores</p>
-                  <p className="text-2xl font-bold">{resumo.totalSetores}</p>
+                  <p className="text-label-medium text-text-muted">Setores</p>
+                  <p className="text-headline-small font-bold">{resumo.totalSetores}</p>
                 </div>
               </div>
-              <div className="flex gap-3 mt-2 text-xs text-text-muted">
+              <div className="flex gap-3 mt-2 text-body-small text-text-muted">
                 <span className="flex items-center gap-1"><CheckCircle size={12} className="text-success" /> {resumo.concluidos} concluídos</span>
                 <span className="flex items-center gap-1"><Clock size={12} className="text-warning" /> {resumo.pendentes} pendentes</span>
               </div>
@@ -152,8 +152,8 @@ export default function EmpresaConsolidadoPage() {
               <div className="flex items-center gap-3">
                 <AlertTriangle size={20} className="text-danger" />
                 <div>
-                  <p className="text-xs text-text-muted">Riscos Identificados</p>
-                  <p className="text-2xl font-bold">{resumo.totalRiscos}</p>
+                  <p className="text-label-medium text-text-muted">Riscos Identificados</p>
+                  <p className="text-headline-small font-bold">{resumo.totalRiscos}</p>
                 </div>
               </div>
             </Card>
@@ -162,8 +162,8 @@ export default function EmpresaConsolidadoPage() {
               <div className="flex items-center gap-3">
                 <Ruler size={20} className="text-info" />
                 <div>
-                  <p className="text-xs text-text-muted">Medições</p>
-                  <p className="text-2xl font-bold">{resumo.totalMedicoes}</p>
+                  <p className="text-label-medium text-text-muted">Medições</p>
+                  <p className="text-headline-small font-bold">{resumo.totalMedicoes}</p>
                 </div>
               </div>
             </Card>
@@ -172,8 +172,8 @@ export default function EmpresaConsolidadoPage() {
               <div className="flex items-center gap-3">
                 <ClipboardList size={20} className="text-primary-600" />
                 <div>
-                  <p className="text-xs text-text-muted">Ações do Plano</p>
-                  <p className="text-2xl font-bold">{resumo.totalAcoes}</p>
+                  <p className="text-label-medium text-text-muted">Ações do Plano</p>
+                  <p className="text-headline-small font-bold">{resumo.totalAcoes}</p>
                 </div>
               </div>
             </Card>
@@ -203,36 +203,36 @@ export default function EmpresaConsolidadoPage() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-text-primary">Setores</h3>
-                <p className="text-xs text-text-muted">Status dos formulários setoriais</p>
+                <h3 className="text-title-small font-semibold text-text-primary">Setores</h3>
+                <p className="text-body-small text-text-muted">Status dos formulários setoriais</p>
               </div>
             </div>
             {consolidado.setores.length === 0 ? (
               <Card className="p-5">
-                <p className="text-sm text-text-muted">Nenhum setor cadastrado.</p>
+                <p className="text-body-medium text-text-muted">Nenhum setor cadastrado.</p>
               </Card>
             ) : (
               <div className="border border-border-light rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
+                <table className="w-full">
                   <thead>
                     <tr className="bg-surface-secondary border-b border-border-light">
-                      <th className="text-left p-3 text-text-muted font-medium">Setor</th>
-                      <th className="text-left p-3 text-text-muted font-medium">Status</th>
-                      <th className="text-center p-3 text-text-muted font-medium">%</th>
-                      <th className="text-center p-3 text-text-muted font-medium">Riscos</th>
-                      <th className="text-center p-3 text-text-muted font-medium">Medições</th>
-                      <th className="text-center p-3 text-text-muted font-medium">Ações</th>
+                      <th className="text-left p-3 text-text-muted font-medium text-label-large">Setor</th>
+                      <th className="text-left p-3 text-text-muted font-medium text-label-large">Status</th>
+                      <th className="text-center p-3 text-text-muted font-medium text-label-large">%</th>
+                      <th className="text-center p-3 text-text-muted font-medium text-label-large">Riscos</th>
+                      <th className="text-center p-3 text-text-muted font-medium text-label-large">Medições</th>
+                      <th className="text-center p-3 text-text-muted font-medium text-label-large">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
                     {consolidado.setores.map((s) => (
                       <tr key={s.setor.id} className="border-b border-border-light hover:bg-surface-secondary/50">
-                        <td className="p-3 font-medium text-text-primary">{s.setor.nome}</td>
-                        <td className="p-3">{statusBadge(s.status)}</td>
-                        <td className="p-3 text-center text-text-primary">{s.percentual}%</td>
-                        <td className="p-3 text-center text-text-primary">{s.riscos.length}</td>
-                        <td className="p-3 text-center text-text-primary">{s.medicoes}</td>
-                        <td className="p-3 text-center text-text-primary">{s.controles.length}</td>
+                        <td className="p-3 font-medium text-text-primary text-body-medium">{s.setor.nome}</td>
+                        <td className="p-3 text-body-medium">{statusBadge(s.status)}</td>
+                        <td className="p-3 text-center text-text-primary text-body-medium">{s.percentual}%</td>
+                        <td className="p-3 text-center text-text-primary text-body-medium">{s.riscos.length}</td>
+                        <td className="p-3 text-center text-text-primary text-body-medium">{s.medicoes}</td>
+                        <td className="p-3 text-center text-text-primary text-body-medium">{s.controles.length}</td>
                       </tr>
                     ))}
                   </tbody>

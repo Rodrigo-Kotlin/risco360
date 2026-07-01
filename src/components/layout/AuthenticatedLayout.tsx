@@ -32,7 +32,7 @@ function MobileDrawer() {
         <div className="flex items-center justify-between px-4 h-16 border-b border-border-light shrink-0">
           <Logo />
           <button type="button" onClick={closeDrawer}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-muted transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-muted transition-colors"
             aria-label="Fechar menu">
             <X size={20} />
           </button>
@@ -48,7 +48,7 @@ function MobileDrawer() {
                     end
                     onClick={closeDrawer}
                     className={({ isActive }) => cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                      'flex items-center gap-3 px-3 py-3 rounded-lg text-label-large transition-colors',
                       isActive
                         ? 'bg-primary-50 text-primary-500'
                         : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'

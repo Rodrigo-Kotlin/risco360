@@ -7,9 +7,9 @@ export default function NotFoundPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-surface">
-          <span className="text-6xl font-bold text-primary-500/20 select-none">404</span>
-      <h1 className="mt-4 text-lg font-semibold text-text-primary">Página não encontrada</h1>
-      <p className="mt-1 text-sm text-text-secondary max-w-sm">
+          <span className="text-display-small font-bold text-primary-500/20 select-none">404</span>
+      <h1 className="mt-4 text-title-large font-semibold text-text-primary">Página não encontrada</h1>
+      <p className="mt-1 text-body-medium text-text-secondary max-w-sm">
         A rota acessada não existe ou foi movida.
       </p>
       <div className="mt-6 flex items-center gap-3">

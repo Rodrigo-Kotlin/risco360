@@ -39,24 +39,24 @@ export default function SincronizacaoPage() {
               {/* Resumo geral */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <Card className="p-4 text-center">
-                  <p className="text-xs font-medium text-text-secondary uppercase tracking-wide">Sincronizados</p>
-                  <p className="mt-1 text-2xl font-bold text-success">{metrics?.synced ?? 0}</p>
+                  <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Sincronizados</p>
+                  <p className="mt-1 text-headline-small font-bold text-success">{metrics?.synced ?? 0}</p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="text-xs font-medium text-text-secondary uppercase tracking-wide">Pendentes</p>
-                  <p className={`mt-1 text-2xl font-bold ${(metrics?.pending ?? 0) > 0 ? 'text-warning' : 'text-text-muted'}`}>
+                  <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Pendentes</p>
+                  <p className={`mt-1 text-headline-small font-bold ${(metrics?.pending ?? 0) > 0 ? 'text-warning' : 'text-text-muted'}`}>
                     {metrics?.pending ?? 0}
                   </p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="text-xs font-medium text-text-secondary uppercase tracking-wide">Falhas</p>
-                  <p className={`mt-1 text-2xl font-bold ${(metrics?.failed ?? 0) > 0 ? 'text-danger' : 'text-text-muted'}`}>
+                  <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Falhas</p>
+                  <p className={`mt-1 text-headline-small font-bold ${(metrics?.failed ?? 0) > 0 ? 'text-danger' : 'text-text-muted'}`}>
                     {metrics?.failed ?? 0}
                   </p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="text-xs font-medium text-text-secondary uppercase tracking-wide">Conflitos</p>
-                  <p className={`mt-1 text-2xl font-bold ${(metrics?.conflicts ?? 0) > 0 ? 'text-warning' : 'text-text-muted'}`}>
+                  <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Conflitos</p>
+                  <p className={`mt-1 text-headline-small font-bold ${(metrics?.conflicts ?? 0) > 0 ? 'text-warning' : 'text-text-muted'}`}>
                     {metrics?.conflicts ?? 0}
                   </p>
                 </Card>
@@ -73,7 +73,7 @@ export default function SincronizacaoPage() {
                     type="button"
                     onClick={triggerSync}
                     disabled={isSyncing}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-500 hover:text-primary-600 disabled:text-text-muted transition-colors"
+                    className="min-h-[48px] inline-flex items-center gap-1.5 text-label-medium font-medium text-primary-500 hover:text-primary-600 disabled:text-text-muted transition-colors"
                   >
                     {isSyncing ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -85,17 +85,17 @@ export default function SincronizacaoPage() {
                 </CardHeader>
                 <div className="px-5 pb-5 space-y-2">
                   {metrics?.lastSyncAt ? (
-                    <p className="text-sm text-text-secondary">
+                      <p className="text-body-medium text-text-secondary">
                       Última sincronização:{' '}
                       <span className="font-medium">
                         {new Date(metrics.lastSyncAt).toLocaleString('pt-BR')}
                       </span>
                     </p>
                   ) : (
-                    <p className="text-sm text-text-muted">Nenhuma sincronização registrada ainda.</p>
+                    <p className="text-body-medium text-text-muted">Nenhuma sincronização registrada ainda.</p>
                   )}
                   {isSyncing && lastSyncMessage && (
-                    <p className="text-xs text-primary-500 flex items-center gap-1">
+                    <p className="text-body-small text-primary-500 flex items-center gap-1">
                       <Loader2 size={10} className="animate-spin" />
                       {lastSyncMessage}
                     </p>
@@ -113,7 +113,7 @@ export default function SincronizacaoPage() {
                     </div>
                   </CardHeader>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
+                    <table className="w-full text-body-small text-left">
                       <thead>
                         <tr className="border-b border-border">
                           <th className="px-5 py-2 font-medium text-text-secondary">Entidade</th>
@@ -157,7 +157,7 @@ export default function SincronizacaoPage() {
                     </div>
                   </CardHeader>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
+                    <table className="w-full text-body-small text-left">
                       <thead>
                         <tr className="border-b border-border">
                           <th className="px-5 py-2 font-medium text-text-secondary">Entidade</th>
@@ -199,8 +199,8 @@ export default function SincronizacaoPage() {
               {metrics && metrics.allItems.length === 0 && (
                 <Card className="p-6 text-center">
                   <CheckCircle2 size={32} className="mx-auto text-success mb-2" />
-                  <p className="text-sm font-medium text-text-primary">Fila vazia</p>
-                  <p className="text-xs text-text-muted mt-1">Nenhum item aguardando sincronização.</p>
+                  <p className="text-title-small font-medium text-text-primary">Fila vazia</p>
+                  <p className="text-body-small text-text-muted mt-1">Nenhum item aguardando sincronização.</p>
                 </Card>
               )}
             </>

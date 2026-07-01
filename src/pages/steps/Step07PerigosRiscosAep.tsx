@@ -91,8 +91,8 @@ export function Step07PerigosRiscosAep({
       <FormSection title="Perigos e riscos ocupacionais"
         description="Identifique os perigos e avalie os riscos presentes no setor">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-text-secondary">{riskItems.length} risco(s) identificado(s)</p>
-          <Button onClick={() => { setEditingRisk(undefined); setShowRiskForm(true) }} size="sm">
+          <p className="text-body-medium text-text-secondary">{riskItems.length} risco(s) identificado(s)</p>
+          <Button onClick={() => { setEditingRisk(undefined); setShowRiskForm(true) }} size="sm" className="min-h-[48px]">
             <Plus size={14} /> Novo risco
           </Button>
         </div>
@@ -157,8 +157,8 @@ export function Step07PerigosRiscosAep({
               onChange={(e) => setAe('necessidade_aet_complementar', e.target.checked)}
               className="mt-1 h-4 w-4 rounded border-border text-brand-600 focus:ring-primary-500" />
             <div>
-              <p className="text-sm font-medium text-text-primary">Necessidade de AET complementar</p>
-              <p className="text-xs text-text-muted">Avaliação Ergonômica do Trabalho detalhada</p>
+              <p className="text-label-large text-text-primary">Necessidade de AET complementar</p>
+              <p className="text-label-medium text-text-muted">Avaliação Ergonômica do Trabalho detalhada</p>
             </div>
           </label>
         </Card>
@@ -175,22 +175,23 @@ export function Step07PerigosRiscosAep({
       <FormSection title="Medidas de controle e plano de ação"
         description="Defina as ações de controle para eliminar ou reduzir os riscos identificados">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-text-secondary">{controlItems.length} aç(ão/ões) de controle</p>
-          <Button onClick={() => { setEditingControl(undefined); setControlModalOpen(true) }} size="sm">
+          <p className="text-body-medium text-text-secondary">{controlItems.length} aç(ão/ões) de controle</p>
+          <Button onClick={() => { setEditingControl(undefined); setControlModalOpen(true) }} size="sm" className="min-h-[48px]">
             <Plus size={14} /> Nova ação
           </Button>
         </div>
         {controlItems.map((item) => (
           <Card key={item.id} className="p-3 mb-2">
             <div className="flex items-start justify-between">
-              <div className="text-sm">
+              <div className="text-body-medium">
                 <p className="font-medium">{item.descricao}</p>
-                {item.responsavel && <p className="text-text-muted text-xs">Responsável: {item.responsavel}</p>}
-                {item.prazo && <p className="text-text-muted text-xs">Prazo: {item.prazo}</p>}
+                {item.responsavel && <p className="text-text-muted text-label-medium">Responsável: {item.responsavel}</p>}
+                {item.prazo && <p className="text-text-muted text-label-medium">Prazo: {item.prazo}</p>}
               </div>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon"
-                  onClick={() => { setEditingControl(item); setControlModalOpen(true) }}>
+                  onClick={() => { setEditingControl(item); setControlModalOpen(true) }}
+                  className="min-h-[48px] w-12 h-12">
                   <ArrowRight size={14} />
                 </Button>
               </div>
@@ -201,7 +202,7 @@ export function Step07PerigosRiscosAep({
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setControlModalOpen(false); setEditingControl(undefined) }}>
             <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="px-6 py-4 border-b border-border">
-                <h2 className="text-lg font-semibold">{editingControl ? 'Editar ação' : 'Nova ação'}</h2>
+                <h2 className="text-title-large font-semibold">{editingControl ? 'Editar ação' : 'Nova ação'}</h2>
               </div>
               <div className="px-6 py-4">
                 <PlanoAcaoForm initial={editingControl} riscoOptions={riscoOptions}

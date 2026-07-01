@@ -31,10 +31,10 @@ export function RiscoCard({ risco, onEdit, onDelete }: RiscoCardProps) {
             <CardTitle className="truncate">{risco.agente}</CardTitle>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Editar risco">
+            <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Editar risco" className="w-12 h-12">
               <Pencil size={14} />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir risco">
+            <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir risco" className="w-12 h-12">
               <Trash2 size={14} />
             </Button>
           </div>
@@ -47,10 +47,10 @@ export function RiscoCard({ risco, onEdit, onDelete }: RiscoCardProps) {
           </div>
 
           {risco.descricao && (
-            <p className="text-sm text-text-secondary">{risco.descricao}</p>
+            <p className="text-body-medium text-text-secondary">{risco.descricao}</p>
           )}
 
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-body-medium">
             {risco.fonte_geradora && (
               <>
                 <span className="text-text-muted">Fonte geradora:</span>

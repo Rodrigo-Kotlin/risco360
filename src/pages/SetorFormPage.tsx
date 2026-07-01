@@ -129,7 +129,7 @@ export default function SetorFormPage() {
         <Header title="Erro" />
         <MainContainer>
           <div className="space-y-4">
-            <p className="text-sm text-danger">{fetchError}</p>
+            <p className="text-body-medium text-danger">{fetchError}</p>
             <Button variant="secondary" onClick={() => navigate(ROUTES.setores)}>
               <ArrowLeft size={16} /> Voltar
             </Button>
@@ -214,7 +214,7 @@ export default function SetorFormPage() {
               {(errors.nome || errors.empresaId) && (
                 <div className="space-y-1">
                   {Object.entries(errors).map(([key, msg]) => (
-                    <p key={key} className="text-xs text-danger">{msg}</p>
+                    <p key={key} className="text-body-small text-danger">{msg}</p>
                   ))}
                 </div>
               )}

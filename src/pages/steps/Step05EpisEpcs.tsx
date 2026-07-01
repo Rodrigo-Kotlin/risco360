@@ -76,25 +76,25 @@ function EpisSection({ items, onChange }: { items: EpisItem[] | null | undefined
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-text-primary">EPIs encontrados ({safeItems.length})</p>
-        <Button size="sm" variant="secondary" onClick={() => { setOpen(true); setEditingIdx(null); setNome(''); setCa(''); setObs('') }}>
+        <p className="text-label-large text-text-primary">EPIs encontrados ({safeItems.length})</p>
+        <Button size="sm" variant="secondary" onClick={() => { setOpen(true); setEditingIdx(null); setNome(''); setCa(''); setObs('') }} className="min-h-[48px]">
           <Plus size={14} /> Adicionar EPI
         </Button>
       </div>
       {safeItems.length === 0 && !open && (
-        <p className="text-sm text-text-muted">Nenhum EPI registrado.</p>
+        <p className="text-body-small text-text-muted">Nenhum EPI registrado.</p>
       )}
       {safeItems.map((epi, i) => (
         <Card key={i} className="p-3">
           <div className="flex items-start justify-between">
-            <div className="text-sm">
-              <p className="font-medium">{epi.nome}</p>
-              {epi.ca && <p className="text-text-muted text-xs">CA: {epi.ca}</p>}
-              {epi.observacao && <p className="text-text-muted text-xs">{epi.observacao}</p>}
+          <div className="text-body-medium">
+            <p className="font-medium">{epi.nome}</p>
+            {epi.ca && <p className="text-text-muted text-label-medium">CA: {epi.ca}</p>}
+            {epi.observacao && <p className="text-text-muted text-label-medium">{epi.observacao}</p>}
             </div>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" onClick={() => edit(i)}><Pencil size={14} /></Button>
-              <Button variant="ghost" size="icon" onClick={() => onChange(safeItems.filter((_, j) => j !== i))} className="text-danger"><Trash2 size={14} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => edit(i)} className="min-h-[48px] w-12 h-12"><Pencil size={14} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => onChange(safeItems.filter((_, j) => j !== i))} className="text-danger min-h-[48px] w-12 h-12"><Trash2 size={14} /></Button>
             </div>
           </div>
         </Card>
@@ -108,7 +108,7 @@ function EpisSection({ items, onChange }: { items: EpisItem[] | null | undefined
               type="button"
               onClick={() => addPredefined(opt.label)}
               aria-pressed={selected}
-              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+              className={`px-3 py-3 text-label-medium rounded-full border transition-colors min-h-[48px] ${
                 selected
                   ? 'bg-primary-500/10 border-primary-500 text-primary-600 cursor-default'
                   : 'bg-surface border-border text-text-secondary hover:border-primary-500 hover:text-primary-600'
@@ -125,8 +125,8 @@ function EpisSection({ items, onChange }: { items: EpisItem[] | null | undefined
           <Input label="CA" value={ca} onChange={(e) => setCa(e.target.value)} placeholder="Certificado de Aprovação" />
           <Textarea label="Observação" value={obs} onChange={(e) => setObs(e.target.value)} rows={2} placeholder="Observações…" />
           <div className="flex gap-2">
-            <Button onClick={save} disabled={!nome.trim()}>{editingIdx !== null ? 'Atualizar' : 'Adicionar'}</Button>
-            <Button variant="secondary" onClick={() => { setOpen(false); setEditingIdx(null) }}>Cancelar</Button>
+            <Button onClick={save} disabled={!nome.trim()} className="min-h-[48px]">{editingIdx !== null ? 'Atualizar' : 'Adicionar'}</Button>
+            <Button variant="secondary" onClick={() => { setOpen(false); setEditingIdx(null) }} className="min-h-[48px]">Cancelar</Button>
           </div>
         </Card>
       )}
@@ -160,24 +160,24 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-text-primary">EPCs encontrados ({safeItems.length})</p>
-        <Button size="sm" variant="secondary" onClick={() => { setOpen(true); setEditingIdx(null); setNome(''); setObs('') }}>
+        <p className="text-label-large text-text-primary">EPCs encontrados ({safeItems.length})</p>
+        <Button size="sm" variant="secondary" onClick={() => { setOpen(true); setEditingIdx(null); setNome(''); setObs('') }} className="min-h-[48px]">
           <Plus size={14} /> Adicionar EPC
         </Button>
       </div>
       {safeItems.length === 0 && !open && (
-        <p className="text-sm text-text-muted">Nenhum EPC registrado.</p>
+        <p className="text-body-small text-text-muted">Nenhum EPC registrado.</p>
       )}
       {safeItems.map((epc, i) => (
         <Card key={i} className="p-3">
           <div className="flex items-start justify-between">
-            <div className="text-sm">
+            <div className="text-body-medium">
               <p className="font-medium">{epc.nome}</p>
-              {epc.observacao && <p className="text-text-muted text-xs">{epc.observacao}</p>}
+              {epc.observacao && <p className="text-text-muted text-label-medium">{epc.observacao}</p>}
             </div>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" onClick={() => { setNome(epc.nome); setObs(epc.observacao ?? ''); setEditingIdx(i); setOpen(true) }}><Pencil size={14} /></Button>
-              <Button variant="ghost" size="icon" onClick={() => onChange(safeItems.filter((_, j) => j !== i))} className="text-danger"><Trash2 size={14} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => { setNome(epc.nome); setObs(epc.observacao ?? ''); setEditingIdx(i); setOpen(true) }} className="min-h-[48px] w-12 h-12"><Pencil size={14} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => onChange(safeItems.filter((_, j) => j !== i))} className="text-danger min-h-[48px] w-12 h-12"><Trash2 size={14} /></Button>
             </div>
           </div>
         </Card>
@@ -191,7 +191,7 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
               type="button"
               onClick={() => addPredefined(opt.label)}
               aria-pressed={selected}
-              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+              className={`px-3 py-3 text-label-medium rounded-full border transition-colors min-h-[48px] ${
                 selected
                   ? 'bg-primary-500/10 border-primary-500 text-primary-600 cursor-default'
                   : 'bg-surface border-border text-text-secondary hover:border-primary-500 hover:text-primary-600'
@@ -207,8 +207,8 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
           <Input label="Nome do EPC" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Extintor, sinalização" />
           <Textarea label="Observação" value={obs} onChange={(e) => setObs(e.target.value)} rows={2} placeholder="Observações…" />
           <div className="flex gap-2">
-            <Button onClick={save} disabled={!nome.trim()}>{editingIdx !== null ? 'Atualizar' : 'Adicionar'}</Button>
-            <Button variant="secondary" onClick={() => { setOpen(false); setEditingIdx(null) }}>Cancelar</Button>
+            <Button onClick={save} disabled={!nome.trim()} className="min-h-[48px]">{editingIdx !== null ? 'Atualizar' : 'Adicionar'}</Button>
+            <Button variant="secondary" onClick={() => { setOpen(false); setEditingIdx(null) }} className="min-h-[48px]">Cancelar</Button>
           </div>
         </Card>
       )}
@@ -295,17 +295,17 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-text-primary">Imagens / evidências ({safeItems.length})</p>
-        <Button size="sm" variant="secondary" onClick={addImage} disabled={uploadingIdx !== null}>
+        <p className="text-label-large text-text-primary">Imagens / evidências ({safeItems.length})</p>
+        <Button size="sm" variant="secondary" onClick={addImage} disabled={uploadingIdx !== null} className="min-h-[48px]">
           {uploadingIdx !== null ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
           {uploadingIdx !== null ? 'Enviando...' : 'Capturar imagem'}
         </Button>
       </div>
       {safeItems.length === 0 && (
-        <p className="text-sm text-text-muted">Nenhuma evidência registrada. Toque em "Capturar imagem" para fotografar o ambiente.</p>
+        <p className="text-body-small text-text-muted">Nenhuma evidência registrada. Toque em "Capturar imagem" para fotografar o ambiente.</p>
       )}
       {errorMessage && (
-        <div className="flex items-center gap-2 p-2 text-xs text-danger bg-danger/5 rounded-lg">
+        <div className="flex items-center gap-2 p-2 text-label-medium text-danger bg-danger/5 rounded-lg">
           <AlertCircle size={14} />
           {errorMessage}
         </div>
@@ -334,18 +334,18 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
               )}
             </div>
             <div className="mt-1.5 space-y-1">
-              <p className="text-xs font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
+              <p className="text-label-medium font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                  {ev.upload_status === 'error' && <span className="text-[10px] text-danger">Erro</span>}
-                  {ev.upload_status === 'pending' && <span className="text-[10px] text-warning">Pendente</span>}
-                  {ev.upload_status === 'uploaded' && <span className="text-[10px] text-success">Enviado</span>}
+                  {ev.upload_status === 'error' && <span className="text-label-medium text-danger">Erro</span>}
+                  {ev.upload_status === 'pending' && <span className="text-label-medium text-warning">Pendente</span>}
+                  {ev.upload_status === 'uploaded' && <span className="text-label-medium text-success">Enviado</span>}
                   {ev.sync_status === 'pending' && !ev.upload_status && (
-                    <span className="text-[10px] px-1 py-0.5 rounded bg-warning/10 text-warning">pendente</span>
+                    <span className="text-label-medium px-1 py-0.5 rounded bg-warning/10 text-warning">pendente</span>
                   )}
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => removeImage(i)}
-                  className="text-danger h-7 w-7" disabled={ev.upload_status === 'uploading'}>
+                  className="text-danger min-h-[48px] w-12 h-12" disabled={ev.upload_status === 'uploading'}>
                   <Trash2 size={12} />
                 </Button>
               </div>
@@ -367,7 +367,7 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
               alt={safeItems[lightboxIdx].legenda ?? `Evidência ${lightboxIdx + 1}`}
               className="max-w-full max-h-[85vh] rounded-lg object-contain" />
             {safeItems[lightboxIdx].legenda && (
-              <p className="text-white/80 text-sm mt-2 text-center">{safeItems[lightboxIdx].legenda}</p>
+              <p className="text-white/80 text-body-medium mt-2 text-center">{safeItems[lightboxIdx].legenda}</p>
             )}
           </div>
         </div>
@@ -415,7 +415,7 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors -mb-px',
+                'flex items-center gap-1.5 px-3 py-3 text-label-medium font-medium whitespace-nowrap border-b-2 transition-colors -mb-px min-h-[48px]',
                 isActive
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-text-muted hover:text-text-secondary hover:border-border-light'
@@ -428,7 +428,7 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
               {tab.label}
               {count > 0 && (
                 <span className={cn(
-                  'text-[10px] px-1.5 py-0.5 rounded-full',
+                  'text-label-medium px-1.5 py-0.5 rounded-full',
                   isActive ? 'bg-primary-500/10 text-primary-600' : 'bg-surface-muted text-text-muted'
                 )}>
                   {count}

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./theme.css";
+@import "./typography.css";
 
 *,
 *::before,
@@ -17,8 +18,15 @@ body,
 }
 
 html {
+  font-size: 16px;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 17px;
+  }
 }
 
 body {
@@ -70,6 +78,13 @@ img {
 }
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -14,7 +14,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="space-y-1">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-text-primary">
+          <label htmlFor={inputId} className="block text-label-large text-text-primary">
             {label}
             {props.required && <span className="text-danger ml-0.5" aria-hidden="true">*</span>}
           </label>
@@ -24,7 +24,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={inputId}
           rows={rows}
           className={cn(
-            'w-full rounded-xl border text-sm bg-white transition-colors resize-y min-h-[80px]',
+            'w-full rounded-xl border text-body-medium bg-white transition-colors resize-y min-h-[80px]',
             'placeholder:text-text-muted py-2.5 px-3.5',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-primary-500',
             error ? 'border-danger' : 'border-border-light hover:border-text-muted',
@@ -35,10 +35,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {hint && !error && (
-          <p id={`${inputId}-hint`} className="text-xs text-text-muted">{hint}</p>
+          <p id={`${inputId}-hint`} className="text-label-medium text-text-muted">{hint}</p>
         )}
         {error && (
-          <p id={`${inputId}-error`} className="text-xs text-danger" role="alert">{error}</p>
+          <p id={`${inputId}-error`} className="text-label-medium text-danger" role="alert">{error}</p>
         )}
       </div>
     )

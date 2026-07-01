@@ -48,7 +48,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             className={cn(
-              'pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg shadow-dropdown text-sm font-medium animate-slide-up',
+              'pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg shadow-dropdown text-body-medium font-medium animate-slide-up',
               variantStyles[t.variant]
             )}
             role="alert"
@@ -58,7 +58,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => removeToast(t.id)}
-              className="shrink-0 opacity-80 hover:opacity-100 transition-opacity"
+              className="shrink-0 min-w-[48px] min-h-[48px] opacity-80 hover:opacity-100 transition-opacity"
               aria-label="Fechar notificação"
             >
               <X size={16} />

@@ -102,32 +102,32 @@ export function Step08RevisaoConclusao({
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-primary">Progresso geral</span>
-              <span className="text-sm font-medium">{percentual}%</span>
+              <span className="text-label-large text-text-primary">Progresso geral</span>
+              <span className="text-label-large">{percentual}%</span>
             </div>
             <ProgressBar value={percentual} variant={percentual === 100 ? 'success' : 'default'} showLabel />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="p-3 bg-surface-muted rounded-lg text-center">
-              <p className="text-2xl font-bold text-text-primary">{totalRiscos}</p>
-              <p className="text-xs text-text-muted">Riscos totais</p>
+              <p className="text-headline-small font-bold text-text-primary">{totalRiscos}</p>
+              <p className="text-label-medium text-text-muted">Riscos totais</p>
             </div>
             <div className="p-3 bg-danger-50 rounded-lg text-center">
-              <p className="text-2xl font-bold text-danger">{criticos}</p>
-              <p className="text-xs text-danger">Críticos</p>
+              <p className="text-headline-small font-bold text-danger">{criticos}</p>
+              <p className="text-label-medium text-danger">Críticos</p>
             </div>
             <div className="p-3 bg-warning-light rounded-lg text-center">
-              <p className="text-2xl font-bold text-warning">{altos}</p>
-              <p className="text-xs text-warning">Altos</p>
+              <p className="text-headline-small font-bold text-warning">{altos}</p>
+              <p className="text-label-medium text-warning">Altos</p>
             </div>
             <div className="p-3 bg-surface-muted rounded-lg text-center">
-              <p className="text-2xl font-bold text-text-primary">{totalMedicoes}</p>
-              <p className="text-xs text-text-muted">Medições</p>
+              <p className="text-headline-small font-bold text-text-primary">{totalMedicoes}</p>
+              <p className="text-label-medium text-text-muted">Medições</p>
             </div>
           </div>
 
-          <div className="text-sm text-text-secondary flex gap-4">
+          <div className="text-body-medium text-text-secondary flex gap-4">
             <span className="flex items-center gap-1"><FileText size={14} /> {totalAcoes} aç(ão/ões)</span>
           </div>
         </div>
@@ -137,7 +137,7 @@ export function Step08RevisaoConclusao({
         <CardTitle className="mb-4">Etapas concluídas</CardTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {itemsChecados.map((s) => (
-            <div key={s.label} className="flex items-center gap-2 text-sm">
+            <div key={s.label} className="flex items-center gap-2 text-body-medium">
               {s.check ? (
                 <CheckCircle2 size={16} className="text-success shrink-0" />
               ) : (
@@ -154,13 +154,13 @@ export function Step08RevisaoConclusao({
           <CardTitle className="mb-4">Riscos identificados</CardTitle>
           <div className="space-y-2">
             {levantamento.riscos.slice(0, 10).map((r) => (
-              <div key={r.id} className="flex items-center justify-between text-sm">
+              <div key={r.id} className="flex items-center justify-between text-body-medium">
                 <span className="text-text-primary truncate">{r.agente}</span>
                 <NivelRiscoBadge nivel={r.nivel_risco} />
               </div>
             ))}
             {levantamento.riscos.length > 10 && (
-              <p className="text-xs text-text-muted">+ {levantamento.riscos.length - 10} riscos ocultos</p>
+              <p className="text-label-medium text-text-muted">+ {levantamento.riscos.length - 10} riscos ocultos</p>
             )}
           </div>
         </Card>
@@ -189,18 +189,18 @@ export function Step08RevisaoConclusao({
               <UserCheck size={16} className="text-text-muted" />
               <CardTitle>Responsável técnico</CardTitle>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setModalTecnicoOpen(true)}>
+            <Button variant="ghost" size="sm" onClick={() => setModalTecnicoOpen(true)} className="min-h-[48px]">
               {assinaturaTecnico.nome ? 'Editar' : 'Adicionar'}
             </Button>
           </div>
           {assinaturaTecnico.nome ? (
-            <div className="text-sm space-y-1">
+            <div className="text-body-medium space-y-1">
               <p><span className="text-text-muted">Nome:</span> {assinaturaTecnico.nome}</p>
               {assinaturaTecnico.cargo && <p><span className="text-text-muted">Cargo:</span> {assinaturaTecnico.cargo}</p>}
               {assinaturaTecnico.registro_profissional && <p><span className="text-text-muted">Registro:</span> {assinaturaTecnico.registro_profissional}</p>}
             </div>
           ) : (
-            <p className="text-sm text-text-muted">Nenhum responsável registrado</p>
+            <p className="text-body-medium text-text-muted">Nenhum responsável registrado</p>
           )}
         </Card>
         <Card className="p-5">
@@ -209,18 +209,18 @@ export function Step08RevisaoConclusao({
               <Building2 size={16} className="text-text-muted" />
               <CardTitle>Responsável da empresa</CardTitle>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setModalEmpresaOpen(true)}>
+            <Button variant="ghost" size="sm" onClick={() => setModalEmpresaOpen(true)} className="min-h-[48px]">
               {assinaturaEmpresa.nome ? 'Editar' : 'Adicionar'}
             </Button>
           </div>
           {assinaturaEmpresa.nome ? (
-            <div className="text-sm space-y-1">
+            <div className="text-body-medium space-y-1">
               <p><span className="text-text-muted">Nome:</span> {assinaturaEmpresa.nome}</p>
               {assinaturaEmpresa.cargo && <p><span className="text-text-muted">Cargo:</span> {assinaturaEmpresa.cargo}</p>}
               {assinaturaEmpresa.registro_profissional && <p><span className="text-text-muted">Registro:</span> {assinaturaEmpresa.registro_profissional}</p>}
             </div>
           ) : (
-            <p className="text-sm text-text-muted">Nenhum responsável registrado</p>
+            <p className="text-body-medium text-text-muted">Nenhum responsável registrado</p>
           )}
         </Card>
       </div>

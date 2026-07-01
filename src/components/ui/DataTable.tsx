@@ -98,8 +98,8 @@ export function DataTable<T extends object>({
   if (error) {
     return (
       <div className="bg-card border border-border rounded-xl p-6">
-        <p className="text-sm text-danger mb-1">Erro ao carregar dados</p>
-        <p className="text-xs text-text-muted">{error}</p>
+        <p className="text-body-medium text-danger mb-1">Erro ao carregar dados</p>
+        <p className="text-body-small text-text-muted">{error}</p>
       </div>
     )
   }
@@ -119,7 +119,7 @@ export function DataTable<T extends object>({
   return (
     <div className={cn('bg-card border border-border rounded-xl overflow-hidden', className)}>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-body-medium">
           <thead>
             <tr className="border-b border-border bg-surface-muted">
               {columns.map((col) => {
@@ -128,7 +128,7 @@ export function DataTable<T extends object>({
                   <th
                     key={String(col.key)}
                     className={cn(
-                      'px-5 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider',
+                      'px-5 py-3 text-left text-label-medium font-semibold text-text-secondary uppercase tracking-wider',
                       col.sortable !== false && sortable && 'cursor-pointer select-none hover:text-text-primary transition-colors',
                       col.headerClassName
                     )}

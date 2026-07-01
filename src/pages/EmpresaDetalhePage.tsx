@@ -92,7 +92,7 @@ export default function EmpresaDetalhePage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-sm text-danger">{error ?? 'Empresa não encontrada'}</p>
+          <p className="text-body-medium text-danger">{error ?? 'Empresa não encontrada'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.empresas)}>
             <ArrowLeft size={16} /> Voltar
           </Button>
@@ -152,8 +152,8 @@ export default function EmpresaDetalhePage() {
                   <div key={label} className="flex items-start gap-2.5">
                     <Icon size={16} className="shrink-0 mt-0.5 text-text-muted" />
                     <div className="min-w-0">
-                      <p className="text-xs text-text-muted">{label}</p>
-                      <p className="text-sm text-text-primary truncate">{value ?? <span className="text-text-muted">—</span>}</p>
+                      <p className="text-label-medium text-text-muted">{label}</p>
+                      <p className="text-body-medium text-text-primary truncate">{value ?? <span className="text-text-muted">—</span>}</p>
                     </div>
                   </div>
                 ))}
@@ -162,18 +162,18 @@ export default function EmpresaDetalhePage() {
 
             <Card className="p-5">
               <CardTitle className="mb-3">Resumo</CardTitle>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 text-body-medium">
                 <div>
-                  <p className="text-xs text-text-muted">Total de levantamentos</p>
-                  <p className="text-2xl font-bold text-text-primary">{levantamentos.length}</p>
+                  <p className="text-label-medium text-text-muted">Total de levantamentos</p>
+                  <p className="text-headline-small font-bold text-text-primary">{levantamentos.length}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-text-muted">Concluídos</p>
-                  <p className="text-2xl font-bold text-success">{levantamentos.filter((l) => l.status === 'concluido').length}</p>
+                  <p className="text-label-medium text-text-muted">Concluídos</p>
+                  <p className="text-headline-small font-bold text-success">{levantamentos.filter((l) => l.status === 'concluido').length}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-text-muted">Em andamento</p>
-                  <p className="text-2xl font-bold text-warning">{levantamentos.filter((l) => l.status !== 'concluido' && l.status !== 'arquivado').length}</p>
+                  <p className="text-label-medium text-text-muted">Em andamento</p>
+                  <p className="text-headline-small font-bold text-warning">{levantamentos.filter((l) => l.status !== 'concluido' && l.status !== 'arquivado').length}</p>
                 </div>
               </div>
             </Card>
@@ -182,15 +182,15 @@ export default function EmpresaDetalhePage() {
           {empresa.observacoes && (
             <Card className="p-5">
               <CardTitle className="mb-2">Observações</CardTitle>
-              <p className="text-sm text-text-secondary whitespace-pre-wrap">{empresa.observacoes}</p>
+              <p className="text-body-medium text-text-secondary whitespace-pre-wrap">{empresa.observacoes}</p>
             </Card>
           )}
 
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-text-primary">Setores</h3>
-                <p className="text-xs text-text-muted">Setores cadastrados e status do formulário LPR + AEP</p>
+                <h3 className="text-title-small font-semibold text-text-primary">Setores</h3>
+                <p className="text-body-small text-text-muted">Setores cadastrados e status do formulário LPR + AEP</p>
               </div>
               <Button size="sm" onClick={() => navigate(ROUTES.setorNovoComEmpresa.replace(':empresaId', empresa.id))}>
                 <Plus size={14} /> Adicionar Setor
@@ -198,7 +198,7 @@ export default function EmpresaDetalhePage() {
             </div>
             {setores.length === 0 ? (
               <Card className="p-5">
-                <p className="text-sm text-text-muted">Nenhum setor cadastrado para esta empresa.</p>
+                <p className="text-body-medium text-text-muted">Nenhum setor cadastrado para esta empresa.</p>
               </Card>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -214,13 +214,13 @@ export default function EmpresaDetalhePage() {
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <Layers size={16} className="text-text-muted shrink-0" />
-                        <p className="font-medium text-text-primary text-sm">{s.nome}</p>
+                        <p className="font-medium text-text-primary text-body-medium">{s.nome}</p>
                       </div>
                       {s.descricao && (
-                        <p className="text-xs text-text-secondary mb-2 line-clamp-2">{s.descricao}</p>
+                        <p className="text-body-small text-text-secondary mb-2 line-clamp-2">{s.descricao}</p>
                       )}
                       {s.responsavel_local && (
-                        <p className="text-xs text-text-muted mb-1">
+                        <p className="text-body-small text-text-muted mb-1">
                           <User size={12} className="inline mr-1" />
                           {s.responsavel_local}
                         </p>
@@ -228,7 +228,7 @@ export default function EmpresaDetalhePage() {
                       <div className="mt-auto space-y-1 pt-2 border-t border-border-light">
                         {form ? (
                           <>
-                            <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center justify-between text-label-medium">
                               <span className="text-text-muted">LPR + AEP</span>
                               <div className="flex items-center gap-1.5">
                                 {statusBadge(form.status)}
@@ -236,14 +236,14 @@ export default function EmpresaDetalhePage() {
                               </div>
                             </div>
                             {medicoesCount > 0 && (
-                              <p className="text-xs text-text-muted">{medicoesCount} medição(ões)</p>
+                              <p className="text-body-small text-text-muted">{medicoesCount} medição(ões)</p>
                             )}
                           </>
                         ) : (
                           <Badge variant="muted">Pendente</Badge>
                         )}
                         {ultimoLev && (
-                          <p className="text-[10px] text-text-muted">
+                          <p className="text-label-medium text-text-muted">
                             Última atualização: {new Date(ultimoLev.updated_at ?? '').toLocaleDateString('pt-BR')}
                           </p>
                         )}
@@ -259,8 +259,8 @@ export default function EmpresaDetalhePage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary">Levantamentos</h3>
-                  <p className="text-xs text-text-muted">Levantamentos de risco desta empresa</p>
+                  <h3 className="text-title-small font-semibold text-text-primary">Levantamentos</h3>
+                  <p className="text-body-small text-text-muted">Levantamentos de risco desta empresa</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -274,12 +274,12 @@ export default function EmpresaDetalhePage() {
                       <div className="flex items-center gap-2">
                         <ClipboardList size={14} className="text-text-muted shrink-0" />
                         <div>
-                          <p className="font-medium text-text-primary text-sm">{lev.codigo ?? 'Sem código'}</p>
-                          <p className="text-xs text-text-secondary">{lev.setor_nome ?? ''}</p>
+                          <p className="font-medium text-text-primary text-body-medium">{lev.codigo ?? 'Sem código'}</p>
+                          <p className="text-body-small text-text-secondary">{lev.setor_nome ?? ''}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-text-muted">{lev.percentual}%</span>
+                        <span className="text-body-small text-text-muted">{lev.percentual}%</span>
                         {statusBadge(lev.status)}
                       </div>
                     </div>

@@ -183,19 +183,19 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
               icon={cnpjLoading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
             />
             {cnpjLoading && (
-              <p className="text-xs text-text-muted flex items-center gap-1">
+              <p className="text-body-small text-text-muted flex items-center gap-1">
                 <Loader2 size={12} className="animate-spin" />
                 Consultando CNPJ...
               </p>
             )}
             {cnpjEmpresa && !cnpjLoading && (
-              <p className="text-xs text-green-600 flex items-center gap-1">
+              <p className="text-body-small text-green-600 flex items-center gap-1">
                 <CheckCircle2 size={12} />
                 Empresa localizada
               </p>
             )}
             {cnpjError && !cnpjLoading && (
-              <p className="text-xs text-danger flex items-center gap-1">
+              <p className="text-body-small text-danger flex items-center gap-1">
                 {cnpjError.includes('sem internet') ? <WifiOff size={12} /> : <AlertCircle size={12} />}
                 {cnpjError}
               </p>
@@ -241,7 +241,7 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
           <CardHeader>
             <CardTitle>Dados da consulta CNPJ</CardTitle>
           </CardHeader>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-body-medium">
             <div className="flex items-center gap-2">
               <span className="text-text-muted">CNAE Principal:</span>
               <span className="font-medium">{cnpjEmpresa.cnae_principal}</span>

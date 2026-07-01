@@ -30,7 +30,7 @@ export function Stepper({ steps, currentStep, onStepClick, className }: StepperP
                 disabled={!isClickable}
                 onClick={() => isClickable && onStepClick(step.number)}
                 className={cn(
-                  'flex items-center gap-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-2 text-label-large min-h-[48px] transition-colors',
                   isCurrent && 'text-primary-500',
                   isCompleted && 'text-success',
                   !isCurrent && !isCompleted && 'text-text-muted',
@@ -41,7 +41,7 @@ export function Stepper({ steps, currentStep, onStepClick, className }: StepperP
               >
                 <span
                   className={cn(
-                    'flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold border-2 transition-colors',
+                    'flex items-center justify-center w-7 h-7 rounded-full text-label-medium font-bold border-2 transition-colors',
                     isCurrent && 'border-primary-500 bg-primary-50 text-primary-500',
                     isCompleted && 'border-success bg-success text-white',
                     !isCurrent && !isCompleted && 'border-border-light bg-white text-text-muted'

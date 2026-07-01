@@ -42,13 +42,13 @@ function ItensComQuantidade({ itens, onChange, label, placeholder }: {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-text-primary">{label}</p>
+      <p className="text-label-large text-text-primary">{label}</p>
       {itens.length > 0 && (
         <div className="space-y-2">
           {itens.map((item) => (
             <div key={item.id} className="flex flex-wrap items-start gap-2 p-2 bg-surface-muted rounded-lg">
               <div className="flex-1 min-w-[120px]">
-                <p className="text-sm font-medium text-text-primary">{item.nome}</p>
+                <p className="text-label-large text-text-primary">{item.nome}</p>
               </div>
               <Input type="number" min="0" value={item.quantidade ?? ''}
                 onChange={(e) => update(item.id, 'quantidade', e.target.value ? parseInt(e.target.value, 10) : null)}
@@ -72,7 +72,7 @@ function ItensComQuantidade({ itens, onChange, label, placeholder }: {
           placeholder={placeholder ?? 'Adicionar item…'}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
         />
-        <Button type="button" variant="secondary" size="icon" onClick={add} disabled={!newNome.trim()}>
+        <Button type="button" variant="secondary" size="icon" onClick={add} disabled={!newNome.trim()} className="min-h-[48px] w-12 h-12">
           <Plus size={16} />
         </Button>
       </div>
@@ -119,13 +119,13 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-text-primary">{label}</p>
+      <p className="text-label-large text-text-primary">{label}</p>
       <div className="flex flex-wrap gap-2">
         {opcoes.map((opt) => {
           const selected = itens.some((i) => i.nome === opt.label)
           return (
             <button key={opt.value} type="button" onClick={() => toggleChip(opt.label)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+              className={`px-3 py-3 text-label-medium font-medium rounded-full border transition-colors min-h-[48px] ${
                 selected
                   ? 'bg-primary-50 border-primary-500 text-primary-700'
                   : 'bg-white border-border text-text-secondary hover:border-text-muted'
@@ -140,7 +140,7 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
         <div className="space-y-2">
           {itens.map((item) => (
             <div key={item.id} className="flex flex-wrap items-start gap-2 p-2 bg-surface-muted rounded-lg">
-              <span className="text-sm font-medium text-text-primary min-w-[120px] flex items-center gap-1">
+              <span className="text-label-large text-text-primary min-w-[120px] flex items-center gap-1">
                 <GripVertical size={12} className="text-text-muted shrink-0" />
                 {item.nome}
               </span>
@@ -166,7 +166,7 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
           placeholder="Adicionar customizado…"
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
         />
-        <Button type="button" variant="secondary" size="icon" onClick={addCustom} disabled={!customNome.trim()}>
+        <Button type="button" variant="secondary" size="icon" onClick={addCustom} disabled={!customNome.trim()} className="min-h-[48px] w-12 h-12">
           <Plus size={16} />
         </Button>
       </div>
@@ -316,15 +316,15 @@ export function Step04SegurancaEquipamentos({ data, onSave, saving, onPrevious }
 
       <div className="space-y-3 pt-2 border-t border-border">
         <div className="flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious}>
+          <Button variant="secondary" onClick={onPrevious} disabled={!onPrevious} className="min-h-[48px]">
             <ArrowLeft size={16} /> Anterior
           </Button>
-          <Button onClick={async () => { await handleSave(5) }} disabled={saving}>
+          <Button onClick={async () => { await handleSave(5) }} disabled={saving} className="min-h-[48px]">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
             Próximo
           </Button>
         </div>
-        <Button variant="secondary" className="w-full" onClick={async () => { await handleSave() }} disabled={saving}>
+        <Button variant="secondary" className="w-full min-h-[48px]" onClick={async () => { await handleSave() }} disabled={saving}>
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Salvar rascunho
         </Button>
