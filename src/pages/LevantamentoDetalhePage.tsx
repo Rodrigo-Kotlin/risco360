@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { queryClient } from '@/lib/query-client'
-import { queryKeys } from '@/lib/query-keys'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -14,13 +12,12 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { NivelRiscoBadge } from '@/components/forms/NivelRiscoBadge'
 import { ROUTES } from '@/constants/app'
 import { TIPOS_LEVANTAMENTO_SHORT_LABELS } from '@/constants/levantamentos'
-import { buscarLevantamentoPorId, atualizarStatusLevantamento } from '@/services/levantamentos.service'
+import { buscarLevantamentoPorId } from '@/services/levantamentos.service'
 import { listarRelatoriosPorLevantamento } from '@/services/relatorios.service'
 import { useToast } from '@/hooks/useToast'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
-import { ArrowLeft, CheckCircle2, Loader2, Building2, User, Calendar, Hash, Info, Edit, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Building2, User, Calendar, Hash, Info, Edit, AlertTriangle } from 'lucide-react'
 import type { Levantamento, StatusLevantamento } from '@/types/levantamento'
-import { getProximoStatusLevantamento } from '@/lib/levantamento-status'
 import type { Relatorio } from '@/types/relatorio'
 
 const statusLabel: Record<string, string> = {
@@ -36,11 +33,6 @@ const statusBadge = (s: StatusLevantamento) => {
   return <Badge variant={map[s] ?? 'default'}>{statusLabel[s] ?? s}</Badge>
 }
 
-const nextStatusLabel: Record<string, string> = {
-  rascunho: 'Iniciar levantamento',
-  em_andamento: 'Concluir levantamento',
-}
-
 export default function LevantamentoDetalhePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -50,8 +42,6 @@ export default function LevantamentoDetalhePage() {
   const [relatorios, setRelatorios] = useState<Relatorio[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [updatingStatus, setUpdatingStatus] = useState(false)
-
   useEffect(() => {
     if (!id) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -70,23 +60,6 @@ export default function LevantamentoDetalhePage() {
     })
     return () => { mounted = false }
   }, [id])
-
-  const handleAdvanceStatus = async () => {
-    if (!levantamento) return
-    const next = getProximoStatusLevantamento(levantamento.status)
-    if (!next) {
-      toast('Não há próximo status disponível para este levantamento.', 'info')
-      return
-    }
-    setUpdatingStatus(true)
-    const result = await atualizarStatusLevantamento(levantamento.id, next)
-    setUpdatingStatus(false)
-    if (result.error) { toast(result.error, 'error'); return }
-    toast(`Status atualizado para "${statusLabel[next]}"`, 'success')
-    queryClient.invalidateQueries({ queryKey: queryKeys.levantamentos.all })
-    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
-    load()
-  }
 
   const load = async () => {
     if (!id) return
@@ -120,14 +93,12 @@ export default function LevantamentoDetalhePage() {
         <MainContainer>
           <p className="text-body-medium text-danger">{error ?? 'Levantamento não encontrado'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.levantamentos)}>
-            <ArrowLeft size={16} /> Voltar
+            <ArrowLeft size={18} /> Voltar
           </Button>
         </MainContainer>
       </>
     )
   }
-
-  const canAdvance = getProximoStatusLevantamento(levantamento.status) !== null
 
   const infoItems = [
     { icon: Building2, label: 'Empresa', value: levantamento.empresa_nome },
@@ -170,20 +141,14 @@ export default function LevantamentoDetalhePage() {
               { label: levantamento.codigo ?? 'Detalhe' },
             ]}
             secondaryActions={
-              <>
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button variant="secondary" onClick={() => navigate(ROUTES.levantamentos)}>
-                  <ArrowLeft size={16} /> Voltar
+                  <ArrowLeft size={18} /> Voltar
                 </Button>
                 <Button variant="secondary" onClick={() => navigate(ROUTES.levantamentosEditar.replace(':id', levantamento.id))}>
-                  <Edit size={16} /> Continuar preenchimento
+                  <Edit size={18} /> Continuar preenchimento
                 </Button>
-                {canAdvance && !levantamento.status.startsWith('conclu') && (
-                  <Button onClick={handleAdvanceStatus} disabled={updatingStatus}>
-                    {updatingStatus ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                    {nextStatusLabel[levantamento.status] ?? 'Avançar status'}
-                  </Button>
-                )}
-              </>
+              </div>
             }
           />
 

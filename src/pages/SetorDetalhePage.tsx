@@ -150,15 +150,15 @@ export default function SetorDetalhePage() {
               { label: setor.nome },
             ]}
             secondaryActions={
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button variant="secondary" onClick={() => navigate(ROUTES.setoresEditar.replace(':setorId', setor.id))}>
-                  <Pencil size={16} /> Editar
+                  <Pencil size={18} /> Editar
                 </Button>
                 <Button variant="danger" onClick={() => setDeleteOpen(true)}>
-                  <Trash2 size={16} /> Excluir
+                  <Trash2 size={18} /> Excluir
                 </Button>
                 <Button variant="secondary" onClick={() => navigate(empresa ? ROUTES.empresasDetalhe.replace(':id', empresa.id) : ROUTES.setores)}>
-                  <ArrowLeft size={16} /> Voltar
+                  <ArrowLeft size={18} /> Voltar
                 </Button>
               </div>
             }
@@ -195,12 +195,12 @@ export default function SetorDetalhePage() {
                       <CheckCircle2 size={14} /> {pendentesCount} aç(ão/ões) pendente(s)
                     </span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button size="sm" variant="secondary" onClick={handleCriarOuContinuar}>
-                      <ClipboardList size={14} /> Continuar Levantamento
+                      <ClipboardList size={16} /> Continuar Levantamento
                     </Button>
                     <Button size="sm" onClick={() => navigate(ROUTES.levantamentosDetalhe.replace(':id', formularioSetorial.id))}>
-                      <Eye size={14} /> Ver detalhes
+                      <Eye size={16} /> Ver detalhes
                     </Button>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default function SetorDetalhePage() {
                 <div className="space-y-3">
                   <p className="text-sm text-text-muted">Nenhum levantamento em andamento para este setor.</p>
                   <Button onClick={handleCriarOuContinuar} disabled={creating}>
-                    <Plus size={16} /> Novo Levantamento
+                    <Plus size={18} /> Novo Levantamento
                   </Button>
                 </div>
               )}
