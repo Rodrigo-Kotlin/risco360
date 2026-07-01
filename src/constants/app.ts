@@ -15,6 +15,8 @@ export const BOTTOM_NAV_ITEMS = [
 export const DRAWER_NAV_ITEMS = [
   { label: 'Dashboard',        href: ROUTES.dashboard,         icon: 'LayoutDashboard' },
   { label: 'Levantamentos',    href: ROUTES.levantamentos,     icon: 'ClipboardList' },
+  { label: 'Setores',          href: ROUTES.setores,           icon: 'Layers' },
+  { label: 'Relatórios',       href: ROUTES.relatorios,        icon: 'FileText' },
   { label: 'Biblioteca Técnica', href: ROUTES.biblioteca,      icon: 'BookOpen' },
   { label: 'Configurações',    href: ROUTES.configuracoes,     icon: 'Settings' },
 ] as const
