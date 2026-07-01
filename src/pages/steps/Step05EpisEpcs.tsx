@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
@@ -11,6 +11,7 @@ import { EPI_OPCOES, EPC_OPCOES } from '@/constants/formulario-options'
 import { uploadEvidenciaFotografica, revogarPreviewEvidencia, obterPreviewLocal } from '@/services/evidencias.service'
 import { removerBlobOffline } from '@/services/offline/offline-evidencia-blobs.service'
 import { ensureArray } from '@/lib/utils'
+import { criarObjectURLDoBlob } from '@/services/offline/offline-evidencia-blobs.service'
 
 function normalizeEpisEpcsEvidencias(data: unknown): EpisEpcsEvidencias {
   if (!data || typeof data !== 'object') {
@@ -402,6 +403,27 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
     normalizeEpisEpcsEvidencias(data)
   )
   const [activeTab, setActiveTab] = useState<TabId>('epis')
+
+  useEffect(() => {
+    const regenerarPreviews = async () => {
+      const evidencias = safeEvidenciaItems(form.evidencias)
+      let modified = false
+      const atualizadas = await Promise.all(evidencias.map(async (ev) => {
+        if (ev.local_blob_id && (!ev.preview_url || ev.preview_url.startsWith('blob:'))) {
+          const novaUrl = await criarObjectURLDoBlob(ev.local_blob_id)
+          if (novaUrl) {
+            modified = true
+            return { ...ev, preview_url: novaUrl }
+          }
+        }
+        return ev
+      }))
+      if (modified) {
+        setForm((prev) => ({ ...prev, evidencias: atualizadas }))
+      }
+    }
+    regenerarPreviews()
+  }, [])
 
   const handleSave = async (next?: number) => {
     await onSave(form, next)

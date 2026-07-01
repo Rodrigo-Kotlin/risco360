@@ -32,7 +32,8 @@ export function calcularPercentual(lev: Levantamento): number {
   )
   if (hasSeguranca) total += STEP_WEIGHTS[4]
 
-  const hasEpis = (lev.epis_epcs_evidencias?.epis ?? []).length > 0
+  const eps = lev.epis_epcs_evidencias
+  const hasEpis = ((eps?.epis ?? []).length > 0 || (eps?.epcs ?? []).length > 0 || (eps?.evidencias ?? []).length > 0)
   if (hasEpis) total += STEP_WEIGHTS[5]
 
   const hasMedicoes = (lev.medicoes ?? []).length > 0 || (lev.pontos_medicao ?? []).length > 0
@@ -76,7 +77,8 @@ export function calcularProximoPasso(lev: Levantamento): number {
   )
   if (!hasSeguranca) return 4
 
-  if ((lev.epis_epcs_evidencias?.epis ?? []).length === 0) return 5
+  const eps = lev.epis_epcs_evidencias
+  if ((eps?.epis ?? []).length === 0 && (eps?.epcs ?? []).length === 0 && (eps?.evidencias ?? []).length === 0) return 5
 
   if ((lev.medicoes ?? []).length === 0 && (lev.pontos_medicao ?? []).length === 0) return 6
 
