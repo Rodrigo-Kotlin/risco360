@@ -9,7 +9,7 @@ import { DRAWER_NAV_ITEMS, ROUTES } from '@/constants/app'
 import { SyncToastListener } from '@/components/sync/SyncToastListener'
 import { X, Plus } from 'lucide-react'
 import {
-  LayoutDashboard, ClipboardList, BookOpen, Settings,
+  LayoutDashboard, ClipboardList, BookOpen, Settings, Layers, FileText,
   type LucideIcon
 } from 'lucide-react'
 
@@ -18,6 +18,8 @@ const drawerIconMap: Record<string, LucideIcon> = {
   ClipboardList,
   BookOpen,
   Settings,
+  Layers,
+  FileText,
 }
 
 function MobileDrawer() {
