@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
@@ -218,7 +218,8 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
 
 function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null | undefined; onChange: (items: EvidenciaItem[]) => void }) {
   const safeItems = safeEvidenciaItems(items)
-  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
+  const itemsRef = useRef(safeItems)
+  itemsRef.current = safeItems
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
 
@@ -232,27 +233,30 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
       if (!file) return
 
       const now = new Date()
-      const idx = safeItems.length
+      const localPreview = URL.createObjectURL(file)
+      const currentItems = itemsRef.current
+      const idx = currentItems.length
 
-      onChange([...safeItems, {
+      onChange([...currentItems, {
         legenda: file.name,
         observacao: `Arquivo: ${file.name}`,
         data: now.toISOString().slice(0, 10),
         hora: now.toTimeString().slice(0, 5),
         mime_type: file.type,
         size_bytes: file.size,
+        preview_url: localPreview,
         upload_status: 'uploading',
       }])
 
-      setUploadingIdx(idx)
       setErrorMessage(null)
 
       const result = await uploadEvidenciaFotografica({ file, legenda: file.name, origem: 'camera' })
 
+      const latestItems = itemsRef.current
+
       if (result.error) {
         setErrorMessage(result.error)
-        setUploadingIdx(null)
-        onChange(safeItems.map((ev, j) =>
+        onChange(latestItems.map((ev, j) =>
           j === idx ? { ...ev, upload_status: 'error' } : ev
         ))
         return
@@ -263,7 +267,7 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
         ? (await obterPreviewLocal(r.local_blob_id, null)) ?? r.preview_url
         : r.preview_url
 
-      onChange(safeItems.map((ev, j) =>
+      onChange(latestItems.map((ev, j) =>
         j === idx ? {
           ...ev,
           local_id: r.localId,
@@ -278,7 +282,7 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
       ))
     }
     input.click()
-  }, [safeItems, onChange])
+  }, [onChange])
 
   const removeImage = useCallback((idx: number) => {
     const item = safeItems[idx]
@@ -296,9 +300,13 @@ function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null 
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-label-large text-text-primary">Imagens / evidências ({safeItems.length})</p>
-        <Button size="sm" variant="secondary" onClick={addImage} disabled={uploadingIdx !== null} className="min-h-[48px]">
-          {uploadingIdx !== null ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-          {uploadingIdx !== null ? 'Enviando...' : 'Capturar imagem'}
+        <Button size="sm" variant="secondary" onClick={addImage}
+          disabled={safeItems.some((ev) => ev.upload_status === 'uploading')}
+          className="min-h-[48px]">
+          {safeItems.some((ev) => ev.upload_status === 'uploading')
+            ? <Loader2 size={14} className="animate-spin" />
+            : <Plus size={14} />}
+          {safeItems.some((ev) => ev.upload_status === 'uploading') ? 'Enviando...' : 'Capturar imagem'}
         </Button>
       </div>
       {safeItems.length === 0 && (
