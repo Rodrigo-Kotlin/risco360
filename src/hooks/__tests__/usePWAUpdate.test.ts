@@ -15,21 +15,27 @@ describe('usePWAUpdate', () => {
   let mockGetRegistration: any
   let mockAddEventListener: any
   let mockRemoveEventListener: any
+  let mockUpdate: any
   let mockWaitingWorker: any
   let mockRegistration: any
   let originalServiceWorker: any
   let originalLocation: any
+  let swEventListeners: Record<string, Set<(...args: any[]) => void>>
 
   beforeEach(() => {
     vi.clearAllMocks()
+    sessionStorage.clear()
     localStorage.clear()
 
     originalServiceWorker = navigator.serviceWorker
     originalLocation = window.location
 
+    swEventListeners = {}
+
     mockPostMessage = vi.fn()
     mockAddEventListener = vi.fn()
     mockRemoveEventListener = vi.fn()
+    mockUpdate = vi.fn().mockResolvedValue(undefined)
 
     mockWaitingWorker = {
       state: 'installed',
@@ -43,6 +49,7 @@ describe('usePWAUpdate', () => {
       installing: null,
       addEventListener: mockAddEventListener,
       removeEventListener: mockRemoveEventListener,
+      update: mockUpdate,
     }
 
     mockGetRegistration = vi.fn().mockResolvedValue(mockRegistration)
@@ -51,12 +58,16 @@ describe('usePWAUpdate', () => {
       writable: true,
       value: {
         getRegistration: mockGetRegistration,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
+        addEventListener: vi.fn((event, cb) => {
+          if (!swEventListeners[event]) swEventListeners[event] = new Set()
+          swEventListeners[event].add(cb)
+        }),
+        removeEventListener: vi.fn((event, cb) => {
+          swEventListeners[event]?.delete(cb)
+        }),
       },
     })
 
-    // Mock window.location.reload
     Object.defineProperty(window, 'location', {
       writable: true,
       value: {
@@ -86,7 +97,6 @@ describe('usePWAUpdate', () => {
 
     const { result } = renderHook(() => usePWAUpdate())
 
-    // Wait for the microtasks/promise to resolve
     await act(async () => {
       await Promise.resolve()
     })
@@ -116,7 +126,6 @@ describe('usePWAUpdate', () => {
     expect(result.current.updateAvailable).toBe(false)
     expect(stateChangeCallback).not.toBeNull()
 
-    // Simulate worker installation finished
     act(() => {
       mockInstalling.state = 'installed'
       stateChangeCallback()
@@ -143,7 +152,7 @@ describe('usePWAUpdate', () => {
     expect(result.current.updateAvailable).toBe(false)
   })
 
-  it('update: posta mensagem SKIP_WAITING e salva flag no localStorage', async () => {
+  it('update: posta mensagem SKIP_WAITING e salva flag no sessionStorage', async () => {
     mockRegistration.waiting = mockWaitingWorker
 
     const { result } = renderHook(() => usePWAUpdate())
@@ -157,15 +166,125 @@ describe('usePWAUpdate', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' })
-    expect(localStorage.getItem('pwa_updated')).toBe('true')
+    expect(sessionStorage.getItem('risco360_update_in_progress')).toBe('true')
   })
 
-  it('exibe toast e limpa flag se localStorage indicar que atualizou', async () => {
-    localStorage.setItem('pwa_updated', 'true')
-    
+  it('exibe toast e limpa flag se sessionStorage indicar que atualizou', async () => {
+    sessionStorage.setItem('risco360_pwa_updated', 'true')
+
     renderHook(() => usePWAUpdate())
 
     expect(mockToast).toHaveBeenCalledWith('Aplicação atualizada com sucesso', 'success')
-    expect(localStorage.getItem('pwa_updated')).toBeNull()
+    expect(sessionStorage.getItem('risco360_pwa_updated')).toBeNull()
+  })
+
+  it('controllerchange: recarrega apenas quando flag está presente (uma vez)', async () => {
+    const reloadSpy = vi.fn()
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { reload: reloadSpy },
+    })
+
+    sessionStorage.setItem('risco360_update_in_progress', 'true')
+
+    renderHook(() => usePWAUpdate())
+
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(swEventListeners.controllerchange).toBeDefined()
+
+    act(() => {
+      swEventListeners.controllerchange.forEach((cb) => cb())
+    })
+
+    expect(reloadSpy).toHaveBeenCalledTimes(1)
+
+    reloadSpy.mockClear()
+
+    act(() => {
+      swEventListeners.controllerchange.forEach((cb) => cb())
+    })
+
+    expect(reloadSpy).not.toHaveBeenCalled()
+  })
+
+  it('controllerchange: NÃO recarrega quando flag NÃO está presente', async () => {
+    const reloadSpy = vi.fn()
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { reload: reloadSpy },
+    })
+
+    renderHook(() => usePWAUpdate())
+
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    act(() => {
+      swEventListeners.controllerchange.forEach((cb) => cb())
+    })
+
+    expect(reloadSpy).not.toHaveBeenCalled()
+  })
+
+  it('checkForUpdates: chama reg.update() e mostra toast quando já está atualizado', async () => {
+    const { result } = renderHook(() => usePWAUpdate())
+
+    await act(async () => {
+      await result.current.checkForUpdates()
+    })
+
+    expect(mockUpdate).toHaveBeenCalledTimes(1)
+    expect(mockToast).toHaveBeenCalledWith('Você já está usando a versão mais recente.', 'success')
+  })
+
+  it('checkForUpdates: mostra banner se reg.waiting existir', async () => {
+    mockRegistration.waiting = mockWaitingWorker
+
+    const { result } = renderHook(() => usePWAUpdate())
+
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(result.current.updateAvailable).toBe(true)
+
+    mockToast.mockClear()
+    mockUpdate.mockClear()
+
+    act(() => {
+      result.current.dismiss()
+    })
+
+    expect(result.current.updateAvailable).toBe(false)
+
+    await act(async () => {
+      await result.current.checkForUpdates()
+    })
+
+    expect(mockUpdate).not.toHaveBeenCalled()
+    expect(result.current.updateAvailable).toBe(true)
+    expect(mockToast).toHaveBeenCalledWith('Nova versão disponível!', 'info')
+  })
+
+  it('checkForUpdates: fallback quando não há registration', async () => {
+    mockGetRegistration.mockResolvedValue(null)
+
+    const { result } = renderHook(() => usePWAUpdate())
+
+    await act(async () => {
+      await result.current.checkForUpdates()
+    })
+
+    expect(mockToast).toHaveBeenCalledWith('Não foi possível verificar atualizações.', 'error')
+  })
+
+  it('disponibiliza checkForUpdates na interface', () => {
+    const { result } = renderHook(() => usePWAUpdate())
+    expect(result.current.checkForUpdates).toBeDefined()
+    expect(typeof result.current.checkForUpdates).toBe('function')
   })
 })

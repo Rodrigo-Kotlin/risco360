@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import { Logo } from '@/components/ui/Logo'
 import { useSyncMetrics } from '@/hooks/useSyncMetrics'
 import { ROUTES } from '@/routes/routes.constants'
+import { APP_VERSION } from '@/lib/app-version'
 import {
   LayoutDashboard, Building2, ClipboardList, BookOpen, FileText, Settings, Layers,
   Cloud, CloudOff,
@@ -88,7 +89,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="px-3 py-3 border-t border-border-light shrink-0">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
           <div className="w-2 h-2 rounded-full bg-success" aria-hidden="true" />
-          <span className="text-label-medium text-text-muted">v1.0.0-beta</span>
+          <span className="text-label-medium text-text-muted">v{APP_VERSION}</span>
         </div>
       </div>
     </aside>

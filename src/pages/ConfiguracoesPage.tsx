@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
+import { usePWAUpdate } from '@/hooks/usePWAUpdate'
 import { useProfileData } from '@/hooks/configuracoes/useProfileData'
 import { useSyncDiagnostics } from '@/hooks/configuracoes/useSyncDiagnostics'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -13,11 +14,13 @@ import { Card, CardTitle, CardHeader } from '@/components/ui/Card'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { isMockModeEnabled, MOCK_USER_EMAIL } from '@/lib/mock-mode'
 import { env } from '@/lib/env'
+import { APP_VERSION } from '@/lib/app-version'
 import { hasMockData, seedAllMockDataIfEmpty, clearMockData } from '@/services/mock-storage.service'
 
 export default function ConfiguracoesPage() {
   const { isAuthenticated, logout } = useAuth()
   const { theme, setTheme } = useTheme()
+  const pwa = usePWAUpdate()
   const profile = useProfileData()
   const diag = useSyncDiagnostics()
 
@@ -118,6 +121,34 @@ export default function ConfiguracoesPage() {
                   </button>
                 ))}
               </div>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-surface-muted flex items-center justify-center text-text-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div className="flex-1">
+                  <CardTitle>PWA e Atualizações</CardTitle>
+                  <p className="text-body-small text-text-secondary mt-0.5">
+                    Versão {APP_VERSION} &middot; {pwa.updateAvailable ? 'Atualização disponível' : 'App atualizado'}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <div className="px-5 pb-5 space-y-3">
+              <p className="text-body-small text-text-secondary">
+                No celular, se a atualização não aparecer, feche o aplicativo e abra novamente após tocar em <strong>Atualizar</strong>.
+              </p>
+              <button
+                type="button"
+                onClick={pwa.checkForUpdates}
+                className="w-full px-4 py-2.5 rounded-lg bg-primary-500 text-white text-body-medium font-medium hover:bg-primary-600 transition-colors"
+              >
+                Verificar atualização
+              </button>
             </div>
           </Card>
         </div>
