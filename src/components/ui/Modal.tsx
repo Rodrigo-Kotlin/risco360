@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 
@@ -21,12 +21,71 @@ const sizeStyles: Record<string, string> = {
 
 export function Modal({ open, onClose, title, description, children, footer, className, size = 'md' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const previousActiveElement = useRef<Element | null>(null)
+
+  const getFocusableElements = useCallback((): HTMLElement[] => {
+    if (!contentRef.current) return []
+    const selectors = [
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      'a[href]',
+      '[tabindex]:not([tabindex="-1"])',
+    ]
+    return Array.from(
+      contentRef.current.querySelectorAll<HTMLElement>(selectors.join(', '))
+    )
+  }, [])
 
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      if (previousActiveElement.current instanceof HTMLElement) {
+        previousActiveElement.current.focus()
+        previousActiveElement.current = null
+      }
+      return
+    }
+
+    previousActiveElement.current = document.activeElement
+
+    const focusable = getFocusableElements()
+    if (focusable.length > 0) {
+      focusable[0].focus()
+    } else if (contentRef.current) {
+      contentRef.current.focus()
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+
+      if (e.key === 'Tab') {
+        const focusable = getFocusableElements()
+        if (focusable.length < 2) {
+          e.preventDefault()
+          return
+        }
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        const current = document.activeElement
+
+        if (e.shiftKey) {
+          if (current === first) {
+            e.preventDefault()
+            last.focus()
+          }
+        } else {
+          if (current === last) {
+            e.preventDefault()
+            first.focus()
+          }
+        }
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown)
@@ -36,7 +95,7 @@ export function Modal({ open, onClose, title, description, children, footer, cla
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
     }
-  }, [open, onClose])
+  }, [open, onClose, getFocusableElements])
 
   if (!open) return null
 
@@ -51,6 +110,8 @@ export function Modal({ open, onClose, title, description, children, footer, cla
       aria-describedby={description ? 'modal-description' : undefined}
     >
       <div
+        ref={contentRef}
+        tabIndex={-1}
         className={cn(
           'bg-card border border-border rounded-xl shadow-modal w-full',
           'animate-slide-up max-h-[90vh] flex flex-col',

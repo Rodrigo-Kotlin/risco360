@@ -9,6 +9,8 @@ import { DRAWER_NAV_ITEMS, ROUTES } from '@/constants/app'
 import { SyncToastListener } from '@/components/sync/SyncToastListener'
 import { PWAInstallBanner } from '@/components/pwa/PWAInstallBanner'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+import { PWAUpdateBanner } from '@/components/pwa/PWAUpdateBanner'
+import { usePWAUpdate } from '@/hooks/usePWAUpdate'
 import { X, Plus } from 'lucide-react'
 import {
   LayoutDashboard, ClipboardList, BookOpen, Settings, Layers, FileText,
@@ -74,12 +76,14 @@ function MobileDrawer() {
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const { canInstall, install, dismiss } = usePWAInstall()
+  const { updateAvailable, update, dismiss: dismissUpdate } = usePWAUpdate()
 
   return (
     <div className="flex min-h-screen bg-surface-alt">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
         <OfflineBanner />
+        {updateAvailable && <PWAUpdateBanner onUpdate={update} onDismiss={dismissUpdate} />}
         {canInstall && <PWAInstallBanner onInstall={install} onDismiss={dismiss} />}
         {children}
         <MobileBottomNavigation />

@@ -4,7 +4,7 @@ import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { isMockModeEnabled } from '@/lib/mock-mode'
 import { isSupabaseConfigured } from '@/lib/supabase'
-import { contarItensPendentes } from '@/services/offline/sync-queue.service'
+import { contarItensPendentes, onSyncQueueChange } from '@/services/offline/sync-queue.service'
 
 function getOfflineMessage(): string {
   if (isMockModeEnabled) {
@@ -30,8 +30,8 @@ export function OfflineBanner() {
       }
     }
     load()
-    const interval = setInterval(load, 30000)
-    return () => clearInterval(interval)
+    const unsubscribe = onSyncQueueChange(load)
+    return () => unsubscribe()
   }, [])
 
   if (!isOnline) {

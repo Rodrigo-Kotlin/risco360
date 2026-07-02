@@ -16,6 +16,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/offline/sync-queue.service', () => ({
   contarItensPendentes: vi.fn().mockResolvedValue(0),
+  onSyncQueueChange: vi.fn(() => vi.fn()),
 }))
 
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'

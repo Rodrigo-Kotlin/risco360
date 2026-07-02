@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: 'auto',
       devOptions: { enabled: true },
       workbox: {
@@ -31,6 +31,47 @@ export default defineConfig({
         theme_color: '#0B6B3A',
         orientation: 'portrait-primary',
         lang: 'pt-BR',
+        categories: ['business', 'productivity', 'health'],
+        iarc_rating_id: 'e.g.',
+        shortcuts: [
+          {
+            name: 'Novo levantamento',
+            short_name: 'Novo',
+            description: 'Iniciar um novo levantamento setorial',
+            url: '/levantamentos/novo',
+            icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }],
+          },
+          {
+            name: 'Dashboard',
+            short_name: 'Dashboard',
+            description: 'Ir para o painel principal',
+            url: '/',
+            icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
+        screenshots: [
+          {
+            src: '/screenshots/mobile-home.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Tela inicial do Risco360',
+          },
+          {
+            src: '/screenshots/mobile-levantamento.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Wizard de levantamento',
+          },
+          {
+            src: '/screenshots/desktop-dashboard.png',
+            sizes: '1440x900',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Dashboard no desktop',
+          },
+        ],
         icons: [
           { src: '/icons/icon-72x72.png', sizes: '72x72', type: 'image/png', purpose: 'any' },
           { src: '/icons/icon-96x96.png', sizes: '96x96', type: 'image/png', purpose: 'any' },

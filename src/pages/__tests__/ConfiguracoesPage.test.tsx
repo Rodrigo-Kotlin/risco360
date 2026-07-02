@@ -1,9 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { ThemeProvider } from '@/hooks/useTheme'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ToastProvider } from '@/components/ui/Toast'
 import ConfiguracoesPage from '../ConfiguracoesPage'
+
+Object.defineProperty(window, 'matchMedia', {
+  value: vi.fn(() => ({
+    matches: false,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  })),
+})
 
 vi.mock('@/lib/mock-mode', () => ({
   isMockModeEnabled: false,
@@ -72,11 +81,13 @@ vi.mock('@/services/sync.service', () => ({
 function renderPage() {
   return render(
     <MemoryRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <ConfiguracoesPage />
-        </ToastProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <ConfiguracoesPage />
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </MemoryRouter>
   )
 }

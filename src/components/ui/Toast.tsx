@@ -1,13 +1,14 @@
-import { useState, useCallback, type ReactNode } from 'react'
+import { useState, useCallback, useRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
-import { ToastContext } from '@/hooks/useToast'
+import { ToastContext, type ToastOptions } from '@/hooks/useToast'
 import type { ToastVariant } from '@/types/ui'
 
 interface Toast {
   id: string
   message: string
   variant: ToastVariant
+  persistent: boolean
 }
 
 const iconMap: Record<ToastVariant, ReactNode> = {
@@ -24,19 +25,50 @@ const variantStyles: Record<ToastVariant, string> = {
   info:    'bg-info text-white',
 }
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+const defaultVariantDuration: Partial<Record<ToastVariant, number>> = {
+  error: 6000,
+  warning: 6000,
+}
+
+interface ToastProviderProps {
+  children: ReactNode
+  duration?: number
+  variantDurations?: Partial<Record<ToastVariant, number>>
+}
+
+export function ToastProvider({
+  children,
+  duration: defaultDuration = 4500,
+  variantDurations = defaultVariantDuration,
+}: ToastProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
-  const addToast = useCallback((message: string, variant: ToastVariant = 'info') => {
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-    setToasts((prev) => [...prev, { id, message, variant }])
-
-    setTimeout(() => {
+  const scheduleRemove = useCallback((id: string, ms: number) => {
+    const timer = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 4500)
+      timersRef.current.delete(id)
+    }, ms)
+    timersRef.current.set(id, timer)
   }, [])
 
+  const addToast = useCallback((message: string, variant: ToastVariant = 'info', options?: ToastOptions) => {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+    const persistent = options?.persistent ?? false
+    setToasts((prev) => [...prev, { id, message, variant, persistent }])
+
+    if (!persistent) {
+      const duration = options?.duration ?? variantDurations[variant] ?? defaultDuration
+      scheduleRemove(id, duration)
+    }
+  }, [defaultDuration, variantDurations, scheduleRemove])
+
   const removeToast = useCallback((id: string) => {
+    const timer = timersRef.current.get(id)
+    if (timer) {
+      clearTimeout(timer)
+      timersRef.current.delete(id)
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 

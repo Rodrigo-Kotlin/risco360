@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 interface DropdownItem {
   label: string
@@ -15,37 +15,112 @@ interface DropdownMenuProps {
   className?: string
 }
 
+function getEnabledIndexes(items: DropdownItem[]): number[] {
+  return items.reduce<number[]>((acc, item, i) => {
+    if (!item.disabled) acc.push(i)
+    return acc
+  }, [])
+}
+
 export function DropdownMenu({ trigger, items, align = 'left', className }: DropdownMenuProps) {
   const [open, setOpen] = useState(false)
+  const [focusIndex, setFocusIndex] = useState(-1)
   const ref = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const enabledIndexes = getEnabledIndexes(items)
+
+  const openMenu = useCallback(() => {
+    setOpen(true)
+    setFocusIndex(enabledIndexes[0] ?? -1)
+  }, [enabledIndexes])
+
+  const closeMenu = useCallback(() => {
+    setOpen(false)
+    setFocusIndex(-1)
+  }, [])
 
   useEffect(() => {
     if (!open) return
-
     const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
+        closeMenu()
       }
     }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
-
     document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open, closeMenu])
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
+  function focusEnabledItem(idx: number) {
+    if (idx >= 0) {
+      itemRefs.current[idx]?.focus()
     }
-  }, [open])
+  }
+
+  function handleMenuKeyDown(e: React.KeyboardEvent) {
+    switch (e.key) {
+      case 'ArrowDown': {
+        e.preventDefault()
+        setFocusIndex((prev) => {
+          const idx = enabledIndexes.indexOf(prev)
+          const next = enabledIndexes[(idx + 1) % enabledIndexes.length] ?? prev
+          focusEnabledItem(next)
+          return next
+        })
+        break
+      }
+      case 'ArrowUp': {
+        e.preventDefault()
+        setFocusIndex((prev) => {
+          const idx = enabledIndexes.indexOf(prev)
+          const next = enabledIndexes[(idx - 1 + enabledIndexes.length) % enabledIndexes.length] ?? prev
+          focusEnabledItem(next)
+          return next
+        })
+        break
+      }
+      case 'Home':
+        e.preventDefault()
+        setFocusIndex(enabledIndexes[0] ?? -1)
+        focusEnabledItem(enabledIndexes[0])
+        break
+      case 'End':
+        e.preventDefault()
+        setFocusIndex(enabledIndexes[enabledIndexes.length - 1] ?? -1)
+        focusEnabledItem(enabledIndexes[enabledIndexes.length - 1])
+        break
+      case 'Enter':
+      case ' ':
+        e.preventDefault()
+        if (focusIndex >= 0 && !items[focusIndex].disabled) {
+          items[focusIndex].onClick()
+          closeMenu()
+        }
+        break
+      case 'Escape':
+      case 'Tab':
+        closeMenu()
+        break
+    }
+  }
 
   return (
     <div ref={ref} className={cn('relative inline-block', className)}>
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => (open ? closeMenu() : openMenu())}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+            if (!open) {
+              e.preventDefault()
+              openMenu()
+            } else {
+              e.preventDefault()
+              const idx = e.key === 'ArrowUp' ? (enabledIndexes[enabledIndexes.length - 1] ?? -1) : (enabledIndexes[0] ?? -1)
+              setFocusIndex(idx)
+              focusEnabledItem(idx)
+            }
+          }
+        }}
         className="inline-flex items-center gap-1 min-h-[48px]"
         aria-haspopup="true"
         aria-expanded={open}
@@ -60,19 +135,28 @@ export function DropdownMenu({ trigger, items, align = 'left', className }: Drop
             align === 'right' ? 'right-0' : 'left-0'
           )}
           role="menu"
+          onKeyDown={handleMenuKeyDown}
         >
           {items.map((item, i) => (
             <button
               key={i}
+              ref={(el) => {
+                itemRefs.current[i] = el
+                if (el && focusIndex === i) {
+                  el.focus()
+                }
+              }}
               type="button"
               role="menuitem"
+              tabIndex={focusIndex === i ? 0 : -1}
               disabled={item.disabled}
               onClick={() => {
                 if (!item.disabled) {
                   item.onClick()
-                  setOpen(false)
+                  closeMenu()
                 }
               }}
+              onMouseEnter={() => setFocusIndex(i)}
               className={cn(
                 'w-full flex items-center gap-2.5 px-3 py-3 text-sm transition-colors text-left min-h-[48px]',
                 item.variant === 'danger'

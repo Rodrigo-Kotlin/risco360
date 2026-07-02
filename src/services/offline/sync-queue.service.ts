@@ -2,6 +2,18 @@ import { getOfflineDB, nowISO, type SyncQueueItem } from '@/lib/offline-db'
 import { createLocalId } from '@/lib/local-id'
 import type { SyncQueueStats, SyncEntity, SyncOperation } from '@/types/sync'
 
+type Listener = () => void
+const listeners = new Set<Listener>()
+
+export function onSyncQueueChange(listener: Listener): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
+function notifySyncQueueChange() {
+  listeners.forEach(fn => fn())
+}
+
 export async function adicionarItemSyncQueue(
   entity: SyncQueueItem['entity'],
   entity_id: string,
@@ -31,6 +43,7 @@ export async function enqueueSyncOperation(
     updated_at: nowISO(),
   }
   await db.add('sync_queue', item)
+  notifySyncQueueChange()
   return item
 }
 
@@ -84,6 +97,7 @@ export async function markSyncItemAsSyncing(id: string): Promise<void> {
     item.status = 'syncing'
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
+    notifySyncQueueChange()
   }
 }
 
@@ -98,6 +112,7 @@ export async function markSyncItemAsSynced(id: string): Promise<void> {
     item.status = 'synced'
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
+    notifySyncQueueChange()
   }
 }
 
@@ -114,6 +129,7 @@ export async function markSyncItemWithError(id: string, error: string): Promise<
     item.last_error = error
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
+    notifySyncQueueChange()
   }
 }
 
@@ -130,6 +146,7 @@ export async function clearSyncedQueueItems(): Promise<void> {
     await tx.store.delete(item.id)
   }
   await tx.done
+  notifySyncQueueChange()
 }
 
 export async function limparTodaFila(): Promise<void> {
@@ -139,6 +156,7 @@ export async function limparTodaFila(): Promise<void> {
 export async function clearAllSyncQueueItems(): Promise<void> {
   const db = await getOfflineDB()
   await db.clear('sync_queue')
+  notifySyncQueueChange()
 }
 
 export async function markConflict(id: string, error: string): Promise<void> {
@@ -150,6 +168,7 @@ export async function markConflict(id: string, error: string): Promise<void> {
     item.last_error = error
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
+    notifySyncQueueChange()
   }
 }
 
@@ -160,6 +179,7 @@ export async function retrySyncItem(id: string): Promise<void> {
     item.status = 'pending'
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
+    notifySyncQueueChange()
   }
 }
 
@@ -174,6 +194,7 @@ export async function retryAllFailedItems(): Promise<number> {
     await tx.store.put(item)
   }
   await tx.done
+  notifySyncQueueChange()
   return failed.length
 }
 

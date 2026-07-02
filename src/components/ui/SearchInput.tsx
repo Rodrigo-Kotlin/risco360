@@ -41,7 +41,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     }
 
     return (
-      <div className="relative">
+      <div role="search" className="relative">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" aria-hidden="true" />
         <input
           ref={ref}
