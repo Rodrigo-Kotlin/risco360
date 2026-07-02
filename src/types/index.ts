@@ -7,6 +7,7 @@ export type * from './risco'
 export type * from './relatorio'
 export type * from './biblioteca'
 export type * from './database'
+export type * from './pwa'
 
 export interface Profile {
   id: string
