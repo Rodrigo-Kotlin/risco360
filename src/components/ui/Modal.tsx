@@ -19,6 +19,15 @@ const sizeStyles: Record<string, string> = {
   lg: 'max-w-2xl',
 }
 
+/**
+ * MD3 Dialog / Modal
+ *
+ * — Backdrop: bg-black/50 com backdrop-blur-sm para profundidade visual
+ * — Safe area: pb-[env(safe-area-inset-bottom)] para iPhones
+ * — Em mobile: ocupa a largura com margem mínima de 16px em cada lado
+ * — Animação: slide-up a partir de baixo (MD3 standard dialog)
+ * — max-h limitado a 85vh (não 90vh) para respiro visual em mobile
+ */
 export function Modal({ open, onClose, title, description, children, footer, className, size = 'md' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -102,7 +111,7 @@ export function Modal({ open, onClose, title, description, children, footer, cla
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-[2px] animate-fade-in"
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
       role="dialog"
       aria-modal="true"
@@ -113,33 +122,51 @@ export function Modal({ open, onClose, title, description, children, footer, cla
         ref={contentRef}
         tabIndex={-1}
         className={cn(
-          'bg-card border border-border rounded-xl shadow-modal w-full',
-          'animate-slide-up max-h-[90vh] flex flex-col',
+          'bg-card border border-border rounded-2xl shadow-modal w-full',
+          'animate-slide-up max-h-[85vh] flex flex-col',
+          'outline-none',
           sizeStyles[size],
           className
         )}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="flex items-start justify-between gap-4 px-5 pt-5 pb-3">
-          <div className="min-w-0">
-            {title && <h2 id="modal-title" className="text-title-medium font-semibold text-text-primary">{title}</h2>}
-            {description && <p id="modal-description" className="mt-0.5 text-body-medium text-text-secondary">{description}</p>}
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 px-5 pt-5 pb-4 border-b border-border-light shrink-0">
+          <div className="min-w-0 flex-1">
+            {title && (
+              <h2 id="modal-title" className="text-title-medium font-semibold text-text-primary">
+                {title}
+              </h2>
+            )}
+            {description && (
+              <p id="modal-description" className="mt-1 text-body-small text-text-secondary">
+                {description}
+              </p>
+            )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 w-8 h-8 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg hover:bg-surface-muted transition-colors"
+            className={cn(
+              'shrink-0 -mt-0.5 -mr-1',
+              'w-9 h-9 flex items-center justify-center',
+              'rounded-xl hover:bg-surface-muted transition-colors',
+              'text-text-muted hover:text-text-primary'
+            )}
             aria-label="Fechar"
           >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
 
-        <div className="overflow-y-auto px-5 py-3 flex-1">
+        {/* Body */}
+        <div className="overflow-y-auto scrollbar-thin flex-1 px-5 py-4">
           {children}
         </div>
 
+        {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-5 pb-5 pt-3 border-t border-border">
+          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border-light shrink-0">
             {footer}
           </div>
         )}

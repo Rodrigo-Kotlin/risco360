@@ -6,6 +6,7 @@ import { buscarLevantamentoPorId, atualizarLevantamento, atualizarStatusLevantam
 import { ROUTES } from '@/constants/app'
 import { calcularPercentual, calcularProximoPasso } from '@/lib/wizard-progress'
 import { useToast } from '@/hooks/useToast'
+import { nowISO } from '@/lib/offline-db'
 import type { Levantamento, LevantamentoUpdateInput } from '@/types/levantamento'
 import type { CaracteristicasFisicas, IluminacaoVentilacaoConforto, SegurancaEquipamentos, EpisEpcsEvidencias } from '@/types/levantamento'
 import type { Medicao, PontoMedicaoQuantitativa } from '@/types/levantamento'
@@ -41,7 +42,7 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       return
     }
     const lev = result.data
-    const initialStep = lev?.status === 'concluido' ? 1 : calcularProximoPasso(lev!)
+    const initialStep = lev?.status === 'concluido' ? 1 : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
     setState((prev) => ({
       ...prev,
       levantamento: lev,
@@ -84,7 +85,11 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
         toast('Salvo localmente. Pendente de sincronização.', 'info')
       }
 
-      await atualizarLevantamento(levantamentoId, { percentual: newPercentual })
+      await atualizarLevantamento(levantamentoId, {
+        percentual: newPercentual,
+        ultimo_step: state.currentStep,
+        ultima_edicao: nowISO(),
+      })
 
       const refreshed = await buscarLevantamentoPorId(levantamentoId)
       setState((prev) => ({
@@ -98,7 +103,7 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
 
       return true
     },
-    [levantamentoId, state.levantamento, toast]
+    [levantamentoId, state.levantamento, state.currentStep, toast]
   )
 
   const concluirWizard = useCallback(async () => {
@@ -107,7 +112,11 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
     setState((prev) => ({ ...prev, saving: true }))
     const newPercentual = calcularPercentual(state.levantamento)
 
-    await atualizarLevantamento(levantamentoId, { percentual: newPercentual })
+    await atualizarLevantamento(levantamentoId, {
+      percentual: newPercentual,
+      ultimo_step: 8,
+      ultima_edicao: nowISO(),
+    })
     const result = await atualizarStatusLevantamento(levantamentoId, 'concluido')
     setState((prev) => ({ ...prev, saving: false }))
 

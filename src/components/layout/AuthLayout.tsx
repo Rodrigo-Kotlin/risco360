@@ -6,7 +6,7 @@ export function AuthLayout() {
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md animate-slide-up">
           <Outlet />
         </div>
         <p className="mt-8 text-label-medium text-text-muted text-center">

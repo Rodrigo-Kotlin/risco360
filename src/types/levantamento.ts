@@ -249,6 +249,10 @@ export interface LevantamentoCreateInput {
   tipo: TipoLevantamento
   status?: StatusLevantamento
   percentual?: number
+  ultimo_step?: number
+  progresso_percentual?: number
+  ultima_edicao?: string
+  ultima_sincronizacao?: string
   empresa_id?: ID
   empresa_nome?: string
   cnpj?: string
@@ -290,6 +294,10 @@ export interface Levantamento extends UserOwnedEntity {
   status: StatusLevantamento
   percentual: number
   sync_status?: SyncStatus
+  ultimo_step: number
+  progresso_percentual: number | null
+  ultima_edicao: string | null
+  ultima_sincronizacao: string | null
   empresa_id: ID | null
   empresa_nome: string | null
   cnpj: string | null

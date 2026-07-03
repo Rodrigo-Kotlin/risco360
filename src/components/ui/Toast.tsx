@@ -12,17 +12,26 @@ interface Toast {
 }
 
 const iconMap: Record<ToastVariant, ReactNode> = {
-  success: <CheckCircle size={18} aria-hidden="true" />,
-  error:   <AlertCircle size={18} aria-hidden="true" />,
-  warning: <AlertTriangle size={18} aria-hidden="true" />,
-  info:    <Info size={18} aria-hidden="true" />,
+  success: <CheckCircle size={16} aria-hidden="true" />,
+  error:   <AlertCircle size={16} aria-hidden="true" />,
+  warning: <AlertTriangle size={16} aria-hidden="true" />,
+  info:    <Info size={16} aria-hidden="true" />,
 }
 
+/**
+ * MD3 Toast / Snackbar:
+ *
+ * — Posicionamento: bottom-center em mobile (como Snackbar do Android)
+ *   e bottom-right em desktop — padrão Google
+ * — Compacto: py-2.5 px-4 — evita parecer um popup gigante
+ * — Máximo de 3 toasts visíveis simultaneamente
+ * — Backdrop transparente — toast não bloqueia interação
+ */
 const variantStyles: Record<ToastVariant, string> = {
-  success: 'bg-success text-white',
-  error:   'bg-danger text-white',
-  warning: 'bg-warning text-white',
-  info:    'bg-info text-white',
+  success: 'bg-[#1E4620] text-white border-none',
+  error:   'bg-[#5F2120] text-white border-none',
+  warning: 'bg-[#4E2600] text-white border-none',
+  info:    'bg-[#1A237E] text-white border-none',
 }
 
 const defaultVariantDuration: Partial<Record<ToastVariant, number>> = {
@@ -55,7 +64,8 @@ export function ToastProvider({
   const addToast = useCallback((message: string, variant: ToastVariant = 'info', options?: ToastOptions) => {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
     const persistent = options?.persistent ?? false
-    setToasts((prev) => [...prev, { id, message, variant, persistent }])
+    // Limita a 3 toasts visíveis
+    setToasts((prev) => [...prev.slice(-2), { id, message, variant, persistent }])
 
     if (!persistent) {
       const duration = options?.duration ?? variantDurations[variant] ?? defaultDuration
@@ -75,25 +85,44 @@ export function ToastProvider({
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite" aria-label="Notificações">
+      {/* 
+        Mobile: bottom-center (Snackbar Android MD3)
+        Desktop: bottom-right
+        Ambos ficam acima do bottom navigation bar (bottom-20 em mobile)
+      */}
+      <div
+        className="fixed z-[100] flex flex-col gap-2 pointer-events-none
+          bottom-20 left-4 right-4
+          sm:bottom-6 sm:left-auto sm:right-6 sm:w-full sm:max-w-[360px]"
+        aria-live="polite"
+        aria-label="Notificações"
+        aria-atomic="false"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}
             className={cn(
-              'pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg shadow-dropdown text-body-medium font-medium animate-slide-up',
+              'pointer-events-auto flex items-center gap-3',
+              'px-4 py-3 rounded-lg shadow-lg',
+              'text-body-medium font-medium animate-slide-up',
+              'min-h-[48px]',
               variantStyles[t.variant]
             )}
             role="alert"
           >
-            <span className="shrink-0 mt-0.5">{iconMap[t.variant]}</span>
-            <p className="flex-1">{t.message}</p>
+            <span className="shrink-0">{iconMap[t.variant]}</span>
+            <p className="flex-1 text-body-small font-medium leading-snug">{t.message}</p>
             <button
               type="button"
               onClick={() => removeToast(t.id)}
-              className="shrink-0 min-w-[48px] min-h-[48px] opacity-80 hover:opacity-100 transition-opacity"
+              className={cn(
+                'shrink-0 -mr-1 p-2 rounded-md',
+                'opacity-80 hover:opacity-100 transition-opacity',
+                'min-w-[36px] min-h-[36px] flex items-center justify-center'
+              )}
               aria-label="Fechar notificação"
             >
-              <X size={16} />
+              <X size={14} />
             </button>
           </div>
         ))}

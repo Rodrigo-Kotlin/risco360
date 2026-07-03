@@ -1,32 +1,45 @@
 @theme {
+  /* ============================================================
+     CORES — Paleta MD3 ajustada para o sistema RISCO360
+     ============================================================ */
+
+  /* Primary — Verde corporativo calibrado (menos saturado, mais sóbrio) */
   --color-primary-50: #F0FDF4;
   --color-primary-100: #DCFCE7;
-  --color-primary-500: #15803D;
-  --color-primary-600: #166534;
-  --color-primary-700: #14532D;
+  --color-primary-200: #BBF7D0;
+  --color-primary-500: #16A34A;
+  --color-primary-600: #15803D;
+  --color-primary-700: #166534;
 
-  --color-teal-500: #14B8A6;
+  /* Secondary — Teal para elementos secundários */
+  --color-teal-500: #0D9488;
+
+  /* Info — Azul Google */
   --color-blue-50: #EFF6FF;
   --color-blue-200: #BFDBFE;
   --color-blue-500: #3B82F6;
   --color-blue-700: #1D4ED8;
 
+  /* Surfaces — Hierarquia clara de superfícies */
   --color-surface: #FFFFFF;
-  --color-surface-alt: #F6F8FB;
+  --color-surface-alt: #F8FAFC;
   --color-surface-muted: #F1F5F9;
   --color-surface-skeleton: #E2E8F0;
   --color-card: #FFFFFF;
 
+  /* Bordas — sistema de 2 níveis */
   --color-border: #CBD5E1;
   --color-border-light: #E2E8F0;
 
+  /* Texto — escala de 3 níveis MD3 */
   --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
   --color-text-muted: #94A3B8;
 
+  /* Semânticas */
   --color-danger: #DC2626;
   --color-danger-50: #FEF2F2;
-  --color-warning: #D97706;
+  --color-warning: #B45309;
   --color-warning-50: #FFFBEB;
   --color-warning-100: #FEF3C7;
   --color-warning-light: #FFF7ED;
@@ -37,48 +50,114 @@
 
   /* Risk level colors — alinhados ao design system */
   --color-risk-low: #16A34A;
-  --color-risk-medium: #D97706;
-  --color-risk-high: #EA580C;
+  --color-risk-medium: #B45309;
+  --color-risk-high: #C2410C;
   --color-risk-high-bg: #FFF7ED;
   --color-risk-critical: #DC2626;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* ============================================================
+     TIPOGRAFIA — MD3 Type Scale
+     ============================================================ */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --text-display-large: 57px;
+  --text-display-large:  57px;
   --text-display-medium: 45px;
-  --text-display-small: 36px;
-  --text-headline-large: 32px;
+  --text-display-small:  36px;
+
+  --text-headline-large:  32px;
   --text-headline-medium: 28px;
-  --text-headline-small: 24px;
-  --text-title-large: 22px;
+  --text-headline-small:  24px;
+
+  --text-title-large:  22px;
   --text-title-medium: 16px;
-  --text-title-small: 14px;
-  --text-body-large: 16px;
+  --text-title-small:  14px;
+
+  --text-body-large:  16px;
   --text-body-medium: 14px;
-  --text-body-small: 12px;
-  --text-label-large: 14px;
+  --text-body-small:  12px;
+
+  --text-label-large:  14px;
   --text-label-medium: 12px;
-  --text-label-small: 11px;
+  --text-label-small:  11px;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
+  /* ============================================================
+     ESPAÇAMENTOS — Grade de 4/8px MD3
+     ============================================================ */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  20px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  /* ============================================================
+     BORDER RADIUS — MD3 Shapes
+     ============================================================ */
+  --radius-xs: 0.25rem;   /* 4px  — chips inline */
+  --radius-sm: 0.5rem;    /* 8px  — badges, chips */
+  --radius-md: 0.75rem;   /* 12px — inputs, botões sm */
+  --radius-lg: 1rem;      /* 16px — cards, modais */
+  --radius-xl: 1.25rem;   /* 20px — grandes superfícies */
+  --radius-2xl: 1.5rem;   /* 24px — bottom sheets */
+  --radius-full: 9999px;  /* circular */
+
+  /* ============================================================
+     SOMBRAS — MD3 Elevation
+     ============================================================ */
+  /* Elevation 0 — sem sombra */
+  /* Elevation 1 — card padrão */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+  /* Elevation 2 — hover estado */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Elevation 3 — dropdown, floating */
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-modal: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-dropdown: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  /* Elevation 4 — modal, dialog */
+  --shadow-lg: 0 10px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+  /* Modal */
+  --shadow-modal: 0 20px 40px -8px rgba(0, 0, 0, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+  /* Dropdown */
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  /* FAB */
+  --shadow-fab: 0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  /* ============================================================
+     Z-INDEX — Camadas bem definidas
+     ============================================================ */
+  --z-base: 0;
+  --z-sticky: 30;
+  --z-drawer: 40;
+  --z-fab: 40;
+  --z-bottom-nav: 40;
+  --z-header: 30;
+  --z-dropdown: 50;
+  --z-modal: 50;
+  --z-toast: 100;
+
+  /* ============================================================
+     TRANSIÇÕES — MD3 Motion
+     ============================================================ */
+  --duration-fast: 100ms;
+  --duration-default: 200ms;
+  --duration-slow: 300ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
 }
 
+/* ============================================================
+   DARK MODE — tema escuro
+   ============================================================ */
 .dark {
-  --color-primary-50: #022c22;
+  --color-primary-50: #052e16;
   --color-primary-100: #064e3b;
-  --color-primary-500: #22c55e;
-  --color-primary-600: #16a34a;
-  --color-primary-700: #15803d;
+  --color-primary-200: #065f46;
+  --color-primary-500: #4ade80;
+  --color-primary-600: #22c55e;
+  --color-primary-700: #16a34a;
 
   --color-surface: #0f172a;
   --color-surface-alt: #1e293b;
@@ -112,9 +191,10 @@
   --color-risk-critical: #f87171;
 
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.35), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
-  --shadow-modal: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-  --shadow-dropdown: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 20px 40px -8px rgba(0, 0, 0, 0.5), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-fab: 0 6px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
 }

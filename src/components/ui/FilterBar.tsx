@@ -48,7 +48,7 @@ export function FilterBar({ children, activeFilters, onToggle, className }: Filt
               <button
                 type="button"
                 onClick={chip.onRemove}
-                className="hover:text-primary-700 transition-colors min-w-[48px] min-h-[48px]"
+                className="hover:text-primary-700 transition-colors p-1.5 -m-1.5"
                 aria-label={`Remover filtro ${chip.label}`}
               >
                 <X size={12} />

@@ -9,13 +9,20 @@ interface CardProps {
   onClick?: () => void
 }
 
+/**
+ * MD3 Card System — Elevated, Filled, Outlined
+ *
+ * Padding padronizado: p-4 (16px) em todos os breakpoints.
+ * Para seções maiores, use className="p-5" ou "p-6" explicitamente.
+ * Borda radius: 16px (--radius-lg) — padrão MD3 para cards.
+ */
 const variantStyles: Record<CardVariant, string> = {
-  default:     'bg-white border-border-light shadow-card',
-  interactive: 'bg-white border-border-light shadow-card hover:shadow-md hover:border-primary-200 cursor-pointer transition-all',
-  selected:    'bg-white border-primary-500 shadow-card ring-1 ring-primary-500',
-  danger:      'bg-white border-danger/30 shadow-card',
-  success:     'bg-white border-success/30 shadow-card',
-  info:        'bg-white border-blue-500/30 shadow-card',
+  default:     'bg-card border-border-light shadow-card',
+  interactive: 'bg-card border-border-light shadow-card hover:shadow-md hover:border-primary-200 cursor-pointer transition-all duration-200',
+  selected:    'bg-card border-primary-500 shadow-card ring-1 ring-primary-500/50',
+  danger:      'bg-card border-danger/25 shadow-card',
+  success:     'bg-card border-success/25 shadow-card',
+  info:        'bg-card border-blue-500/25 shadow-card',
 }
 
 export function Card({ children, className, padding = true, variant = 'default', onClick }: CardProps) {
@@ -24,10 +31,10 @@ export function Card({ children, className, padding = true, variant = 'default',
   return (
     <div
       className={cn(
-        'border rounded-xl text-left',
+        'border rounded-2xl text-left',
         variantStyles[variant],
-        padding && 'p-4 md:p-5',
-        isClickable && 'w-full cursor-pointer',
+        padding && 'p-4',
+        isClickable && 'w-full cursor-pointer active:scale-[0.99] transition-transform duration-100',
         className
       )}
       onClick={onClick}
@@ -47,7 +54,7 @@ export function Card({ children, className, padding = true, variant = 'default',
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-between mb-4', className)}>
+    <div className={cn('flex items-center justify-between mb-3', className)}>
       {children}
     </div>
   )

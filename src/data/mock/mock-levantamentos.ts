@@ -141,6 +141,8 @@ export const mockLevantamentos: Levantamento[] = [
   {
     id: 'mock-lev-adm-001', codigo: 'LPR-AEP-2026-0001',
     tipo: 'LPR_AEP', status: 'em_andamento', percentual: 45,
+    ultimo_step: 4, progresso_percentual: 45,
+    ultima_edicao: '2026-06-01T10:00:00Z', ultima_sincronizacao: '2026-06-01T10:00:00Z',
     empresa_id: mockEmpresaId, empresa_nome: EMPRESA_NOME,
     cnpj: '12.345.678/0001-90', unidade: 'Matriz', setor: 'Administrativo',
     setor_id: mockSetorAdmId, setor_nome: 'Administrativo',
@@ -179,6 +181,8 @@ export const mockLevantamentos: Levantamento[] = [
   {
     id: 'mock-lev-com-001', codigo: 'LPR-AEP-2026-0002',
     tipo: 'LPR_AEP', status: 'em_andamento', percentual: 30,
+    ultimo_step: 3, progresso_percentual: 30,
+    ultima_edicao: '2026-06-01T10:00:00Z', ultima_sincronizacao: '2026-06-01T10:00:00Z',
     empresa_id: mockEmpresaId, empresa_nome: EMPRESA_NOME,
     cnpj: '12.345.678/0001-90', unidade: 'Matriz', setor: 'Comercial',
     setor_id: mockSetorComId, setor_nome: 'Comercial',
@@ -203,6 +207,8 @@ export const mockLevantamentos: Levantamento[] = [
   {
     id: 'mock-lev-fin-001', codigo: 'LPR-AEP-2026-0003',
     tipo: 'LPR_AEP', status: 'em_andamento', percentual: 50,
+    ultimo_step: 5, progresso_percentual: 50,
+    ultima_edicao: '2026-06-01T10:00:00Z', ultima_sincronizacao: '2026-06-01T10:00:00Z',
     empresa_id: mockEmpresaId, empresa_nome: EMPRESA_NOME,
     cnpj: '12.345.678/0001-90', unidade: 'Matriz', setor: 'Financeiro',
     setor_id: mockSetorFinId, setor_nome: 'Financeiro',
@@ -282,6 +288,8 @@ export const mockLevantamentos: Levantamento[] = [
   {
     id: 'mock-lev-rh-001', codigo: 'LPR-AEP-2026-0004',
     tipo: 'LPR_AEP', status: 'rascunho', percentual: 10,
+    ultimo_step: 1, progresso_percentual: 10,
+    ultima_edicao: '2026-06-10T08:00:00Z', ultima_sincronizacao: null,
     empresa_id: mockEmpresaId, empresa_nome: EMPRESA_NOME,
     cnpj: '12.345.678/0001-90', unidade: 'Matriz', setor: 'RH',
     setor_id: mockSetorRhId, setor_nome: 'RH',

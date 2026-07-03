@@ -38,16 +38,16 @@ export function OfflineBanner() {
     return (
       <div
         className={cn(
-          'flex items-center justify-center gap-2 flex-wrap text-center',
+          'flex items-center justify-center gap-2',
           'bg-warning text-white px-4 py-2 text-body-medium font-medium',
           'animate-slide-up'
         )}
         role="alert"
       >
-        <WifiOff size={16} aria-hidden="true" />
-        <span className="text-center">{getOfflineMessage()}</span>
+        <WifiOff size={16} aria-hidden="true" className="shrink-0" />
+        <span className="text-center text-body-small sm:text-body-medium leading-tight">{getOfflineMessage()}</span>
         {pendingCount > 0 && (
-          <span className="ml-2 text-warning-100 text-label-medium">
+          <span className="shrink-0 text-warning-100 text-label-medium whitespace-nowrap">
             ({pendingCount} pendente{pendingCount !== 1 ? 's' : ''})
           </span>
         )}
@@ -59,17 +59,17 @@ export function OfflineBanner() {
     return (
       <div
         className={cn(
-          'flex items-center justify-center gap-2 flex-wrap text-center',
+          'flex items-center justify-center gap-2',
           'bg-success text-white px-4 py-2 text-body-medium font-medium',
           'animate-slide-up'
         )}
         role="alert"
       >
-        <Wifi size={16} aria-hidden="true" />
-        <span className="text-center">Conexão restaurada.</span>
+        <Wifi size={16} aria-hidden="true" className="shrink-0" />
+        <span className="text-body-small sm:text-body-medium leading-tight">Conexão restaurada.</span>
         {pendingCount > 0 && (
-          <span className="ml-1">
-            {pendingCount} alteraç{pendingCount !== 1 ? 'ões' : 'ão'} pendente{pendingCount !== 1 ? 's' : ''} de sincronização.
+          <span className="shrink-0 whitespace-nowrap text-label-medium">
+            {pendingCount} alteraç{pendingCount !== 1 ? 'ões' : 'ão'} pendente{pendingCount !== 1 ? 's' : ''}
           </span>
         )}
       </div>

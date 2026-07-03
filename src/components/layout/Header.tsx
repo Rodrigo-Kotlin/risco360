@@ -79,7 +79,7 @@ export function Header({ title, description, className }: HeaderProps) {
           align="right"
           trigger={
             <span className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-muted transition-colors cursor-pointer">
-              <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-label-medium font-bold">
+              <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-label-medium font-bold">
                 {avatarInitial}
               </div>
               <span className="hidden sm:block text-body-medium text-text-secondary">{displayName}</span>

@@ -7,13 +7,20 @@ interface SkeletonProps {
   height?: string | number
 }
 
+/**
+ * MD3 Skeleton / Shimmer
+ *
+ * Usa animate-pulse mais suave via custom keyframes em globals.css
+ * Cor: --color-surface-skeleton (E2E8F0 light / 334155 dark)
+ */
 export function Skeleton({ className, variant = 'text', width, height }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse bg-surface-skeleton rounded',
+        'animate-skeleton bg-surface-skeleton rounded',
         variant === 'circular' && 'rounded-full',
-        variant === 'rectangular' && 'rounded-lg',
+        variant === 'rectangular' && 'rounded-xl',
+        variant === 'text' && 'rounded-md',
         className
       )}
       style={{ width, height }}
@@ -24,10 +31,18 @@ export function Skeleton({ className, variant = 'text', width, height }: Skeleto
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white border border-border-light rounded-xl p-4 md:p-5 space-y-3" aria-hidden="true">
-      <Skeleton width="60%" height={16} />
-      <Skeleton width="40%" height={32} />
-      <Skeleton width="80%" height={12} />
+    <div
+      className="bg-white border border-border-light rounded-2xl p-4 border-l-4 border-l-border-light shadow-card"
+      aria-hidden="true"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 space-y-2">
+          <Skeleton height={12} width="55%" />
+          <Skeleton height={28} width="45%" />
+          <Skeleton height={12} width="70%" />
+        </div>
+        <Skeleton variant="rectangular" className="w-9 h-9 rounded-xl shrink-0" />
+      </div>
     </div>
   )
 }

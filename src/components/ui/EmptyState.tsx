@@ -17,21 +17,34 @@ interface EmptyStateProps {
   className?: string
 }
 
+/**
+ * EmptyState — MD3 Empty Content Pattern
+ *
+ * Container do ícone: 64×64 (era 56×56) para melhor presença visual
+ * Espaçamento: py-10 (era py-12) — ligeiramente mais compacto
+ * Título: text-title-medium (16px/500) — consistente com outros títulos de seção
+ * Descrição: max-w-xs (era max-w-sm) — linhas mais curtas, mais legível
+ */
 export function EmptyState({ icon, title, description, action, secondaryAction, className }: EmptyStateProps) {
   return (
     <div className={cn(
-      'flex flex-col items-center justify-center text-center px-6 py-12',
+      'flex flex-col items-center justify-center text-center px-6 py-10',
       className
     )}>
-      <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-surface-muted text-text-muted mb-4" aria-hidden="true">
-        {icon || <Inbox size={28} />}
+      <div
+        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-muted text-text-muted mb-4"
+        aria-hidden="true"
+      >
+        {icon || <Inbox size={32} />}
       </div>
-      <h3 className="text-base font-semibold text-text-primary">{title}</h3>
+      <h3 className="text-title-medium font-semibold text-text-primary">{title}</h3>
       {description && (
-        <p className="mt-1 text-body-medium text-text-secondary max-w-sm leading-relaxed">{description}</p>
+        <p className="mt-1.5 text-body-medium text-text-secondary max-w-xs leading-relaxed">
+          {description}
+        </p>
       )}
       {(action || secondaryAction) && (
-        <div className="mt-5 flex items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {action && (
             <Button size="sm" onClick={action.onClick}>{action.label}</Button>
           )}

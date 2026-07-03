@@ -18,23 +18,25 @@ body,
 }
 
 html {
+  /* MD3: base 16px em todos os breakpoints — sem inflação de font-size em mobile
+   * que causava textos grandes e inconsistência na escala tipográfica */
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
-}
-
-@media (max-width: 640px) {
-  html {
-    font-size: 17px;
-  }
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   @apply bg-surface-alt text-text-primary antialiased;
   font-family: var(--font-sans);
-  line-height: 1.6;
+  /* MD3: line-height padrão para body — 1.5 alinhado com Body Large */
+  line-height: 1.5;
 }
 
+/* ============================================================
+   FOCUS — WCAG 2.2 AA
+   ============================================================ */
 :focus-visible {
   @apply outline-none ring-2 ring-primary-500/70 ring-offset-2 ring-offset-white;
 }
@@ -43,10 +45,16 @@ body {
   border: 0;
 }
 
+/* ============================================================
+   SELEÇÃO
+   ============================================================ */
 ::selection {
   @apply bg-primary-500/15 text-primary-700;
 }
 
+/* ============================================================
+   TIPOGRAFIA BASE
+   ============================================================ */
 input,
 textarea,
 select,
@@ -64,32 +72,120 @@ img {
   display: block;
 }
 
+/* ============================================================
+   ANIMAÇÕES — MD3 Motion Guidelines
+   ============================================================ */
+
+/* Slide up — usado por Toast, Modal, Bottom Sheet */
 @keyframes slide-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* Fade in — usado por Modal backdrop, overlays */
 @keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out;
+  animation: fade-in 0.15s ease-out;
 }
 
+/* Scale in — usado por Dropdown, Popover */
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-scale-in {
+  animation: scale-in 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Pulse skeleton — mais suave */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%        { opacity: 0.5; }
+}
+.animate-skeleton {
+  animation: skeleton-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================================
+   TOUCH TARGETS — MD3 mínimo 48×48
+   ============================================================ */
 @media (hover: none) and (pointer: coarse) {
   .touch-target {
     min-height: 48px;
     min-width: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
+/* ============================================================
+   SAFE AREA — iPhone home indicator
+   ============================================================ */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* ============================================================
+   SCROLL CUSTOMIZATION
+   ============================================================ */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+/* Indicador de scroll horizontal em tabelas */
+.scroll-shadow-right {
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.06)) right no-repeat;
+  background-size: 40px 100%;
+}
+
+/* ============================================================
+   MOTION REDUCTION — acessibilidade
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
+}
+
+/* ============================================================
+   DARK MODE — base body
+   ============================================================ */
+.dark :focus-visible {
+  @apply ring-offset-gray-900;
 }

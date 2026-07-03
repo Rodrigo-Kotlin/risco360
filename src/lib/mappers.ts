@@ -107,6 +107,10 @@ export function mapLevantamentoRowToLevantamento(row: LevantamentoRow): Levantam
       ? row.status
       : 'rascunho') as Levantamento['status'],
     percentual: row.percentual,
+    ultimo_step: row.ultimo_step ?? 1,
+    progresso_percentual: row.progresso_percentual ?? null,
+    ultima_edicao: row.ultima_edicao ?? null,
+    ultima_sincronizacao: row.ultima_sincronizacao ?? null,
     empresa_id: row.empresa_id,
     empresa_nome: row.empresa_nome,
     cnpj: row.cnpj,
