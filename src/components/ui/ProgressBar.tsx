@@ -22,13 +22,6 @@ const variantStyles = {
   danger:  'bg-danger',
 }
 
-/**
- * MD3 Progress Indicator — Linear
- *
- * h-2 (8px) como default — mais visível que h-1.5 (6px)
- * Animação de transição 500ms com easing decelerate — padrão MD3
- * Track: bg-surface-muted com rounded-full para consistência
- */
 export function ProgressBar({
   value,
   max = 100,
@@ -54,8 +47,7 @@ export function ProgressBar({
       >
         <div
           className={cn(
-            'h-full rounded-full transition-all duration-500',
-            'will-change-transform',
+            'h-full rounded-full transition-all duration-500 ease-out',
             variantStyles[variant]
           )}
           style={{ width: `${pct}%` }}

@@ -9,15 +9,8 @@ interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
   placeholder?: string
 }
 
-/**
- * SearchInput — MD3 Search Bar simplificada
- *
- * Ícone de busca: left-3 (12px do início)
- * Botão clear: posicionado com padding interno para não sobrepor texto
- * Sem min-w exagerado no clear button — usa padding para expandir área de toque
- */
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ value = '', onChange, debounce = 300, placeholder = 'Pesquisar…', className, ...props }, ref) => {
+  ({ value = '', onChange, debounce = 300, placeholder = 'Pesquisar\u2026', className, ...props }, ref) => {
     const [local, setLocal] = useState(value)
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const mountedRef = useRef(false)
@@ -61,7 +54,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={(e) => setLocal(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'w-full min-h-[44px] pl-10 rounded-xl border border-border-light bg-white text-body-medium',
+            'w-full h-12 pl-10 rounded-xl border border-border-light bg-white text-body-medium',
             'placeholder:text-text-muted',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-primary-500',
             'transition-colors duration-150',
@@ -75,10 +68,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             type="button"
             onClick={handleClear}
             className={cn(
-              'absolute right-0 top-0 bottom-0',
-              'w-10 flex items-center justify-center',
+              'absolute right-1 top-1/2 -translate-y-1/2',
+              'w-9 h-9 flex items-center justify-center',
               'text-text-muted hover:text-text-primary transition-colors',
-              'rounded-r-xl'
+              'rounded-lg hover:bg-surface-muted'
             )}
             aria-label="Limpar pesquisa"
           >

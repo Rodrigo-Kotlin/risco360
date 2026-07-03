@@ -60,7 +60,7 @@ export function Stepper({ steps, currentStep, onStepClick, className }: StepperP
                   {isCompleted ? <Check size={15} strokeWidth={2.5} /> : step.number}
                 </span>
                 {/* Label — visível a partir de sm */}
-                <span className="hidden sm:inline text-label-medium font-medium truncate max-w-[7rem]">
+                <span className="hidden md:inline text-label-medium font-medium truncate max-w-[7rem]">
                   {step.label}
                 </span>
               </button>

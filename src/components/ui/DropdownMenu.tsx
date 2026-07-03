@@ -158,7 +158,7 @@ export function DropdownMenu({ trigger, items, align = 'left', className }: Drop
               }}
               onMouseEnter={() => setFocusIndex(i)}
               className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-3 text-sm transition-colors text-left min-h-[48px]',
+                'w-full flex items-center gap-2.5 px-3 py-2.5 text-body-medium transition-colors text-left min-h-[44px]',
                 item.variant === 'danger'
                   ? 'text-danger hover:bg-red-50'
                   : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary',

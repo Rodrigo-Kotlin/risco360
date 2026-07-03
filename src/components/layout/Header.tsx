@@ -49,9 +49,9 @@ export function Header({ title, description, className }: HeaderProps) {
         {title && (
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-label-large md:text-title-medium font-semibold text-text-primary truncate">{title}</h2>
+              <h2 className="text-title-small md:text-title-medium font-semibold text-text-primary truncate">{title}</h2>
               {isMockModeEnabled && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-label-medium font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-label-small font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
                   <Beaker size={10} />
                   Mock Dev
                 </span>
@@ -66,11 +66,11 @@ export function Header({ title, description, className }: HeaderProps) {
 
       <div className="flex items-center gap-1 md:gap-2">
         {isOnline ? (
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-success font-medium bg-success/5 rounded-md">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-success font-medium bg-success-50 rounded-md">
             <Wifi size={12} /> Online
           </span>
         ) : (
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-warning font-medium bg-warning/5 rounded-md">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-warning font-medium bg-warning-50 rounded-md">
             <WifiOff size={12} /> Offline
           </span>
         )}
@@ -78,8 +78,8 @@ export function Header({ title, description, className }: HeaderProps) {
         <DropdownMenu
           align="right"
           trigger={
-            <span className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-muted transition-colors cursor-pointer">
-              <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-label-medium font-bold">
+            <span className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-muted transition-colors cursor-pointer min-h-[44px]">
+              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-label-medium font-bold">
                 {avatarInitial}
               </div>
               <span className="hidden sm:block text-body-medium text-text-secondary">{displayName}</span>

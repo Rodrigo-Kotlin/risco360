@@ -13,18 +13,13 @@ const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
 }
 
-/**
- * Navegação inferior para mobile.
- * Inclui safe-area-inset-bottom para compatibilidade com iPhones com home indicator.
- */
 export function MobileBottomNavigation() {
   const mainItems = BOTTOM_NAV_ITEMS
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border-light shadow-lg"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border-light shadow-lg safe-bottom"
       aria-label="Navegação mobile"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <ul className="flex items-center justify-around h-16 px-2">
         {mainItems.map((item) => {
@@ -35,7 +30,7 @@ export function MobileBottomNavigation() {
                 to={item.href}
                 end
                 className={({ isActive }) => cn(
-                  'flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all w-full relative',
+                  'flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all w-full relative min-h-[48px] justify-center',
                   isActive
                     ? 'text-primary-600'
                     : 'text-text-muted hover:text-primary-500'

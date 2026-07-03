@@ -37,10 +37,10 @@ const variantStyles: Record<ButtonVariant, string> = {
  * distorcer o visual do botão com min-h que conflita com o h-*.
  */
 const sizeStyles: Record<ButtonSize, string> = {
-  sm:   'h-8 px-3 text-label-medium gap-1.5 rounded-lg py-0 relative after:absolute after:inset-0 after:-m-[8px]',
+  sm:   'h-8 px-3 text-label-medium gap-1.5 rounded-lg',
   md:   'h-10 px-4 text-label-large gap-2 rounded-xl min-h-[44px]',
   lg:   'h-12 px-6 text-label-large gap-2 rounded-xl min-h-[48px]',
-  icon: 'h-11 w-11 p-0 rounded-xl min-h-[44px] min-w-[44px]',
+  icon: 'h-12 w-12 p-0 rounded-xl',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

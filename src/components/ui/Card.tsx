@@ -9,13 +9,6 @@ interface CardProps {
   onClick?: () => void
 }
 
-/**
- * MD3 Card System — Elevated, Filled, Outlined
- *
- * Padding padronizado: p-4 (16px) em todos os breakpoints.
- * Para seções maiores, use className="p-5" ou "p-6" explicitamente.
- * Borda radius: 16px (--radius-lg) — padrão MD3 para cards.
- */
 const variantStyles: Record<CardVariant, string> = {
   default:     'bg-card border-border-light shadow-card',
   interactive: 'bg-card border-border-light shadow-card hover:shadow-md hover:border-primary-200 cursor-pointer transition-all duration-200',
@@ -31,7 +24,7 @@ export function Card({ children, className, padding = true, variant = 'default',
   return (
     <div
       className={cn(
-        'border rounded-2xl text-left',
+        'border rounded-2xl text-left bg-card',
         variantStyles[variant],
         padding && 'p-4',
         isClickable && 'w-full cursor-pointer active:scale-[0.99] transition-transform duration-100',
@@ -54,7 +47,7 @@ export function Card({ children, className, padding = true, variant = 'default',
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-between mb-3', className)}>
+    <div className={cn('flex items-center justify-between gap-3 mb-3', className)}>
       {children}
     </div>
   )

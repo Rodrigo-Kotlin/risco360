@@ -7,12 +7,6 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: string
 }
 
-/**
- * MD3 Text Field multiline — Outlined variant
- *
- * Alinhado com Input em padding, border, focus ring.
- * min-h de 96px (~4 linhas) para boa usabilidade mobile.
- */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, hint, error, className, id, rows = 4, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
@@ -35,9 +29,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             'resize-y min-h-[96px]',
             'transition-colors duration-150',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-primary-500',
+            'hover:border-text-muted/60',
             error
-              ? 'border-danger bg-danger/[0.02] focus:ring-danger/40 focus:border-danger'
-              : 'border-border-light hover:border-text-muted/60',
+              ? 'border-danger bg-danger-50/30 focus:ring-danger/40 focus:border-danger'
+              : 'border-border-light',
             className
           )}
           aria-invalid={!!error}

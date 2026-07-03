@@ -26,6 +26,7 @@
   --color-surface-muted: #F1F5F9;
   --color-surface-skeleton: #E2E8F0;
   --color-card: #FFFFFF;
+  --color-card-alt: #F8FAFC;
 
   /* Bordas — sistema de 2 níveis */
   --color-border: #CBD5E1;
@@ -38,6 +39,8 @@
 
   /* Semânticas */
   --color-danger: #DC2626;
+  --color-danger-100: #FEE2E2;
+  --color-danger-200: #FECACA;
   --color-danger-50: #FEF2F2;
   --color-warning: #B45309;
   --color-warning-50: #FFFBEB;
@@ -164,6 +167,7 @@
   --color-surface-muted: #334155;
   --color-surface-skeleton: #334155;
   --color-card: #1e293b;
+  --color-card-alt: #1e293b;
 
   --color-border: #334155;
   --color-border-light: #475569;

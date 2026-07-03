@@ -43,7 +43,7 @@ function MobileDrawer() {
             <X size={20} />
           </button>
         </div>
-        <nav className="flex-1 overflow-y-auto py-3 px-3" aria-label="Menu lateral">
+        <nav className="flex-1 overflow-y-auto py-2 px-2" aria-label="Menu lateral">
           <ul className="space-y-0.5">
             {DRAWER_NAV_ITEMS.map((item) => {
               const Icon = drawerIconMap[item.icon]
@@ -54,9 +54,9 @@ function MobileDrawer() {
                     end
                     onClick={closeDrawer}
                     className={({ isActive }) => cn(
-                      'flex items-center gap-3 px-3 py-3 rounded-lg text-label-large transition-colors',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-large transition-colors',
                       isActive
-                        ? 'bg-primary-50 text-primary-500'
+                        ? 'bg-primary-50 text-primary-600 font-semibold'
                         : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
                     )}
                   >
@@ -89,7 +89,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         <MobileBottomNavigation />
 
         <button type="button" onClick={() => navigate(ROUTES.levantamentosNovo)}
-          className="lg:hidden fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-primary-500 text-white shadow-lg flex items-center justify-center hover:bg-primary-600 active:scale-95 transition-all"
+          className="lg:hidden fixed right-4 z-40 w-14 h-14 rounded-full bg-primary-500 text-white shadow-fab flex items-center justify-center hover:bg-primary-600 active:scale-95 transition-all"
+          style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}
           aria-label="Novo levantamento">
           <Plus size={24} />
         </button>

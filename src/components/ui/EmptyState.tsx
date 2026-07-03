@@ -17,14 +17,6 @@ interface EmptyStateProps {
   className?: string
 }
 
-/**
- * EmptyState — MD3 Empty Content Pattern
- *
- * Container do ícone: 64×64 (era 56×56) para melhor presença visual
- * Espaçamento: py-10 (era py-12) — ligeiramente mais compacto
- * Título: text-title-medium (16px/500) — consistente com outros títulos de seção
- * Descrição: max-w-xs (era max-w-sm) — linhas mais curtas, mais legível
- */
 export function EmptyState({ icon, title, description, action, secondaryAction, className }: EmptyStateProps) {
   return (
     <div className={cn(
@@ -32,10 +24,10 @@ export function EmptyState({ icon, title, description, action, secondaryAction, 
       className
     )}>
       <div
-        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-muted text-text-muted mb-4"
+        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-surface-muted text-text-muted mb-4"
         aria-hidden="true"
       >
-        {icon || <Inbox size={32} />}
+        {icon || <Inbox size={28} />}
       </div>
       <h3 className="text-title-medium font-semibold text-text-primary">{title}</h3>
       {description && (

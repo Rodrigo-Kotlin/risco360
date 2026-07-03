@@ -11,7 +11,6 @@ export interface Column<T> {
   render?: (item: T) => ReactNode
   className?: string
   headerClassName?: string
-  /** Se true, oculta a coluna em mobile (< 768px) */
   hideOnMobile?: boolean
 }
 
@@ -31,14 +30,6 @@ interface DataTableProps<T> {
   className?: string
 }
 
-/**
- * DataTable — MD3 Data Table
- *
- * Em mobile (< md): exibe as colunas marcadas hideOnMobile=false apenas.
- * Scroll horizontal com indicador visual de sombra no lado direito.
- * Row height: py-3.5 (56px aprox.) — touch target adequado para linhas clicáveis.
- * Header: text-label-medium uppercase com tracking-wider — padrão MD3 para table headers.
- */
 export function DataTable<T extends object>({
   columns,
   data,
@@ -82,7 +73,6 @@ export function DataTable<T extends object>({
   if (loading) {
     return (
       <div className="bg-card border border-border rounded-2xl overflow-hidden" aria-busy="true">
-        {/* Skeleton desktop */}
         <div className="hidden md:block">
           <div className="grid gap-4 px-5 py-3 border-b border-border bg-surface-muted"
             style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}>
@@ -99,7 +89,6 @@ export function DataTable<T extends object>({
             </div>
           ))}
         </div>
-        {/* Skeleton mobile */}
         <div className="md:hidden space-y-2.5 p-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex gap-3 p-3 border border-border-light rounded-xl">
@@ -138,7 +127,6 @@ export function DataTable<T extends object>({
 
   return (
     <div className={cn('bg-card border border-border rounded-2xl overflow-hidden', className)}>
-      {/* Wrapper com sombra lateral indicando scroll */}
       <div className="overflow-x-auto scrollbar-thin scroll-shadow-right">
         <table className="w-full text-body-medium min-w-max md:min-w-0">
           <thead>
@@ -195,7 +183,7 @@ export function DataTable<T extends object>({
                   <td
                     key={String(col.key)}
                     className={cn(
-                      'px-4 py-3.5 text-text-primary',
+                      'px-4 py-3 text-text-primary',
                       col.hideOnMobile && 'hidden md:table-cell',
                       col.className
                     )}
@@ -203,7 +191,7 @@ export function DataTable<T extends object>({
                     {col.render
                       ? col.render(item)
                       : ((item as unknown as Record<string, unknown>)[col.key as string] as ReactNode)
-                        ?? <span className="text-text-muted">—</span>
+                        ?? <span className="text-text-muted">\u2014</span>
                     }
                   </td>
                 ))}

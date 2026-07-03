@@ -25,19 +25,11 @@ const accentStyles: Record<string, string> = {
 const iconBgStyles: Record<string, string> = {
   default: 'bg-primary-50 text-primary-600',
   success: 'bg-success-50 text-success',
-  warning: 'bg-[#FEF3C7] text-[#B45309]',
+  warning: 'bg-warning-100 text-warning',
   danger:  'bg-danger/10 text-danger',
   info:    'bg-blue-50 text-blue-700',
 }
 
-/**
- * StatCard — Cartão de métrica MD3
- *
- * Grid 2 colunas em mobile: tamanho do valor reduzido de headline-small (24px)
- * para title-large (22px) para caber melhor no espaço reduzido.
- * Ícone: 36×36 (era 40×40) para não competir com o valor em telas pequenas.
- * Acento border-l-4 mantido como identificador visual de variante.
- */
 export function StatCard({
   title, value, description, icon, trend, trendValue,
   variant = 'default', className, onClick,
@@ -47,7 +39,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'bg-white border border-border-light rounded-2xl p-4 border-l-4 shadow-card transition-all duration-200',
+        'bg-card border border-border-light rounded-2xl p-4 border-l-4 shadow-card transition-all duration-200',
         accentStyles[variant],
         isClickable && 'cursor-pointer hover:shadow-md hover:border-primary-200 active:scale-[0.98]',
         className
@@ -64,8 +56,7 @@ export function StatCard({
           <p className="text-label-medium font-semibold text-text-secondary uppercase tracking-wide truncate">
             {title}
           </p>
-          {/* Valor: title-large em mobile, headline-small em telas maiores */}
-          <p className="mt-1.5 text-[22px] leading-7 font-bold text-text-primary tabular-nums">
+          <p className="mt-1.5 text-title-large font-bold text-text-primary tabular-nums">
             {value}
           </p>
           {description && (

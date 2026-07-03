@@ -10,12 +10,6 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string
 }
 
-/**
- * MD3 Select — Outlined variant
- *
- * Altura: 48px — alinhado com Input para consistência
- * Ícone chevron customizado — aparência consistente entre browsers
- */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, hint, error, options, placeholder, className, id, children, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
@@ -33,14 +27,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'w-full min-h-[48px] rounded-xl border bg-white text-body-medium text-text-primary',
+              'w-full h-12 rounded-xl border bg-white text-body-medium text-text-primary',
               'appearance-none cursor-pointer',
               'px-3.5 pr-10',
               'transition-colors duration-150',
               'focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-primary-500',
+              'hover:border-text-muted/60',
               error
-                ? 'border-danger bg-danger/[0.02] focus:ring-danger/40 focus:border-danger'
-                : 'border-border-light hover:border-text-muted/60',
+                ? 'border-danger bg-danger-50/30 focus:ring-danger/40 focus:border-danger'
+                : 'border-border-light',
               className
             )}
             aria-invalid={!!error}

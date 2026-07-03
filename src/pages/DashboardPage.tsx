@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { APP_NAME, ROUTES } from '@/constants/app'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { useSyncMetrics } from '@/hooks/useSyncMetrics'
+import { cn } from '@/lib/utils'
 import {
   ClipboardList, Building2, FileText, Plus,
   BarChart3, Activity,
@@ -44,12 +45,11 @@ export default function DashboardPage() {
           />
 
           {isError && (
-            <Card className="p-4">
+            <Card className="p-4 variant-danger">
               <p className="text-body-medium text-danger">{error instanceof Error ? error.message : 'Erro ao carregar dados'}</p>
             </Card>
           )}
 
-          {/* Métricas principais */}
           {isLoading ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
@@ -90,13 +90,12 @@ export default function DashboardPage() {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Ações rápidas */}
             <Card className="lg:col-span-2">
               <CardTitle className="mb-4">Ações rápidas</CardTitle>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Button
                   variant="secondary"
-                  className="justify-start h-auto py-3 px-4 text-left"
+                  className="justify-start h-auto py-3 px-4 text-left min-h-[56px]"
                   onClick={() => navigate(ROUTES.levantamentosNovo)}
                 >
                   <ClipboardList size={16} className="shrink-0" />
@@ -107,7 +106,7 @@ export default function DashboardPage() {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="justify-start h-auto py-3 px-4 text-left"
+                  className="justify-start h-auto py-3 px-4 text-left min-h-[56px]"
                   onClick={() => navigate(ROUTES.empresasNova)}
                 >
                   <Building2 size={16} className="shrink-0" />
@@ -118,7 +117,7 @@ export default function DashboardPage() {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="justify-start h-auto py-3 px-4 text-left"
+                  className="justify-start h-auto py-3 px-4 text-left min-h-[56px]"
                   onClick={() => navigate(ROUTES.levantamentos)}
                 >
                   <Activity size={16} className="shrink-0" />
@@ -129,7 +128,7 @@ export default function DashboardPage() {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="justify-start h-auto py-3 px-4 text-left"
+                  className="justify-start h-auto py-3 px-4 text-left min-h-[56px]"
                   onClick={() => navigate(ROUTES.relatorios)}
                 >
                   <BarChart3 size={16} className="shrink-0" />
@@ -141,7 +140,6 @@ export default function DashboardPage() {
               </div>
             </Card>
 
-            {/* Painel de sincronização */}
             <Card>
               <CardTitle className="mb-4">Status da Sincronização</CardTitle>
               <SyncStatusContent />
@@ -149,7 +147,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.configuracoes)}
-                  className="flex items-center gap-1 text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[48px]"
+                  className="flex items-center gap-1 text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[44px]"
                 >
                   Ver detalhes <ArrowRight size={12} />
                 </button>
@@ -157,7 +155,6 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Levantamentos recentes */}
           {!isLoading && !isError && levantamentos.length === 0 && (
             <Card className="p-0">
               <EmptyState
@@ -185,7 +182,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.levantamentos)}
-                  className="text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[48px]"
+                  className="text-label-medium text-primary-500 hover:text-primary-600 font-medium transition-colors min-h-[44px]"
                 >
                   Ver todos
                 </button>
@@ -207,13 +204,13 @@ export default function DashboardPage() {
                   return (
                     <Card
                       key={lev.id}
-                      className="p-4 cursor-pointer hover:border-primary-200 hover:shadow-md transition-all"
+                      className="cursor-pointer hover:border-primary-200 hover:shadow-md transition-all"
                       onClick={() => navigate(ROUTES.levantamentosDetalhe.replace(':id', lev.id))}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-text-primary truncate">{lev.codigo ?? 'Sem código'}</p>
-                          <p className="text-body-small text-text-secondary truncate">{lev.empresa_nome ?? 'Sem empresa'}{lev.setor_nome ? ` — ${lev.setor_nome}` : ''}</p>
+                          <p className="text-body-small text-text-secondary truncate">{lev.empresa_nome ?? 'Sem empresa'}{lev.setor_nome ? ` \u2014 ${lev.setor_nome}` : ''}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <div className="hidden sm:flex items-center gap-1">
@@ -225,7 +222,7 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-label-medium text-text-muted tabular-nums">{lev.percentual ?? 0}%</span>
                           </div>
-                          <span className={`text-label-medium font-medium px-2 py-0.5 rounded-full ${statusColors[lev.status] ?? 'text-text-muted bg-surface-muted'}`}>
+                          <span className={cn('text-label-medium font-medium px-2 py-0.5 rounded-full', statusColors[lev.status] ?? 'text-text-muted bg-surface-muted')}>
                             {statusLabels[lev.status] ?? lev.status}
                           </span>
                         </div>
@@ -248,8 +245,8 @@ function SyncStatusContent() {
   if (isLoading) {
     return (
       <div className="space-y-2 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-full" />
-        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-surface-skeleton rounded w-full" />
+        <div className="h-4 bg-surface-skeleton rounded w-3/4" />
       </div>
     )
   }
@@ -272,7 +269,7 @@ function SyncStatusContent() {
           <CloudOff size={14} className={isPending ? 'text-warning' : 'text-text-muted'} />
           Pendentes
         </span>
-        <span className={`text-title-small font-semibold ${isPending ? 'text-warning' : 'text-text-muted'}`}>
+        <span className={cn('text-title-small font-semibold', isPending ? 'text-warning' : 'text-text-muted')}>
           {metrics?.pending ?? 0}
         </span>
       </div>
@@ -281,7 +278,7 @@ function SyncStatusContent() {
           <AlertTriangle size={14} className={hasIssues ? 'text-danger' : 'text-text-muted'} />
           Falhas
         </span>
-        <span className={`text-title-small font-semibold ${hasIssues ? 'text-danger' : 'text-text-muted'}`}>
+        <span className={cn('text-title-small font-semibold', hasIssues ? 'text-danger' : 'text-text-muted')}>
           {(metrics?.failed ?? 0) + (metrics?.conflicts ?? 0)}
         </span>
       </div>

@@ -12,21 +12,12 @@ interface Toast {
 }
 
 const iconMap: Record<ToastVariant, ReactNode> = {
-  success: <CheckCircle size={16} aria-hidden="true" />,
-  error:   <AlertCircle size={16} aria-hidden="true" />,
-  warning: <AlertTriangle size={16} aria-hidden="true" />,
-  info:    <Info size={16} aria-hidden="true" />,
+  success: <CheckCircle size={18} aria-hidden="true" />,
+  error:   <AlertCircle size={18} aria-hidden="true" />,
+  warning: <AlertTriangle size={18} aria-hidden="true" />,
+  info:    <Info size={18} aria-hidden="true" />,
 }
 
-/**
- * MD3 Toast / Snackbar:
- *
- * — Posicionamento: bottom-center em mobile (como Snackbar do Android)
- *   e bottom-right em desktop — padrão Google
- * — Compacto: py-2.5 px-4 — evita parecer um popup gigante
- * — Máximo de 3 toasts visíveis simultaneamente
- * — Backdrop transparente — toast não bloqueia interação
- */
 const variantStyles: Record<ToastVariant, string> = {
   success: 'bg-[#1E4620] text-white border-none',
   error:   'bg-[#5F2120] text-white border-none',
@@ -64,7 +55,6 @@ export function ToastProvider({
   const addToast = useCallback((message: string, variant: ToastVariant = 'info', options?: ToastOptions) => {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
     const persistent = options?.persistent ?? false
-    // Limita a 3 toasts visíveis
     setToasts((prev) => [...prev.slice(-2), { id, message, variant, persistent }])
 
     if (!persistent) {
@@ -85,15 +75,11 @@ export function ToastProvider({
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      {/* 
-        Mobile: bottom-center (Snackbar Android MD3)
-        Desktop: bottom-right
-        Ambos ficam acima do bottom navigation bar (bottom-20 em mobile)
-      */}
       <div
         className="fixed z-[100] flex flex-col gap-2 pointer-events-none
-          bottom-20 left-4 right-4
-          sm:bottom-6 sm:left-auto sm:right-6 sm:w-full sm:max-w-[360px]"
+          bottom-20 left-0 right-0 px-4
+          sm:bottom-6 sm:left-auto sm:right-6 sm:w-auto sm:min-w-[320px] sm:max-w-[360px]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         aria-live="polite"
         aria-label="Notificações"
         aria-atomic="false"
@@ -103,9 +89,9 @@ export function ToastProvider({
             key={t.id}
             className={cn(
               'pointer-events-auto flex items-center gap-3',
-              'px-4 py-3 rounded-lg shadow-lg',
+              'px-4 py-3 rounded-xl shadow-lg',
               'text-body-medium font-medium animate-slide-up',
-              'min-h-[48px]',
+              'min-h-[48px] mx-auto sm:mx-0 w-full sm:w-auto sm:min-w-[320px] sm:max-w-[360px]',
               variantStyles[t.variant]
             )}
             role="alert"
@@ -122,7 +108,7 @@ export function ToastProvider({
               )}
               aria-label="Fechar notificação"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           </div>
         ))}

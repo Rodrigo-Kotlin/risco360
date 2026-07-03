@@ -41,16 +41,16 @@ export function PageHeader({ title, description, breadcrumb, action, secondaryAc
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-headline-small md:text-headline-medium font-bold text-text-primary">{title}</h1>
+          <h1 className="text-headline-small font-bold text-text-primary">{title}</h1>
           {description && (
             <p className="mt-0.5 text-body-medium text-text-secondary">{description}</p>
           )}
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {secondaryActions}
           {action && (
-            <Button size="sm" onClick={action.onClick}>
+            <Button onClick={action.onClick}>
               {action.icon && <span className="shrink-0">{action.icon}</span>}
               {action.label}
             </Button>

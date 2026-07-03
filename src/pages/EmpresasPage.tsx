@@ -70,10 +70,10 @@ export default function EmpresasPage() {
       )
     },
     { key: 'cnpj' as keyof Empresa, header: 'CNPJ', sortable: true,
-      render: (item: Empresa) => item.cnpj ?? <span className="text-text-muted">—</span>
+      render: (item: Empresa) => item.cnpj ?? <span className="text-text-muted">\u2014</span>
     },
     { key: 'cidade' as keyof Empresa, header: 'Cidade', sortable: true,
-      render: (item: Empresa) => item.cidade ? `${item.cidade}${item.uf ? `/${item.uf}` : ''}` : <span className="text-text-muted">—</span>
+      render: (item: Empresa) => item.cidade ? `${item.cidade}${item.uf ? `/${item.uf}` : ''}` : <span className="text-text-muted">\u2014</span>
     },
     { key: 'sync_status' as string, header: 'Sync', sortable: false,
       render: (item: Empresa) => <SyncStatusChip sync_status={item.sync_status} />,
@@ -88,8 +88,8 @@ export default function EmpresasPage() {
           <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.empresasEditar.replace(':id', item.id))} aria-label="Editar">
             <Pencil size={16} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="text-danger hover:text-danger" aria-label="Excluir">
-            <Trash2 size={16} />
+          <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} aria-label="Excluir">
+            <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
       ),
@@ -115,7 +115,7 @@ export default function EmpresasPage() {
 
           {!isLoading && (
             <div className="max-w-md">
-              <SearchInput value={search} onChange={setSearch} placeholder="Buscar por nome, fantasia ou CNPJ…" />
+              <SearchInput value={search} onChange={setSearch} placeholder="Buscar por nome, fantasia ou CNPJ\u2026" />
             </div>
           )}
 
@@ -128,7 +128,7 @@ export default function EmpresasPage() {
           {isError && (
             <Card className="p-6">
               <p className="text-body-medium text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar empresas'}</p>
-              <button type="button" onClick={() => refetch()} className="text-label-large text-primary-600 hover:text-primary-700 underline min-h-[48px]">Tentar novamente</button>
+              <button type="button" onClick={() => refetch()} className="text-label-large text-primary-600 hover:text-primary-700 underline min-h-[44px]">Tentar novamente</button>
             </Card>
           )}
 

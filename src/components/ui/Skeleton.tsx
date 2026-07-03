@@ -7,12 +7,6 @@ interface SkeletonProps {
   height?: string | number
 }
 
-/**
- * MD3 Skeleton / Shimmer
- *
- * Usa animate-pulse mais suave via custom keyframes em globals.css
- * Cor: --color-surface-skeleton (E2E8F0 light / 334155 dark)
- */
 export function Skeleton({ className, variant = 'text', width, height }: SkeletonProps) {
   return (
     <div
@@ -32,7 +26,7 @@ export function Skeleton({ className, variant = 'text', width, height }: Skeleto
 export function SkeletonCard() {
   return (
     <div
-      className="bg-white border border-border-light rounded-2xl p-4 border-l-4 border-l-border-light shadow-card"
+      className="bg-card border border-border-light rounded-2xl p-4 shadow-card"
       aria-hidden="true"
     >
       <div className="flex items-start justify-between gap-2">
