@@ -20,9 +20,10 @@ const Step02Caracteristicas = lazy(() => import('@/pages/steps/Step02Caracterist
 const Step03IluminacaoVentilacao = lazy(() => import('@/pages/steps/Step03IluminacaoVentilacao').then(m => ({ default: m.Step03IluminacaoVentilacao })))
 const Step04SegurancaEquipamentos = lazy(() => import('@/pages/steps/Step04SegurancaEquipamentos').then(m => ({ default: m.Step04SegurancaEquipamentos })))
 const Step05EpisEpcs = lazy(() => import('@/pages/steps/Step05EpisEpcs').then(m => ({ default: m.Step05EpisEpcs })))
-const Step06Medicoes = lazy(() => import('@/pages/steps/Step06Medicoes').then(m => ({ default: m.Step06Medicoes })))
-const Step07PerigosRiscosAep = lazy(() => import('@/pages/steps/Step07PerigosRiscosAep').then(m => ({ default: m.Step07PerigosRiscosAep })))
-const Step08RevisaoConclusao = lazy(() => import('@/pages/steps/Step08RevisaoConclusao').then(m => ({ default: m.Step08RevisaoConclusao })))
+const Step06Evidencias = lazy(() => import('@/pages/steps/Step06Evidencias').then(m => ({ default: m.Step06Evidencias })))
+const Step07Medicoes = lazy(() => import('@/pages/steps/Step07Medicoes').then(m => ({ default: m.Step07Medicoes })))
+const Step08PerigosRiscosAep = lazy(() => import('@/pages/steps/Step08PerigosRiscosAep').then(m => ({ default: m.Step08PerigosRiscosAep })))
+const Step09RevisaoConclusao = lazy(() => import('@/pages/steps/Step09RevisaoConclusao').then(m => ({ default: m.Step09RevisaoConclusao })))
 
 function StepSkeleton() {
   return (
@@ -43,9 +44,10 @@ function preloadStep(step: number) {
     3: () => import('@/pages/steps/Step03IluminacaoVentilacao'),
     4: () => import('@/pages/steps/Step04SegurancaEquipamentos'),
     5: () => import('@/pages/steps/Step05EpisEpcs'),
-    6: () => import('@/pages/steps/Step06Medicoes'),
-    7: () => import('@/pages/steps/Step07PerigosRiscosAep'),
-    8: () => import('@/pages/steps/Step08RevisaoConclusao'),
+    6: () => import('@/pages/steps/Step06Evidencias'),
+    7: () => import('@/pages/steps/Step07Medicoes'),
+    8: () => import('@/pages/steps/Step08PerigosRiscosAep'),
+    9: () => import('@/pages/steps/Step09RevisaoConclusao'),
   }
   loaders[step]?.()
 }
@@ -160,7 +162,7 @@ export default function LevantamentoWizardPage() {
 
   useEffect(() => {
     const next = wizard.currentStep + 1
-    if (next <= 8) preloadStep(next)
+    if (next <= 9) preloadStep(next)
   }, [wizard.currentStep])
 
   if (wizard.loading) {
@@ -250,16 +252,26 @@ export default function LevantamentoWizardPage() {
         )
       case 6:
         return (
-          <Step06Medicoes
-            medicoes={lev.pontos_medicao ?? []}
-            onSave={wizard.setPontosMedicao}
+          <Step06Evidencias
+            data={lev.epis_epcs_evidencias}
+            empresaNome={lev.empresa_nome}
+            onSave={wizard.setEpisEpcs}
             saving={wizard.saving}
             onPrevious={() => wizard.goToStep(5)}
           />
         )
       case 7:
         return (
-          <Step07PerigosRiscosAep
+          <Step07Medicoes
+            medicoes={lev.pontos_medicao ?? []}
+            onSave={wizard.setPontosMedicao}
+            saving={wizard.saving}
+            onPrevious={() => wizard.goToStep(6)}
+          />
+        )
+      case 8:
+        return (
+          <Step08PerigosRiscosAep
             riscos={lev.riscos}
             avaliacao_ergonomica_preliminar={lev.avaliacao_ergonomica_preliminar ?? lev.avaliacao_ergonomica}
             plano_acao={lev.plano_acao ?? lev.controles}
@@ -267,20 +279,20 @@ export default function LevantamentoWizardPage() {
             onSaveAvaliacaoErgonomica={wizard.setAvaliacaoErgonomica}
             onSaveControles={wizard.setControles}
             saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(6)}
+            onPrevious={() => wizard.goToStep(7)}
             bibliotecaItens={bibliotecaItens ?? []}
           />
         )
-      case 8:
+      case 9:
         return (
-          <Step08RevisaoConclusao
+          <Step09RevisaoConclusao
             levantamento={lev}
             percentual={wizard.percentual}
             onSaveParecer={wizard.setParecer}
             onSaveAssinaturas={wizard.setAssinaturas}
             onConcluir={wizard.concluirWizard}
             saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(7)}
+            onPrevious={() => wizard.goToStep(8)}
           />
         )
       default:

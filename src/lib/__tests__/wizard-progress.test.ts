@@ -9,6 +9,10 @@ function makeBase(id = 'test-1'): Levantamento {
     tipo: 'LPR_AEP',
     status: 'em_andamento',
     percentual: 0,
+    ultimo_step: 1,
+    progresso_percentual: null,
+    ultima_edicao: null,
+    ultima_sincronizacao: null,
     empresa_id: 'emp-1',
     empresa_nome: null,
     cnpj: null,
@@ -70,13 +74,19 @@ describe('calcularPercentual', () => {
     expect(calcularPercentual(lev)).toBe(10)
   })
 
-  it('conta step 6 com pontos_medicao', () => {
+  it('conta step 6 (evidências)', () => {
+    const lev = makeBase()
+    lev.epis_epcs_evidencias = { epis: [], epcs: [], evidencias: [{ legenda: 'foto.jpg', observacao: null, data: null, hora: null }], observacoes: null }
+    expect(calcularPercentual(lev)).toBe(5)
+  })
+
+  it('conta step 7 com pontos_medicao', () => {
     const lev = makeBase()
     lev.pontos_medicao = [{ id: 'p1', ponto_local: 'Ponto A', ruido_dba: 85, iluminacao_lux: null, temperatura_c: null, velocidade_ar_ms: null, umidade_percent: null, radiacao_usvh: null, observacoes: null }]
     expect(calcularPercentual(lev)).toBe(15)
   })
 
-  it('conta step 6 com medicoes antigas', () => {
+  it('conta step 7 com medicoes antigas', () => {
     const lev = makeBase()
     lev.medicoes = [{ id: 'm1', tipo: 'Ruído', agente: 'Ruído', metodo: null, equipamento: null, numero_serie: null, valor: 85, unidade: 'dB(A)', limite_tolerancia: null, fonte: null, duracao: null, local: null, responsavel: null, data: null, hora: null, observacao: null }]
     expect(calcularPercentual(lev)).toBe(15)

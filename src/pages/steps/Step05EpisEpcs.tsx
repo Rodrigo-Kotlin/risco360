@@ -1,17 +1,14 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Plus, Trash2, Pencil, ImageIcon, AlertCircle, Loader2, Shield, ShieldCheck, Camera, X, Maximize2 } from 'lucide-react'
+import { Plus, Trash2, Pencil, Shield, ShieldCheck } from 'lucide-react'
 import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import { cn } from '@/lib/utils'
 import type { EpisEpcsEvidencias, EpisItem, EpcItem, EvidenciaItem } from '@/types/levantamento'
 import { EPI_OPCOES, EPC_OPCOES } from '@/constants/formulario-options'
-import { uploadEvidenciaFotografica, revogarPreviewEvidencia, obterPreviewLocal } from '@/services/evidencias.service'
-import { removerBlobOffline } from '@/services/offline/offline-evidencia-blobs.service'
 import { ensureArray } from '@/lib/utils'
-import { criarObjectURLDoBlob } from '@/services/offline/offline-evidencia-blobs.service'
 
 function normalizeEpisEpcsEvidencias(data: unknown): EpisEpcsEvidencias {
   if (!data || typeof data !== 'object') {
@@ -31,10 +28,6 @@ function safeEpisItems(items: EpisItem[] | null | undefined): EpisItem[] {
 }
 
 function safeEpcItems(items: EpcItem[] | null | undefined): EpcItem[] {
-  return ensureArray(items)
-}
-
-function safeEvidenciaItems(items: EvidenciaItem[] | null | undefined): EvidenciaItem[] {
   return ensureArray(items)
 }
 
@@ -217,185 +210,11 @@ function EpcsSection({ items, onChange }: { items: EpcItem[] | null | undefined;
   )
 }
 
-function EvidenciasSection({ items, onChange }: { items: EvidenciaItem[] | null | undefined; onChange: (items: EvidenciaItem[]) => void }) {
-  const safeItems = safeEvidenciaItems(items)
-  const itemsRef = useRef(safeItems)
-  itemsRef.current = safeItems
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
-
-  const addImage = useCallback(() => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/jpeg,image/png,image/webp'
-    input.capture = 'environment'
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (!file) return
-
-      const now = new Date()
-      const localPreview = URL.createObjectURL(file)
-      const currentItems = itemsRef.current
-      const idx = currentItems.length
-
-      onChange([...currentItems, {
-        legenda: file.name,
-        observacao: `Arquivo: ${file.name}`,
-        data: now.toISOString().slice(0, 10),
-        hora: now.toTimeString().slice(0, 5),
-        mime_type: file.type,
-        size_bytes: file.size,
-        preview_url: localPreview,
-        upload_status: 'uploading',
-      }])
-
-      setErrorMessage(null)
-
-      const result = await uploadEvidenciaFotografica({ file, legenda: file.name, origem: 'camera' })
-
-      const latestItems = itemsRef.current
-
-      if (result.error) {
-        setErrorMessage(result.error)
-        onChange(latestItems.map((ev, j) =>
-          j === idx ? { ...ev, upload_status: 'error' } : ev
-        ))
-        return
-      }
-
-      const r = result.data!
-      const finalPreviewUrl = r.local_blob_id
-        ? (await obterPreviewLocal(r.local_blob_id, null)) ?? r.preview_url
-        : r.preview_url
-
-      onChange(latestItems.map((ev, j) =>
-        j === idx ? {
-          ...ev,
-          local_id: r.localId,
-          storage_path: r.storage_path,
-          preview_url: finalPreviewUrl,
-          mime_type: r.mime_type,
-          size_bytes: r.size_bytes,
-          upload_status: r.upload_status,
-          local_blob_id: r.local_blob_id,
-          sync_status: r.upload_status === 'pending' ? 'pending' as const : 'synced' as const,
-        } : ev
-      ))
-    }
-    input.click()
-  }, [onChange])
-
-  const removeImage = useCallback((idx: number) => {
-    const item = safeItems[idx]
-    if (!item) return
-    if (item.preview_url && item.preview_url.startsWith('blob:')) {
-      revogarPreviewEvidencia(item.preview_url)
-    }
-    if (item.local_blob_id) {
-      removerBlobOffline(item.local_blob_id)
-    }
-    onChange(safeItems.filter((_, j) => j !== idx))
-  }, [safeItems, onChange])
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-label-large text-text-primary">Imagens / evidências ({safeItems.length})</p>
-        <Button size="sm" variant="secondary" onClick={addImage}
-          disabled={safeItems.some((ev) => ev.upload_status === 'uploading')}
-          className="min-h-[48px]">
-          {safeItems.some((ev) => ev.upload_status === 'uploading')
-            ? <Loader2 size={14} className="animate-spin" />
-            : <Plus size={14} />}
-          {safeItems.some((ev) => ev.upload_status === 'uploading') ? 'Enviando...' : 'Capturar imagem'}
-        </Button>
-      </div>
-      {safeItems.length === 0 && (
-        <p className="text-body-small text-text-muted">Nenhuma evidência registrada. Toque em "Capturar imagem" para fotografar o ambiente.</p>
-      )}
-      {errorMessage && (
-        <div className="flex items-center gap-2 p-2 text-label-medium text-danger bg-danger/5 rounded-lg">
-          <AlertCircle size={14} />
-          {errorMessage}
-        </div>
-      )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {safeItems.map((ev, i) => (
-          <Card key={i} className="p-2 overflow-hidden group">
-            <div className="relative">
-              {ev.preview_url ? (
-                <div className="w-full aspect-video rounded-lg overflow-hidden bg-surface-muted cursor-pointer"
-                  onClick={() => setLightboxIdx(i)}>
-                  <img src={ev.preview_url} alt={ev.legenda ?? `Evidência ${i + 1}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <Maximize2 size={18} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full aspect-video rounded-lg bg-surface-muted flex items-center justify-center">
-                  <ImageIcon size={24} className="text-text-muted" />
-                </div>
-              )}
-              {ev.upload_status === 'uploading' && (
-                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-lg">
-                  <Loader2 size={20} className="animate-spin text-primary" />
-                </div>
-              )}
-            </div>
-            <div className="mt-1.5 space-y-1">
-              <p className="text-label-medium font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
-              {(ev.data || ev.hora) && (
-                <p className="text-label-medium text-text-muted">
-                  {ev.data} {ev.hora}
-                </p>
-              )}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  {ev.upload_status === 'error' && <span className="text-label-medium text-danger">Erro</span>}
-                  {ev.upload_status === 'pending' && <span className="text-label-medium text-warning">Pendente</span>}
-                  {ev.upload_status === 'uploaded' && <span className="text-label-medium text-success">Enviado</span>}
-                  {ev.sync_status === 'pending' && !ev.upload_status && (
-                    <span className="text-label-medium px-1 py-0.5 rounded bg-warning/10 text-warning">pendente</span>
-                  )}
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => removeImage(i)}
-                  className="text-danger min-h-[48px] w-12 h-12" disabled={ev.upload_status === 'uploading'}>
-                  <Trash2 size={12} />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {lightboxIdx !== null && safeItems[lightboxIdx]?.preview_url && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setLightboxIdx(null)}>
-          <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <button type="button" onClick={() => setLightboxIdx(null)}
-              className="absolute -top-10 right-0 text-white/80 hover:text-white transition-colors"
-              aria-label="Fechar">
-              <X size={24} />
-            </button>
-            <img src={safeItems[lightboxIdx].preview_url!}
-              alt={safeItems[lightboxIdx].legenda ?? `Evidência ${lightboxIdx + 1}`}
-              className="max-w-full max-h-[85vh] rounded-lg object-contain" />
-            {safeItems[lightboxIdx].legenda && (
-              <p className="text-white/80 text-body-medium mt-2 text-center">{safeItems[lightboxIdx].legenda}</p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-type TabId = 'epis' | 'epcs' | 'evidencias'
+type TabId = 'epis' | 'epcs'
 
 const TABS: { id: TabId; label: string; icon: typeof Shield; count?: number }[] = [
   { id: 'epis', label: 'EPIs', icon: Shield },
   { id: 'epcs', label: 'EPCs', icon: ShieldCheck },
-  { id: 'evidencias', label: 'Evidências', icon: Camera },
 ]
 
 export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisEpcsProps) {
@@ -404,27 +223,6 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
   )
   const [activeTab, setActiveTab] = useState<TabId>('epis')
 
-  useEffect(() => {
-    const regenerarPreviews = async () => {
-      const evidencias = safeEvidenciaItems(form.evidencias)
-      let modified = false
-      const atualizadas = await Promise.all(evidencias.map(async (ev) => {
-        if (ev.local_blob_id && (!ev.preview_url || ev.preview_url.startsWith('blob:'))) {
-          const novaUrl = await criarObjectURLDoBlob(ev.local_blob_id)
-          if (novaUrl) {
-            modified = true
-            return { ...ev, preview_url: novaUrl }
-          }
-        }
-        return ev
-      }))
-      if (modified) {
-        setForm((prev) => ({ ...prev, evidencias: atualizadas }))
-      }
-    }
-    regenerarPreviews()
-  }, [])
-
   const handleSave = async (next?: number) => {
     await onSave(form, next)
   }
@@ -432,7 +230,6 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
   const tabCounts: Record<TabId, number> = {
     epis: safeEpisItems(form.epis).length,
     epcs: safeEpcItems(form.epcs).length,
-    evidencias: safeEvidenciaItems(form.evidencias).length,
   }
 
   return (
@@ -481,12 +278,6 @@ export function Step05EpisEpcs({ data, onSave, saving, onPrevious }: Step05EpisE
       <div role="tabpanel" id="panel-epcs" hidden={activeTab !== 'epcs'}>
         {activeTab === 'epcs' && (
           <EpcsSection items={form.epcs} onChange={(epcs) => setForm((prev) => ({ ...prev, epcs }))} />
-        )}
-      </div>
-
-      <div role="tabpanel" id="panel-evidencias" hidden={activeTab !== 'evidencias'}>
-        {activeTab === 'evidencias' && (
-          <EvidenciasSection items={form.evidencias} onChange={(evidencias) => setForm((prev) => ({ ...prev, evidencias }))} />
         )}
       </div>
 

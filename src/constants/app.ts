@@ -34,10 +34,11 @@ export const STEPS = [
   { id: 'caracteristicas-fisicas',      label: 'Características físicas do local',                      number: 2 },
   { id: 'iluminacao-ventilacao',        label: 'Iluminação, ventilação e conforto',                     number: 3 },
   { id: 'seguranca-equipamentos',       label: 'Segurança, GES, mobiliários, máquinas e equipamentos',  number: 4 },
-  { id: 'epis-epcs-evidencias',         label: 'EPIs, EPCs e evidências',                              number: 5 },
-  { id: 'medicoes',                     label: 'Medições quantitativas pontuais',                       number: 6 },
-  { id: 'perigos-riscos-aep',           label: 'Perigos, riscos, medidas de controle e AEP',            number: 7 },
-  { id: 'revisao-conclusao',            label: 'Revisão e conclusão do setor',                         number: 8 },
+  { id: 'epis-epcs',                    label: 'EPIs e EPCs',                                          number: 5 },
+  { id: 'evidencias',                   label: 'Evidências fotográficas',                              number: 6 },
+  { id: 'medicoes',                     label: 'Medições quantitativas pontuais',                       number: 7 },
+  { id: 'perigos-riscos-aep',           label: 'Perigos, riscos, medidas de controle e AEP',            number: 8 },
+  { id: 'revisao-conclusao',            label: 'Revisão e conclusão do setor',                         number: 9 },
 ] as const
 
 export const STEP_WEIGHTS: Record<number, number> = {
@@ -45,8 +46,9 @@ export const STEP_WEIGHTS: Record<number, number> = {
   2: 10,
   3: 10,
   4: 10,
-  5: 10,
-  6: 15,
-  7: 20,
-  8: 15,
+  5: 5,
+  6: 5,
+  7: 15,
+  8: 20,
+  9: 15,
 }

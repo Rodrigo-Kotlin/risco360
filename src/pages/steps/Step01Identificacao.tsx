@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
-import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
 import { WizardNavigation } from '@/components/ui/WizardNavigation'
 import { Building2, FileText, User, Hash, Calendar } from 'lucide-react'
@@ -17,19 +16,13 @@ export function Step01Identificacao({ levantamento, onSave, saving }: Step01Iden
   const today = new Date().toISOString().slice(0, 10)
   const [auditorTecnico, setAuditorTecnico] = useState(levantamento.auditor_tecnico ?? '')
   const [registroMte, setRegistroMte] = useState(levantamento.registro_mte ?? '')
-  const [dataLevantamento, setDataLevantamento] = useState(levantamento.data_levantamento ?? today)
-  const [dataLancamentoSgg, setDataLancamentoSgg] = useState(levantamento.data_lancamento_sgg ?? '')
-  const [responsavelLancamento, setResponsavelLancamento] = useState(levantamento.responsavel_lancamento ?? '')
-  const [observacoesIniciais, setObservacoesIniciais] = useState(levantamento.observacoes_iniciais ?? '')
+  const [dataLevantamento] = useState(levantamento.data_levantamento ?? today)
 
   const handleSave = async () => {
     await onSave({
       auditor_tecnico: auditorTecnico || undefined,
       registro_mte: registroMte || undefined,
       data_levantamento: dataLevantamento || undefined,
-      data_lancamento_sgg: dataLancamentoSgg || undefined,
-      responsavel_lancamento: responsavelLancamento || undefined,
-      observacoes_iniciais: observacoesIniciais || undefined,
     }, 2)
   }
 
@@ -83,28 +76,6 @@ export function Step01Identificacao({ levantamento, onSave, saving }: Step01Iden
         </div>
       </FormSection>
 
-      <FormSection title="Datas e lançamento">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Data do levantamento" type="date" value={dataLevantamento}
-            onChange={(e) => setDataLevantamento(e.target.value)}
-          />
-          <Input label="Data lançamento SGG" type="date" value={dataLancamentoSgg}
-            onChange={(e) => setDataLancamentoSgg(e.target.value)}
-          />
-          <Input label="Responsável pelo lançamento" value={responsavelLancamento}
-            onChange={(e) => setResponsavelLancamento(e.target.value)}
-            placeholder="Nome de quem lançou o levantamento"
-          />
-        </div>
-      </FormSection>
-
-      <FormSection title="Observações iniciais">
-        <Textarea value={observacoesIniciais}
-          onChange={(e) => setObservacoesIniciais(e.target.value)}
-          rows={3} placeholder="Observações sobre o início do levantamento…"
-        />
-      </FormSection>
-
       <WizardNavigation
         saving={saving}
         isFirst
@@ -114,9 +85,6 @@ export function Step01Identificacao({ levantamento, onSave, saving }: Step01Iden
             auditor_tecnico: auditorTecnico || undefined,
             registro_mte: registroMte || undefined,
             data_levantamento: dataLevantamento || undefined,
-            data_lancamento_sgg: dataLancamentoSgg || undefined,
-            responsavel_lancamento: responsavelLancamento || undefined,
-            observacoes_iniciais: observacoesIniciais || undefined,
           })
         }}
       />

@@ -33,6 +33,14 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
     error: null,
   })
 
+  const normalizeWizardStep = useCallback((step: number): number => {
+    const OLD_TO_NEW_STEP: Record<number, number> = {
+      1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
+      6: 7, 7: 8, 8: 9,
+    }
+    return OLD_TO_NEW_STEP[step] ?? step
+  }, [])
+
   const load = useCallback(async () => {
     if (!levantamentoId) return
     setState((prev) => ({ ...prev, loading: true, error: null }))
@@ -42,20 +50,21 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       return
     }
     const lev = result.data
-    const initialStep = lev?.status === 'concluido' ? 1 : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
+    const rawStep = lev?.status === 'concluido' ? 1 : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
+    const initialStep = normalizeWizardStep(rawStep)
     setState((prev) => ({
       ...prev,
       levantamento: lev,
       loading: false,
       currentStep: initialStep,
     }))
-  }, [levantamentoId])
+  }, [levantamentoId, normalizeWizardStep])
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   const goToStep = useCallback((step: number) => {
-    if (step >= 1 && step <= 8) {
+    if (step >= 1 && step <= 9) {
       setState((prev) => ({ ...prev, currentStep: step }))
     }
   }, [])
@@ -114,7 +123,7 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
 
     await atualizarLevantamento(levantamentoId, {
       percentual: newPercentual,
-      ultimo_step: 8,
+      ultimo_step: 9,
       ultima_edicao: nowISO(),
     })
     const result = await atualizarStatusLevantamento(levantamentoId, 'concluido')

@@ -33,19 +33,22 @@ export function calcularPercentual(lev: Levantamento): number {
   if (hasSeguranca) total += STEP_WEIGHTS[4]
 
   const eps = lev.epis_epcs_evidencias
-  const hasEpis = ((eps?.epis ?? []).length > 0 || (eps?.epcs ?? []).length > 0 || (eps?.evidencias ?? []).length > 0)
+  const hasEpis = ((eps?.epis ?? []).length > 0 || (eps?.epcs ?? []).length > 0)
   if (hasEpis) total += STEP_WEIGHTS[5]
 
+  const hasEvidencias = (eps?.evidencias ?? []).length > 0
+  if (hasEvidencias) total += STEP_WEIGHTS[6]
+
   const hasMedicoes = (lev.medicoes ?? []).length > 0 || (lev.pontos_medicao ?? []).length > 0
-  if (hasMedicoes) total += STEP_WEIGHTS[6]
+  if (hasMedicoes) total += STEP_WEIGHTS[7]
 
   const hasRiscos = (lev.riscos ?? []).length > 0
-  if (hasRiscos) total += STEP_WEIGHTS[7]
+  if (hasRiscos) total += STEP_WEIGHTS[8]
 
   const hasRevisao = !!(
     lev.parecer?.conclusao || lev.assinatura_tecnico?.nome
   )
-  if (hasRevisao) total += STEP_WEIGHTS[8]
+  if (hasRevisao) total += STEP_WEIGHTS[9]
 
   return Math.min(100, total)
 }
@@ -78,13 +81,15 @@ export function calcularProximoPasso(lev: Levantamento): number {
   if (!hasSeguranca) return 4
 
   const eps = lev.epis_epcs_evidencias
-  if ((eps?.epis ?? []).length === 0 && (eps?.epcs ?? []).length === 0 && (eps?.evidencias ?? []).length === 0) return 5
+  if ((eps?.epis ?? []).length === 0 && (eps?.epcs ?? []).length === 0) return 5
 
-  if ((lev.medicoes ?? []).length === 0 && (lev.pontos_medicao ?? []).length === 0) return 6
+  if ((eps?.evidencias ?? []).length === 0) return 6
 
-  if ((lev.riscos ?? []).length === 0) return 7
+  if ((lev.medicoes ?? []).length === 0 && (lev.pontos_medicao ?? []).length === 0) return 7
 
-  if (!(lev.parecer?.conclusao || lev.assinatura_tecnico?.nome)) return 8
+  if ((lev.riscos ?? []).length === 0) return 8
+
+  if (!(lev.parecer?.conclusao || lev.assinatura_tecnico?.nome)) return 9
 
   return 1
 }
