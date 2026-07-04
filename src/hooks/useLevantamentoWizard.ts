@@ -4,7 +4,7 @@ import { queryClient } from '@/lib/query-client'
 import { queryKeys } from '@/lib/query-keys'
 import { buscarLevantamentoPorId, atualizarLevantamento, atualizarStatusLevantamento } from '@/services/levantamentos.service'
 import { ROUTES } from '@/constants/app'
-import { calcularPercentual, calcularProximoPasso } from '@/lib/wizard-progress'
+import { calcularPercentual, calcularProximoPasso, normalizeWizardStep } from '@/lib/wizard-progress'
 import { useToast } from '@/hooks/useToast'
 import { nowISO } from '@/lib/offline-db'
 import type { Levantamento, LevantamentoUpdateInput } from '@/types/levantamento'
@@ -12,6 +12,8 @@ import type { CaracteristicasFisicas, IluminacaoVentilacaoConforto, SegurancaEqu
 import type { Medicao, PontoMedicaoQuantitativa } from '@/types/levantamento'
 import type { RiscoOcupacional, PlanoAcaoItem } from '@/types/risco'
 import type { AvaliacaoErgonomica, ParecerTecnico, Assinatura } from '@/types/levantamento'
+
+const TOTAL_STEPS = 9
 
 interface WizardState {
   levantamento: Levantamento | null
@@ -33,14 +35,6 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
     error: null,
   })
 
-  const normalizeWizardStep = useCallback((step: number): number => {
-    const OLD_TO_NEW_STEP: Record<number, number> = {
-      1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
-      6: 7, 7: 8, 8: 9,
-    }
-    return OLD_TO_NEW_STEP[step] ?? step
-  }, [])
-
   const load = useCallback(async () => {
     if (!levantamentoId) return
     setState((prev) => ({ ...prev, loading: true, error: null }))
@@ -50,7 +44,7 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       return
     }
     const lev = result.data
-    const rawStep = lev?.status === 'concluido' ? 1 : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
+    const rawStep = lev?.status === 'concluido' ? TOTAL_STEPS : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
     const initialStep = normalizeWizardStep(rawStep)
     setState((prev) => ({
       ...prev,
@@ -58,16 +52,19 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       loading: false,
       currentStep: initialStep,
     }))
-  }, [levantamentoId, normalizeWizardStep])
+  }, [levantamentoId])
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   const goToStep = useCallback((step: number) => {
-    if (step >= 1 && step <= 9) {
+    if (step >= 1 && step <= TOTAL_STEPS) {
       setState((prev) => ({ ...prev, currentStep: step }))
+      if (levantamentoId) {
+        atualizarLevantamento(levantamentoId, { ultimo_step: step }).catch(() => {})
+      }
     }
-  }, [])
+  }, [levantamentoId])
 
   const saveStep = useCallback(
     async (input: LevantamentoUpdateInput, nextStep?: number) => {

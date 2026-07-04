@@ -1,6 +1,20 @@
 import { STEP_WEIGHTS } from '@/constants/app'
 import type { Levantamento } from '@/types/levantamento'
 
+const TOTAL_STEPS = 9
+
+export function normalizeWizardStep(step: number | null | undefined): number {
+  if (step == null || step < 1) return 1
+  const OLD_TO_NEW_STEP: Record<number, number> = {
+    1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
+    6: 7, 7: 8, 8: 9,
+  }
+  const normalized = OLD_TO_NEW_STEP[step] ?? step
+  if (normalized > TOTAL_STEPS) return TOTAL_STEPS
+  if (normalized < 1) return 1
+  return normalized
+}
+
 export function calcularPercentual(lev: Levantamento): number {
   let total = 0
 

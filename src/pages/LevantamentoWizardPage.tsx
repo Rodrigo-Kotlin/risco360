@@ -1,5 +1,5 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -14,6 +14,7 @@ import { useBibliotecaTecnica } from '@/hooks/useBibliotecaTecnica'
 import { ArrowLeft, Info, Building2, Layers, Check } from 'lucide-react'
 import { TIPOS_LEVANTAMENTO_SHORT_LABELS } from '@/constants/levantamentos'
 import { cn } from '@/lib/utils'
+import { normalizeWizardStep } from '@/lib/wizard-progress'
 
 const Step01Identificacao = lazy(() => import('@/pages/steps/Step01Identificacao').then(m => ({ default: m.Step01Identificacao })))
 const Step02Caracteristicas = lazy(() => import('@/pages/steps/Step02Caracteristicas').then(m => ({ default: m.Step02Caracteristicas })))
@@ -146,7 +147,9 @@ function WizardStepperMobile({
 export default function LevantamentoWizardPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const wizard = useLevantamentoWizard(id)
+  const { loading: wizardLoading, levantamento: levWizard, currentStep, goToStep, saving, percentual, error, setIdentificacao, setCaracteristicasFisicas, setIluminacaoVentilacao, setSegurancaEquipamentos, setEpisEpcs, setPontosMedicao, setRiscos, setAvaliacaoErgonomica, setControles, setParecer, setAssinaturas, concluirWizard } = wizard
   const [_empresas, setEmpresas] = useState<{ value: string; label: string }[]>([])
   const { data: bibliotecaItens } = useBibliotecaTecnica()
 
@@ -161,11 +164,46 @@ export default function LevantamentoWizardPage() {
   }, [])
 
   useEffect(() => {
-    const next = wizard.currentStep + 1
+    const next = currentStep + 1
     if (next <= 9) preloadStep(next)
-  }, [wizard.currentStep])
+  }, [currentStep])
 
-  if (wizard.loading) {
+  const handleGoToStep = useCallback((step: number) => {
+    const s = normalizeWizardStep(step)
+    goToStep(s)
+    setSearchParams({ step: String(s) }, { replace: false })
+  }, [goToStep, setSearchParams])
+
+  const handleNavigateBack = useCallback(() => {
+    const prev = currentStep - 1
+    if (prev >= 1) {
+      handleGoToStep(prev)
+    }
+  }, [currentStep, handleGoToStep])
+
+  // Sync URL step → wizard step on browser back/forward
+  const urlStepStr = searchParams.get('step')
+  const urlStep = urlStepStr ? parseInt(urlStepStr, 10) : NaN
+  useEffect(() => {
+    if (wizardLoading || !levWizard) return
+    const isValid = !isNaN(urlStep) && urlStep >= 1 && urlStep <= 9
+    if (isValid && urlStep !== currentStep) {
+      goToStep(urlStep)
+    }
+  }, [urlStep, wizardLoading, currentStep, levWizard, goToStep])
+
+  // On initial load, set URL step param if missing or invalid
+  useEffect(() => {
+    if (wizardLoading || !levWizard) return
+    const raw = searchParams.get('step')
+    const parsed = raw ? parseInt(raw, 10) : NaN
+    const isValid = !isNaN(parsed) && parsed >= 1 && parsed <= 9
+    if (!isValid || parsed !== currentStep) {
+      setSearchParams({ step: String(currentStep) }, { replace: true })
+    }
+  }, [wizardLoading, levWizard, currentStep, searchParams, setSearchParams])
+
+  if (wizardLoading) {
     return (
       <>
         <Header title="Editando levantamento" />
@@ -185,12 +223,12 @@ export default function LevantamentoWizardPage() {
     )
   }
 
-  if (wizard.error || !wizard.levantamento) {
+  if (error || !levWizard) {
     return (
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-body-medium text-danger">{wizard.error ?? 'Levantamento não encontrado'}</p>
+          <p className="text-body-medium text-danger">{error ?? 'Levantamento não encontrado'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => navigate(ROUTES.levantamentos)}>
             <ArrowLeft size={16} /> Voltar
           </Button>
@@ -199,55 +237,55 @@ export default function LevantamentoWizardPage() {
     )
   }
 
-  const lev = wizard.levantamento
-  const currentStepData = STEPS[wizard.currentStep - 1]
+  const lev = levWizard
+  const currentStepData = STEPS[currentStep - 1]
 
   const renderStep = () => {
-    switch (wizard.currentStep) {
+    switch (currentStep) {
       case 1:
         return (
           <Step01Identificacao
             levantamento={lev}
             onSave={async (data, nextStep) => {
-              return wizard.setIdentificacao(data, nextStep as 2 | undefined)
+              return setIdentificacao(data, nextStep as 2 | undefined)
             }}
-            saving={wizard.saving}
+            saving={saving}
           />
         )
       case 2:
         return (
           <Step02Caracteristicas
             caracteristicas={lev.caracteristicas_fisicas}
-            onSave={wizard.setCaracteristicasFisicas}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(1)}
+            onSave={setCaracteristicasFisicas}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 3:
         return (
           <Step03IluminacaoVentilacao
             data={lev.iluminacao_ventilacao_conforto}
-            onSave={wizard.setIluminacaoVentilacao}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(2)}
+            onSave={setIluminacaoVentilacao}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 4:
         return (
           <Step04SegurancaEquipamentos
             data={lev.seguranca_equipamentos}
-            onSave={wizard.setSegurancaEquipamentos}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(3)}
+            onSave={setSegurancaEquipamentos}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 5:
         return (
           <Step05EpisEpcs
             data={lev.epis_epcs_evidencias}
-            onSave={wizard.setEpisEpcs}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(4)}
+            onSave={setEpisEpcs}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 6:
@@ -256,18 +294,18 @@ export default function LevantamentoWizardPage() {
             data={lev.epis_epcs_evidencias}
             empresaNome={lev.empresa_nome}
             setorNome={lev.setor_nome}
-            onSave={wizard.setEpisEpcs}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(5)}
+            onSave={setEpisEpcs}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 7:
         return (
           <Step07Medicoes
             medicoes={lev.pontos_medicao ?? []}
-            onSave={wizard.setPontosMedicao}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(6)}
+            onSave={setPontosMedicao}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       case 8:
@@ -276,11 +314,11 @@ export default function LevantamentoWizardPage() {
             riscos={lev.riscos}
             avaliacao_ergonomica_preliminar={lev.avaliacao_ergonomica_preliminar ?? lev.avaliacao_ergonomica}
             plano_acao={lev.plano_acao ?? lev.controles}
-            onSaveRiscos={wizard.setRiscos}
-            onSaveAvaliacaoErgonomica={wizard.setAvaliacaoErgonomica}
-            onSaveControles={wizard.setControles}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(7)}
+            onSaveRiscos={setRiscos}
+            onSaveAvaliacaoErgonomica={setAvaliacaoErgonomica}
+            onSaveControles={setControles}
+            saving={saving}
+            onPrevious={handleNavigateBack}
             bibliotecaItens={bibliotecaItens ?? []}
           />
         )
@@ -288,12 +326,12 @@ export default function LevantamentoWizardPage() {
         return (
           <Step09RevisaoConclusao
             levantamento={lev}
-            percentual={wizard.percentual}
-            onSaveParecer={wizard.setParecer}
-            onSaveAssinaturas={wizard.setAssinaturas}
-            onConcluir={wizard.concluirWizard}
-            saving={wizard.saving}
-            onPrevious={() => wizard.goToStep(8)}
+            percentual={percentual}
+            onSaveParecer={setParecer}
+            onSaveAssinaturas={setAssinaturas}
+            onConcluir={concluirWizard}
+            saving={saving}
+            onPrevious={handleNavigateBack}
           />
         )
       default:
@@ -341,16 +379,16 @@ export default function LevantamentoWizardPage() {
 
           {/* Stepper — compacto em mobile, horizontal em desktop */}
           <WizardStepperMobile
-            currentStep={wizard.currentStep}
+            currentStep={currentStep}
             totalSteps={STEPS.length}
             stepLabel={currentStepData?.label ?? ''}
-            percentual={wizard.percentual}
+            percentual={percentual}
           />
           <WizardStepperDesktop
-            currentStep={wizard.currentStep}
+            currentStep={currentStep}
             _totalSteps={STEPS.length}
             steps={STEPS}
-            onStepClick={(s) => wizard.goToStep(s)}
+            onStepClick={handleGoToStep}
           />
 
           {/* Contexto do levantamento */}
