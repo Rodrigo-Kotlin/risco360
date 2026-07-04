@@ -5,7 +5,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { PontoMedicaoForm } from '@/components/forms/PontoMedicaoForm'
 import { normalizePontosMedicao } from '@/lib/normalizers'
-import { Pencil, Trash2, Copy, Plus, ArrowLeft, ArrowRight, Loader2, Save } from 'lucide-react'
+import { Pencil, Trash2, Copy, ArrowLeft, ArrowRight, Loader2, Save } from 'lucide-react'
 import type { PontoMedicaoQuantitativa } from '@/types/levantamento'
 
 interface Step06MedicoesProps {
@@ -17,8 +17,8 @@ interface Step06MedicoesProps {
 
 export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06MedicoesProps) {
   const [items, setItems] = useState<PontoMedicaoQuantitativa[]>(() => normalizePontosMedicao(medicoes))
-  const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<PontoMedicaoQuantitativa | undefined>(undefined)
+  const [formKey, setFormKey] = useState(0)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const handleSaveItem = async (item: PontoMedicaoQuantitativa) => {
@@ -26,13 +26,13 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
       ? items.map((m) => (m.id === item.id ? item : m))
       : [...items, item]
     setItems(updated)
-    setShowForm(false)
     setEditing(undefined)
+    setFormKey(k => k + 1)
   }
 
-  const handleCancel = () => {
-    setShowForm(false)
+  const handleNewPoint = () => {
     setEditing(undefined)
+    setFormKey(k => k + 1)
   }
 
   const handleDelete = (id: string) => {
@@ -50,14 +50,9 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
     setItems((prev) => [...prev, novo])
   }
 
-  const openNew = () => {
-    setEditing(undefined)
-    setShowForm(true)
-  }
-
   const openEdit = (item: PontoMedicaoQuantitativa) => {
     setEditing(item)
-    setShowForm(true)
+    setFormKey(k => k + 1)
   }
 
   const hasAnyMedicao = (item: PontoMedicaoQuantitativa) =>
@@ -67,14 +62,9 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-body-medium text-text-secondary">{items.length} ponto(s) de medição registrado(s)</p>
-          <p className="text-label-medium text-text-muted">Registre medições quantitativas por ponto avaliado</p>
-        </div>
-        <Button onClick={openNew} size="sm" className="min-h-[48px]">
-          <Plus size={14} /> Novo ponto
-        </Button>
+      <div>
+        <p className="text-body-medium text-text-secondary">{items.length} ponto(s) de medição registrado(s)</p>
+        <p className="text-label-medium text-text-muted">Registre medições quantitativas por ponto avaliado</p>
       </div>
 
       {items.length === 0 ? (
@@ -82,7 +72,6 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
           icon={undefined}
           title="Nenhum ponto de medição"
           description="Adicione pontos de medição quantitativas: ruído, iluminação, temperatura, umidade, etc."
-          action={{ label: 'Adicionar ponto', onClick: openNew }}
         />
       ) : (
         <div className="space-y-3">
@@ -156,11 +145,9 @@ export function Step06Medicoes({ medicoes, onSave, saving, onPrevious }: Step06M
         </div>
       )}
 
-      {showForm && (
-        <div className="border border-border rounded-lg p-4 bg-surface-secondary">
-          <PontoMedicaoForm initial={editing} onSave={handleSaveItem} onCancel={handleCancel} />
-        </div>
-      )}
+      <div className="border border-border rounded-lg p-4 bg-surface-secondary">
+        <PontoMedicaoForm key={formKey} initial={editing} onSave={handleSaveItem} onNewPoint={handleNewPoint} />
+      </div>
 
       <ConfirmDialog
         open={confirmDeleteId !== null}

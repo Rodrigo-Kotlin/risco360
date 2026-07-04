@@ -7,11 +7,11 @@ import type { PontoMedicaoQuantitativa } from '@/types/levantamento'
 vi.mock('lucide-react', () => ({
   Save: () => <div data-testid="mock-icon-save" />,
   Loader2: () => <div data-testid="mock-icon-loader" />,
-  X: () => <div data-testid="mock-icon-x" />,
+  Plus: () => <div data-testid="mock-icon-plus" />,
 }))
 
 const mockOnSave = vi.fn().mockResolvedValue(undefined)
-const mockOnCancel = vi.fn()
+const mockOnNewPoint = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -34,89 +34,89 @@ function makePonto(overrides: Partial<PontoMedicaoQuantitativa> = {}): PontoMedi
 
 describe('PontoMedicaoForm — renderização de campos novos', () => {
   it('renderiza Ponto / local avaliado', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Ponto / local avaliado')).toBeInTheDocument()
   })
 
   it('renderiza Ruído (dB(A))', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Ruído (dB(A))')).toBeInTheDocument()
   })
 
   it('renderiza Iluminação (lux)', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Iluminação (lux)')).toBeInTheDocument()
   })
 
   it('renderiza Temperatura (°C)', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Temperatura (°C)')).toBeInTheDocument()
   })
 
   it('renderiza Velocidade do ar (m/s)', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Velocidade do ar (m/s)')).toBeInTheDocument()
   })
 
   it('renderiza Umidade (%)', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Umidade (%)')).toBeInTheDocument()
   })
 
   it('renderiza Radiação (µSv/h)', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Radiação (µSv/h)')).toBeInTheDocument()
   })
 
   it('renderiza Observações', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.getByLabelText('Observações')).toBeInTheDocument()
   })
 })
 
 describe('PontoMedicaoForm — não renderiza campos legados', () => {
   it('não renderiza Agente', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/agente/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Responsável', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/respons[áa]vel/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Nome colaborador', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/colaborador/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Método', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/m[eé]todo/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Limite de tolerância', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/limite de toler[âa]ncia/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Equipamento', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/equipamento/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Número de série', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/n[uú]mero de s[eé]rie/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Posto de trabalho', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/posto de trabalho/i)).not.toBeInTheDocument()
   })
 
   it('não renderiza Duração', () => {
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
     expect(screen.queryByLabelText(/dura[cç][ãa]o/i)).not.toBeInTheDocument()
   })
 })
@@ -124,13 +124,13 @@ describe('PontoMedicaoForm — não renderiza campos legados', () => {
 describe('PontoMedicaoForm — salvamento', () => {
   it('salva nos campos novos (ponto_local, ruido_dba, iluminacao_lux)', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Sala 301')
     await user.type(screen.getByLabelText('Ruído (dB(A))'), '82.5')
     await user.type(screen.getByLabelText('Iluminação (lux)'), '450')
 
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith(
@@ -145,7 +145,7 @@ describe('PontoMedicaoForm — salvamento', () => {
 
   it('salva temperatura, velocidade ar, umidade e radiação', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto A')
     await user.type(screen.getByLabelText('Temperatura (°C)'), '24.5')
@@ -153,7 +153,7 @@ describe('PontoMedicaoForm — salvamento', () => {
     await user.type(screen.getByLabelText('Umidade (%)'), '62')
     await user.type(screen.getByLabelText('Radiação (µSv/h)'), '0.08')
 
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith(
@@ -169,11 +169,11 @@ describe('PontoMedicaoForm — salvamento', () => {
 
   it('não salva iluminação em limite_tolerancia', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Iluminação (lux)'), '500')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       const saved = mockOnSave.mock.calls[0][0] as PontoMedicaoQuantitativa
@@ -183,11 +183,11 @@ describe('PontoMedicaoForm — salvamento', () => {
 
   it('não salva temperatura em fonte', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Temperatura (°C)'), '23')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       const saved = mockOnSave.mock.calls[0][0] as PontoMedicaoQuantitativa
@@ -197,11 +197,11 @@ describe('PontoMedicaoForm — salvamento', () => {
 
   it('não salva umidade em numero_serie', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Umidade (%)'), '55')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       const saved = mockOnSave.mock.calls[0][0] as PontoMedicaoQuantitativa
@@ -211,11 +211,11 @@ describe('PontoMedicaoForm — salvamento', () => {
 
   it('não salva radiação em responsavel', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Radiação (µSv/h)'), '0.15')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       const saved = mockOnSave.mock.calls[0][0] as PontoMedicaoQuantitativa
@@ -232,7 +232,7 @@ describe('PontoMedicaoForm — salvamento', () => {
       observacao: 'Obs antiga',
     } as unknown as PontoMedicaoQuantitativa
 
-    render(<PontoMedicaoForm initial={legado} onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm initial={legado} onSave={mockOnSave} />)
 
     expect(screen.getByLabelText('Ponto / local avaliado')).toHaveValue('Sala 101')
     expect(screen.getByLabelText('Ruído (dB(A))')).toHaveValue(85)
@@ -243,11 +243,11 @@ describe('PontoMedicaoForm — salvamento', () => {
 describe('PontoMedicaoForm — validações', () => {
   it('mostra erro quando umidade acima de 100', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Umidade (%)'), '120')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     expect(await screen.findByText('Umidade deve estar entre 0 e 100%')).toBeInTheDocument()
     expect(mockOnSave).not.toHaveBeenCalled()
@@ -255,11 +255,11 @@ describe('PontoMedicaoForm — validações', () => {
 
   it('mostra erro quando ruído é negativo', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Ruído (dB(A))'), '-5')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     expect(await screen.findByText('Ruído não pode ser negativo')).toBeInTheDocument()
     expect(mockOnSave).not.toHaveBeenCalled()
@@ -267,11 +267,11 @@ describe('PontoMedicaoForm — validações', () => {
 
   it('mostra erro quando iluminação é negativa', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Iluminação (lux)'), '-10')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     expect(await screen.findByText('Iluminação não pode ser negativa')).toBeInTheDocument()
     expect(mockOnSave).not.toHaveBeenCalled()
@@ -279,11 +279,11 @@ describe('PontoMedicaoForm — validações', () => {
 
   it('mostra erro quando velocidade do ar é negativa', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Velocidade do ar (m/s)'), '-1')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     expect(await screen.findByText('Velocidade do ar não pode ser negativa')).toBeInTheDocument()
     expect(mockOnSave).not.toHaveBeenCalled()
@@ -291,11 +291,11 @@ describe('PontoMedicaoForm — validações', () => {
 
   it('mostra erro quando radiação é negativa', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto')
     await user.type(screen.getByLabelText('Radiação (µSv/h)'), '-0.5')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     expect(await screen.findByText('Radiação não pode ser negativa')).toBeInTheDocument()
     expect(mockOnSave).not.toHaveBeenCalled()
@@ -303,10 +303,10 @@ describe('PontoMedicaoForm — validações', () => {
 
   it('rascunho pode ser salvo sem preencher medições', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm onSave={mockOnSave} />)
 
     await user.type(screen.getByLabelText('Ponto / local avaliado'), 'Ponto teste')
-    await user.click(screen.getByText('Salvar'))
+    await user.click(screen.getByText('Salvar ponto'))
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith(
@@ -338,7 +338,7 @@ describe('PontoMedicaoForm — edição', () => {
       observacoes: 'Medição OK',
     })
 
-    render(<PontoMedicaoForm initial={ponto} onSave={mockOnSave} onCancel={mockOnCancel} />)
+    render(<PontoMedicaoForm initial={ponto} onSave={mockOnSave} />)
 
     expect(screen.getByLabelText('Ponto / local avaliado')).toHaveValue('Sala 401')
     expect(screen.getByLabelText('Ruído (dB(A))')).toHaveValue(88)
@@ -350,10 +350,10 @@ describe('PontoMedicaoForm — edição', () => {
     expect(screen.getByLabelText('Observações')).toHaveValue('Medição OK')
   })
 
-  it('chama onCancel ao clicar Cancelar', async () => {
+  it('chama onNewPoint ao clicar Novo ponto', async () => {
     const user = userEvent.setup()
-    render(<PontoMedicaoForm onSave={mockOnSave} onCancel={mockOnCancel} />)
-    await user.click(screen.getByText('Cancelar'))
-    expect(mockOnCancel).toHaveBeenCalledTimes(1)
+    render(<PontoMedicaoForm onSave={mockOnSave} onNewPoint={mockOnNewPoint} />)
+    await user.click(screen.getByText('Novo ponto'))
+    expect(mockOnNewPoint).toHaveBeenCalledTimes(1)
   })
 })

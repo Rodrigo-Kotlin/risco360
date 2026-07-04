@@ -5,16 +5,16 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { generateId } from '@/lib/utils'
 import { normalizePontoMedicao } from '@/lib/normalizers'
-import { Save, Loader2, X } from 'lucide-react'
+import { Save, Loader2, Plus } from 'lucide-react'
 import type { PontoMedicaoQuantitativa } from '@/types/levantamento'
 
 interface PontoMedicaoFormProps {
   initial?: PontoMedicaoQuantitativa
   onSave: (medicao: PontoMedicaoQuantitativa) => Promise<void>
-  onCancel: () => void
+  onNewPoint?: () => void
 }
 
-export function PontoMedicaoForm({ initial, onSave, onCancel }: PontoMedicaoFormProps) {
+export function PontoMedicaoForm({ initial, onSave, onNewPoint }: PontoMedicaoFormProps) {
   const normalized = initial ? normalizePontoMedicao(initial) : null
 
   const [localPonto, setLocalPonto] = useState(normalized?.ponto_local || '')
@@ -108,13 +108,13 @@ export function PontoMedicaoForm({ initial, onSave, onCancel }: PontoMedicaoForm
         </div>
       </FormSection>
 
-      <div className="flex items-center justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
-          <X size={16} /> Cancelar
-        </Button>
-        <Button type="submit" disabled={saving}>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+        <Button type="submit" disabled={saving} className="min-h-[48px] flex-1">
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Salvar
+          {initial ? 'Salvar alterações' : 'Salvar ponto'}
+        </Button>
+        <Button type="button" variant="secondary" onClick={onNewPoint} disabled={saving} className="min-h-[48px] flex-1">
+          <Plus size={16} /> Novo ponto
         </Button>
       </div>
     </form>
