@@ -255,6 +255,7 @@ export default function LevantamentoWizardPage() {
           <Step06Evidencias
             data={lev.epis_epcs_evidencias}
             empresaNome={lev.empresa_nome}
+            setorNome={lev.setor_nome}
             onSave={wizard.setEpisEpcs}
             saving={wizard.saving}
             onPrevious={() => wizard.goToStep(5)}

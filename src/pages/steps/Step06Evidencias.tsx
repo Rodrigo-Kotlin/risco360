@@ -2,17 +2,11 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { WizardNavigation } from '@/components/ui/WizardNavigation'
-import { Plus, Trash2, ImageIcon, AlertCircle, Loader2, Maximize2, X } from 'lucide-react'
+import { Camera, Trash2, ImageIcon, AlertCircle, Loader2, Maximize2, X } from 'lucide-react'
 import type { EpisEpcsEvidencias, EvidenciaItem } from '@/types/levantamento'
 import { uploadEvidenciaFotografica, revogarPreviewEvidencia, obterPreviewLocal } from '@/services/evidencias.service'
 import { removerBlobOffline } from '@/services/offline/offline-evidencia-blobs.service'
-import { ensureArray } from '@/lib/utils'
-
-function deriveSigla(nome: string | null | undefined): string {
-  if (!nome) return 'EMPRESA'
-  const cleaned = nome.replace(/[^a-zA-ZÀ-ÿ0-9]/g, '').toUpperCase()
-  return cleaned.slice(0, 8) || 'EMPRESA'
-}
+import { ensureArray, cn, gerarNomeArquivoEvidencia } from '@/lib/utils'
 
 function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -66,12 +60,13 @@ function safeEvidenciaItems(items: EvidenciaItem[] | null | undefined): Evidenci
 interface Step06EvidenciasProps {
   data: EpisEpcsEvidencias | null | undefined
   empresaNome?: string | null
+  setorNome?: string | null
   onSave: (data: EpisEpcsEvidencias, nextStep?: number) => Promise<boolean>
   saving: boolean
   onPrevious?: () => void
 }
 
-export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious }: Step06EvidenciasProps) {
+export function Step06Evidencias({ data, empresaNome: _empresaNome, setorNome, onSave, saving, onPrevious }: Step06EvidenciasProps) {
   const d = data && typeof data === 'object' ? data : { epis: [], epcs: [], evidencias: [], observacoes: null }
   const initialEvidencias = safeEvidenciaItems((d as EpisEpcsEvidencias).evidencias)
   const [evidencias, setEvidencias] = useState<EvidenciaItem[]>(initialEvidencias)
@@ -79,12 +74,7 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
   useEffect(() => { itemsRef.current = evidencias }, [evidencias])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
-  const sigla = deriveSigla(empresaNome)
-
-  const buildFileName = useCallback((idx: number, ext: string): string => {
-    const seq = String(idx + 1).padStart(4, '0')
-    return `${sigla}-${seq}.${ext}`
-  }, [sigla])
+  const isUploading = evidencias.some((ev) => ev.upload_status === 'uploading')
 
   const addImage = useCallback(() => {
     const input = document.createElement('input')
@@ -97,16 +87,21 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
 
       const now = new Date()
       const currentItems = itemsRef.current
-      const idx = currentItems.length
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const fileName = buildFileName(idx, ext)
+      const fileName = gerarNomeArquivoEvidencia({
+        setorNome,
+        evidenciasExistentes: currentItems,
+        extensao: 'jpg',
+      })
 
       const stampedBlob = await aplicarTimestampCanvas(file)
       const stampedFile = new File([stampedBlob], fileName, { type: 'image/jpeg' })
       const localPreview = URL.createObjectURL(stampedFile)
 
+      const idx = currentItems.length
+
       setEvidencias((prev) => [...prev, {
         legenda: fileName,
+        arquivo_nome: fileName,
         observacao: `Arquivo: ${fileName}`,
         data: now.toISOString().slice(0, 10),
         hora: now.toTimeString().slice(0, 5),
@@ -150,7 +145,7 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
       ))
     }
     input.click()
-  }, [buildFileName])
+  }, [setorNome])
 
   const removeImage = useCallback((idx: number) => {
     const item = evidencias[idx]
@@ -170,43 +165,64 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-body-medium text-text-secondary">{evidencias.length} evidência(s) registrada(s)</p>
-          <p className="text-label-medium text-text-muted">As fotos recebem automaticamente data/hora e são nomeadas como {sigla}-0001.jpg</p>
-        </div>
-        <Button size="sm" variant="secondary" onClick={addImage}
-          disabled={evidencias.some((ev) => ev.upload_status === 'uploading')}
-          className="min-h-[48px]">
-          {evidencias.some((ev) => ev.upload_status === 'uploading')
-            ? <Loader2 size={14} className="animate-spin" />
-            : <Plus size={14} />}
-          {evidencias.some((ev) => ev.upload_status === 'uploading') ? 'Enviando...' : 'Capturar imagem'}
-        </Button>
-      </div>
+      <p className="text-body-medium text-text-secondary">{evidencias.length} evidência(s) registrada(s)</p>
 
-      {evidencias.length === 0 && (
-        <p className="text-body-medium text-text-muted">Nenhuma evidência registrada. Toque em "Capturar imagem" para fotografar o ambiente.</p>
-      )}
+      <button
+        type="button"
+        onClick={addImage}
+        disabled={isUploading}
+        className={cn(
+          'w-full flex flex-col items-center justify-center gap-3',
+          'rounded-2xl border-2 border-dashed border-primary-200',
+          'bg-primary-50/40 hover:bg-primary-50 active:bg-primary-100',
+          'hover:border-primary-300 active:border-primary-400',
+          'transition-all duration-200',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/70 focus-visible:ring-offset-2',
+          'cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+          evidencias.length === 0 ? 'py-12 sm:py-16' : 'py-6 sm:py-8'
+        )}
+        aria-label="Capturar nova evidência fotográfica"
+      >
+        {isUploading ? (
+          <Loader2 size={evidencias.length === 0 ? 44 : 32} className="animate-spin text-primary" aria-hidden="true" />
+        ) : (
+          <Camera size={evidencias.length === 0 ? 44 : 32} className="text-primary" aria-hidden="true" />
+        )}
+        <span className="text-title-small font-semibold text-text-primary">
+          {isUploading ? 'Enviando...' : 'Capturar imagem'}
+        </span>
+        {evidencias.length === 0 && (
+          <span className="text-body-small text-text-muted text-center max-w-xs">
+            Registre uma evidência fotográfica do ponto avaliado
+          </span>
+        )}
+      </button>
 
       {errorMessage && (
-        <div className="flex items-center gap-2 p-2 text-label-medium text-danger bg-danger/5 rounded-lg">
+        <div className="flex items-center gap-2 p-2 text-label-medium text-danger bg-danger/5 rounded-lg" role="alert">
           <AlertCircle size={14} />
           {errorMessage}
         </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {evidencias.map((ev, i) => (
+        {evidencias.map((ev, i) => {
+          const nomeArquivo = ev.arquivo_nome ?? ev.legenda
+          return (
           <Card key={i} className="p-2 overflow-hidden group">
             <div className="relative">
               {ev.preview_url ? (
                 <div className="w-full aspect-video rounded-lg overflow-hidden bg-surface-muted cursor-pointer"
                   onClick={() => setLightboxIdx(i)}>
-                  <img src={ev.preview_url} alt={ev.legenda ?? `Evidência ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={ev.preview_url} alt={nomeArquivo ?? `Evidência ${i + 1}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                     <Maximize2 size={18} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                  {nomeArquivo && (
+                    <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-label-small px-1.5 py-0.5 rounded font-mono">
+                      {nomeArquivo}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <div className="w-full aspect-video rounded-lg bg-surface-muted flex items-center justify-center">
@@ -220,7 +236,7 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
               )}
             </div>
             <div className="mt-1.5 space-y-1">
-              <p className="text-label-medium font-medium truncate">{ev.legenda ?? 'Sem legenda'}</p>
+              <p className="text-label-medium font-medium truncate">{nomeArquivo ?? 'Sem legenda'}</p>
               {(ev.data || ev.hora) && (
                 <p className="text-label-medium text-text-muted">
                   {ev.data} {ev.hora}
@@ -233,13 +249,15 @@ export function Step06Evidencias({ data, empresaNome, onSave, saving, onPrevious
                   {ev.upload_status === 'uploaded' && <span className="text-label-medium text-success">Enviado</span>}
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => removeImage(i)}
-                  className="text-danger min-h-[48px] w-12 h-12" disabled={ev.upload_status === 'uploading'}>
+                  className="text-danger min-h-[48px] w-12 h-12" disabled={ev.upload_status === 'uploading'}
+                  aria-label={`Remover evidência ${nomeArquivo ?? i + 1}`}>
                   <Trash2 size={12} />
                 </Button>
               </div>
             </div>
           </Card>
-        ))}
+          )
+        })}
       </div>
 
       {lightboxIdx !== null && evidencias[lightboxIdx]?.preview_url && (

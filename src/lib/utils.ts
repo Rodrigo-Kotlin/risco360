@@ -35,6 +35,47 @@ export function ensureArray<T>(value: T[] | undefined | null): T[] {
   return Array.isArray(value) ? value : []
 }
 
+export function removerAcentos(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+export function gerarPrefixoSetor(setorNome: string | null | undefined): string {
+  if (!setorNome || typeof setorNome !== 'string') return 'SET'
+  const semAcentos = removerAcentos(setorNome)
+  const apenasLetras = semAcentos.replace(/[^a-zA-Z]/g, '')
+  const maiusculas = apenasLetras.toUpperCase()
+  if (maiusculas.length === 0) return 'SET'
+  return maiusculas.slice(0, 3).padEnd(3, 'X')
+}
+
+export function gerarNomeArquivoEvidencia(params: {
+  setorNome: string | null | undefined
+  evidenciasExistentes: Array<{ arquivo_nome?: string | null; legenda?: string | null }>
+  extensao: string
+}): string {
+  const prefixo = gerarPrefixoSetor(params.setorNome)
+  const ext = params.extensao.replace(/^\./, '').toLowerCase()
+  const extensoesValidas = ['jpg', 'jpeg', 'png', 'webp']
+  const extFinal = extensoesValidas.includes(ext) ? ext : 'jpg'
+
+  let maxNum = 0
+  const regex = new RegExp(`^${prefixo}-(\\d{4})\\.\\w+$`)
+
+  for (const ev of params.evidenciasExistentes) {
+    const nome = ev.arquivo_nome ?? ev.legenda
+    if (!nome) continue
+    const match = nome.match(regex)
+    if (match) {
+      const num = parseInt(match[1], 10)
+      if (num > maxNum) maxNum = num
+    }
+  }
+
+  const proximo = maxNum + 1
+  const seq = String(proximo).padStart(4, '0')
+  return `${prefixo}-${seq}.${extFinal}`
+}
+
 export interface ItemQuantificadoOutput {
   id: string
   nome: string
