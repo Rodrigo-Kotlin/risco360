@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
@@ -181,27 +181,36 @@ export default function LevantamentoWizardPage() {
     }
   }, [currentStep, handleGoToStep])
 
-  // Sync URL step → wizard step on browser back/forward
-  const urlStepStr = searchParams.get('step')
-  const urlStep = urlStepStr ? parseInt(urlStepStr, 10) : NaN
+  const lastUrlRef = useRef('')
+  // Single effect for all URL ↔ step synchronization
+  // Intentionally omits currentStep — avoids loop between URL→state and state→URL
   useEffect(() => {
     if (wizardLoading || !levWizard) return
-    const isValid = !isNaN(urlStep) && urlStep >= 1 && urlStep <= 9
-    if (isValid && urlStep !== currentStep) {
-      goToStep(urlStep)
-    }
-  }, [urlStep, wizardLoading, currentStep, levWizard, goToStep])
 
-  // On initial load, set URL step param if missing or invalid
-  useEffect(() => {
-    if (wizardLoading || !levWizard) return
-    const raw = searchParams.get('step')
-    const parsed = raw ? parseInt(raw, 10) : NaN
-    const isValid = !isNaN(parsed) && parsed >= 1 && parsed <= 9
-    if (!isValid || parsed !== currentStep) {
-      setSearchParams({ step: String(currentStep) }, { replace: true })
+    const currentUrl = window.location.pathname + window.location.search
+    const urlStepRaw = searchParams.get('step')
+    const urlStep = urlStepRaw ? parseInt(urlStepRaw, 10) : NaN
+    const hasValidUrlStep = !isNaN(urlStep) && urlStep >= 1 && urlStep <= 9
+
+    // Prevent re-processing same URL
+    if (currentUrl === lastUrlRef.current) return
+    lastUrlRef.current = currentUrl
+
+    if (hasValidUrlStep) {
+      // Browser back/forward or direct URL — sync state to URL step
+      if (urlStep !== currentStep) {
+        goToStep(urlStep)
+      }
+    } else {
+      // No valid step in URL — set it from levantamento data (initial load / invalid URL)
+      const targetStep = normalizeWizardStep(levWizard.ultimo_step ?? 1)
+      if (targetStep !== currentStep) {
+        goToStep(targetStep)
+      }
+      setSearchParams({ step: String(targetStep) }, { replace: true })
     }
-  }, [wizardLoading, levWizard, currentStep, searchParams, setSearchParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wizardLoading, levWizard, searchParams, setSearchParams, goToStep])
 
   if (wizardLoading) {
     return (
