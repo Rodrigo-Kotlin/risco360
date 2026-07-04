@@ -11,6 +11,7 @@ const LABELS: Record<SyncStatus, string> = {
   syncing: 'Sincronizando…',
   error: 'Erro',
   conflict: 'Conflito',
+  failed_permanent: 'Falha permanente',
 }
 
 const VARIANTS: Record<SyncStatus, 'success' | 'warning' | 'info' | 'danger'> = {
@@ -19,6 +20,7 @@ const VARIANTS: Record<SyncStatus, 'success' | 'warning' | 'info' | 'danger'> = 
   syncing: 'info',
   error: 'danger',
   conflict: 'warning',
+  failed_permanent: 'danger',
 }
 
 export function SyncStatusChip({ sync_status }: SyncStatusChipProps) {

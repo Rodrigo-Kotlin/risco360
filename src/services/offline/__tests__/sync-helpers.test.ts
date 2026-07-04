@@ -111,14 +111,14 @@ describe('getNextSyncBatch', () => {
 
 describe('getSyncSummary', () => {
   it('retorna "0 pendentes" para stats vazios', () => {
-    expect(getSyncSummary({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 })).toBe('0 pendentes')
+    expect(getSyncSummary({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 })).toBe('0 pendentes')
   })
 
   it('retorna contagem de pendentes', () => {
-    expect(getSyncSummary({ pending: 3, syncing: 0, error: 0, synced: 0, conflict: 0, total: 3 })).toBe('3 pendentes')
+    expect(getSyncSummary({ pending: 3, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 3 })).toBe('3 pendentes')
   })
 
   it('inclui erros quando presentes', () => {
-    expect(getSyncSummary({ pending: 2, syncing: 0, error: 1, synced: 0, conflict: 0, total: 3 })).toBe('2 pendentes, 1 erros')
+    expect(getSyncSummary({ pending: 2, syncing: 0, error: 1, synced: 0, conflict: 0, failedPermanent: 0, total: 3 })).toBe('2 pendentes, 1 erros')
   })
 })

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 import { env } from './env'
 
 function isValidSupabaseUrl(value: string | undefined): value is string {
@@ -50,8 +51,8 @@ if (!isSupabaseConfigured && env.isDev) {
   )
 }
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(env.supabaseUrl, env.supabaseAnonKey, {
+export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
+  ? createClient<Database>(env.supabaseUrl, env.supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -60,7 +61,7 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
     })
   : null
 
-export function getSupabaseClient(): SupabaseClient {
+export function getSupabaseClient(): SupabaseClient<Database> {
   if (!supabase) {
     throw new Error(
       'Servidor não configurado. Verifique as variáveis de ambiente do Supabase.'

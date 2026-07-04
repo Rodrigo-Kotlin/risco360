@@ -3,7 +3,7 @@ import { openDB, type IDBPDatabase } from 'idb'
 const DB_NAME = 'risco360_offline_db'
 const DB_VERSION = 2
 
-export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error' | 'conflict'
+export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error' | 'conflict' | 'failed_permanent'
 
 export interface OfflineEntity {
   id: string
@@ -23,7 +23,7 @@ export interface SyncQueueItem {
   entity_id: string
   operation: 'create' | 'update' | 'delete'
   payload: unknown
-  status: 'pending' | 'syncing' | 'synced' | 'error' | 'conflict'
+  status: 'pending' | 'syncing' | 'synced' | 'error' | 'conflict' | 'failed_permanent'
   attempts: number
   last_error: string | null
   created_at: string

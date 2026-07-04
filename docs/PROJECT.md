@@ -316,7 +316,7 @@ Regras:
    - `sb_secret`: 1 ocorrência em `supabase.ts` (validação de rejeição, legítima) ✅
    - `LPP`: 2 ocorrências em testes (afirmam que LPP não é permitido, legítimo) ✅
    - `Criar LPR`, `Criar AEP`, `Formulário LPR`, `Formulário AEP`: 0 ocorrências ✅
-   - `relatorio_setorial_lpr`, `relatorio_setorial_aep`: 1 ocorrência em `supabase/migrations/001_initial_schema.sql` (migration histórica, não executável) ✅
+   - `relatorio_setorial_lpr`, `relatorio_setorial_aep`: 1 ocorrência em `supabase/migrations/0001_initial_schema.sql` (migration histórica, não executável) ✅
    - `using (true)`: 0 ocorrências ✅
 
 7. **Arquivos/pastas não versionáveis** — Nenhum arquivo sensível encontrado sendo rastreado. `node_modules/`, `dist/`, `.env.local` já estão no `.gitignore`.
@@ -798,7 +798,7 @@ Após o hotfix 9.0.2 (ensureArray), dados antigos no IndexedDB (pré-Fase 9.0.1)
 ### O que foi implementado
 
 1. **Migration consolidada** `supabase/migrations/0002_risco360_schema_consolidado.sql`:
-   - Evolução idempotente da `001_initial_schema.sql` (ALTER TABLE ADD COLUMN, DO $$ blocks)
+   - Evolução idempotente da `0001_initial_schema.sql` (ALTER TABLE ADD COLUMN, DO $$ blocks)
    - Fix: constraint `levantamentos.tipo` alterada de `IN ('LPR','LPP','AEP','LPR_AEP')` para `= 'LPR_AEP'`
    - Fix: constraint `levantamentos.status` atualizada para `('rascunho', 'em_andamento', 'concluido', 'arquivado')`
    - Fix: constraint `relatorios.tipo` alterada para `('xlsx', 'csv', 'pdf_conferencia')`

@@ -61,12 +61,15 @@ interface Step06EvidenciasProps {
   data: EpisEpcsEvidencias | null | undefined
   empresaNome?: string | null
   setorNome?: string | null
+  levantamentoId?: string | null
+  empresaId?: string | null
+  setorId?: string | null
   onSave: (data: EpisEpcsEvidencias, nextStep?: number) => Promise<boolean>
   saving: boolean
   onPrevious?: () => void
 }
 
-export function Step06Evidencias({ data, empresaNome: _empresaNome, setorNome, onSave, saving, onPrevious }: Step06EvidenciasProps) {
+export function Step06Evidencias({ data, empresaNome: _empresaNome, setorNome, levantamentoId, empresaId, setorId, onSave, saving, onPrevious }: Step06EvidenciasProps) {
   const d = data && typeof data === 'object' ? data : { epis: [], epcs: [], evidencias: [], observacoes: null }
   const initialEvidencias = safeEvidenciaItems((d as EpisEpcsEvidencias).evidencias)
   const [evidencias, setEvidencias] = useState<EvidenciaItem[]>(initialEvidencias)
@@ -113,9 +116,27 @@ export function Step06Evidencias({ data, empresaNome: _empresaNome, setorNome, o
 
       setErrorMessage(null)
 
-      const result = await uploadEvidenciaFotografica({ file: stampedFile, legenda: fileName, origem: 'camera' })
-
       const latestItems = itemsRef.current
+
+      if (!levantamentoId) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Step06Evidencias: levantamentoId ausente — evidência órfã evitada')
+        }
+        setErrorMessage('Não foi possível vincular esta evidência ao levantamento atual. Reabra o levantamento e tente novamente.')
+        setEvidencias(latestItems.map((ev, j) =>
+          j === idx ? { ...ev, upload_status: 'error' } : ev
+        ))
+        return
+      }
+
+      const result = await uploadEvidenciaFotografica(
+        { file: stampedFile, legenda: fileName, origem: 'camera' },
+        {
+          empresa_id: empresaId ?? undefined,
+          setor_id: setorId ?? undefined,
+          levantamento_id: levantamentoId,
+        }
+      )
 
       if (result.error) {
         setErrorMessage(result.error)
@@ -145,7 +166,7 @@ export function Step06Evidencias({ data, empresaNome: _empresaNome, setorNome, o
       ))
     }
     input.click()
-  }, [setorNome])
+  }, [setorNome, empresaId, levantamentoId, setorId])
 
   const removeImage = useCallback((idx: number) => {
     const item = evidencias[idx]

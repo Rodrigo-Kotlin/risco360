@@ -45,6 +45,34 @@ describe('offline-evidencias.service', () => {
     expect(list.data).toHaveLength(0)
   })
 
+  it('salva empresa_id e setor_id quando fornecidos', async () => {
+    const result = await salvarEvidenciaOffline({
+      levantamento_id: 'lev_01',
+      empresa_id: 'emp_01',
+      setor_id: 'set_01',
+      caption: 'Foto com contexto',
+    })
+    expect(result.data?.empresa_id).toBe('emp_01')
+    expect(result.data?.setor_id).toBe('set_01')
+    expect(result.data?.levantamento_id).toBe('lev_01')
+
+    const list = await listarEvidenciasPorLevantamento('lev_01')
+    expect(list.data).toHaveLength(1)
+    expect(list.data![0].empresa_id).toBe('emp_01')
+    expect(list.data![0].setor_id).toBe('set_01')
+    expect(list.data![0].levantamento_id).toBe('lev_01')
+  })
+
+  it('preserva levantamento_id não vazio mesmo sem empresa/setor', async () => {
+    const result = await salvarEvidenciaOffline({
+      levantamento_id: 'lev_completo',
+      caption: 'Evidência com levantamento apenas',
+    })
+    expect(result.data?.levantamento_id).toBe('lev_completo')
+    expect(result.data?.empresa_id).toBeNull()
+    expect(result.data?.setor_id).toBeNull()
+  })
+
   it('salva blob_data como base64', async () => {
     const result = await salvarEvidenciaOffline({
       levantamento_id: 'lev_01',

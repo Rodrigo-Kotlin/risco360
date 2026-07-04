@@ -23,8 +23,6 @@ import type { ILevantamentoService } from './contracts/levantamento-service'
 import type { IRelatorioService } from './contracts/relatorio-service'
 import type { IBibliotecaTecnicaService } from './contracts/biblioteca-service'
 import type { IProfileService } from './contracts/profile-service'
-import type { ServiceResult } from '@/types/common'
-import type { UploadEvidenciaResult, UploadEvidenciaInput } from './evidencias.service'
 
 function selectProvider<T>(supabase: T, mock: T): T {
   return isMockModeEnabled ? mock : supabase

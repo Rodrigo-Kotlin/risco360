@@ -45,7 +45,7 @@
 
 | Migração | Linhas | Conteúdo |
 |---|---|---|
-| `001_initial_schema.sql` | 480 | Extensões, funções, 7 tabelas, RLS, índices, triggers |
+| `0001_initial_schema.sql` | 480 | Extensões, funções, 7 tabelas, RLS, índices, triggers |
 | `0002_risco360_schema_consolidado.sql` | 617 | Soft delete, sync fields, evidencias, sync_log, storage |
 | `0003_empresa_cnae_nr4.sql` | 62 | CNAE fields + grau_risco_nr4 |
 | `0004_optimization_indexes.sql` | 68 | 8 índices compostos |

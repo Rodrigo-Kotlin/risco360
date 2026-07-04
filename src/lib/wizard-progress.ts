@@ -3,14 +3,22 @@ import type { Levantamento } from '@/types/levantamento'
 
 const TOTAL_STEPS = 9
 
-export function normalizeWizardStep(step: number | null | undefined): number {
-  if (step == null || step < 1) return 1
+export function normalizeWizardStep(
+  step: number | null | undefined,
+  status?: string | null,
+  totalSteps: number = TOTAL_STEPS,
+): number {
+  if (status === 'concluido') return totalSteps
+
+  const raw = step ?? 1
+  if (raw < 1) return 1
+
   const OLD_TO_NEW_STEP: Record<number, number> = {
     1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
     6: 7, 7: 8, 8: 9,
   }
-  const normalized = OLD_TO_NEW_STEP[step] ?? step
-  if (normalized > TOTAL_STEPS) return TOTAL_STEPS
+  const normalized = OLD_TO_NEW_STEP[raw] ?? raw
+  if (normalized > totalSteps) return totalSteps
   if (normalized < 1) return 1
   return normalized
 }
@@ -105,5 +113,5 @@ export function calcularProximoPasso(lev: Levantamento): number {
 
   if (!(lev.parecer?.conclusao || lev.assinatura_tecnico?.nome)) return 9
 
-  return 1
+  return TOTAL_STEPS
 }

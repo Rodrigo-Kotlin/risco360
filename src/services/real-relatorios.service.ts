@@ -14,6 +14,8 @@ import type {
 } from '@/types/relatorio'
 import type { RelatorioRow } from '@/types/database'
 
+const RELATORIO_LIST_SELECT = 'id, levantamento_id, empresa_nome, tipo, modelo, status, arquivo_url, metadados, user_id, created_at, updated_at, deleted_at'
+
 export async function listarRelatorios(
   params?: PaginationParams
 ): Promise<PaginatedServiceResult<Relatorio>> {
@@ -23,8 +25,8 @@ export async function listarRelatorios(
     const hasPagination = params?.page != null && params?.pageSize != null
     let query = client
       .from('relatorios')
-      .select('*', hasPagination ? { count: 'exact' } : undefined)
-      .is('deleted_at', 'null')
+      .select(RELATORIO_LIST_SELECT, hasPagination ? { count: 'exact' } : undefined)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
     if (params?.page && params?.pageSize) {
@@ -62,7 +64,7 @@ export async function buscarRelatorioPorId(id: string): Promise<ServiceResult<Re
       .from('relatorios')
       .select('*')
       .eq('id', id)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .single()
 
     if (error) throw error
@@ -81,9 +83,9 @@ export async function listarRelatoriosPorLevantamento(
 
     const { data, error } = await client
       .from('relatorios')
-      .select('*')
+      .select(RELATORIO_LIST_SELECT)
       .eq('levantamento_id', levantamentoId)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
     if (error) throw error

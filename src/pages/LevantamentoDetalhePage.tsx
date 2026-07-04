@@ -14,7 +14,8 @@ import { ROUTES } from '@/constants/app'
 import { TIPOS_LEVANTAMENTO_SHORT_LABELS } from '@/constants/levantamentos'
 import { buscarLevantamentoPorId } from '@/services/levantamentos.service'
 import { listarRelatoriosPorLevantamento } from '@/services/relatorios.service'
-import { useToast } from '@/hooks/useToast'
+
+import { normalizeWizardStep } from '@/lib/wizard-progress'
 import { SyncStatusChip } from '@/components/ui/SyncStatusChip'
 import { ArrowLeft, Building2, User, Calendar, Hash, Info, Edit, AlertTriangle } from 'lucide-react'
 import type { Levantamento, StatusLevantamento } from '@/types/levantamento'
@@ -36,7 +37,6 @@ const statusBadge = (s: StatusLevantamento) => {
 export default function LevantamentoDetalhePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { toast } = useToast()
 
   const [levantamento, setLevantamento] = useState<Levantamento | null>(null)
   const [relatorios, setRelatorios] = useState<Relatorio[]>([])
@@ -60,15 +60,6 @@ export default function LevantamentoDetalhePage() {
     })
     return () => { mounted = false }
   }, [id])
-
-  const load = async () => {
-    if (!id) return
-    setLoading(true)
-    const result = await buscarLevantamentoPorId(id)
-    setLoading(false)
-    if (result.error) { setError(result.error); return }
-    if (result.data) setLevantamento(result.data)
-  }
 
   const formatoData = (d: string | null) => d ? new Date(d).toLocaleDateString('pt-BR') : null
 
@@ -145,7 +136,10 @@ export default function LevantamentoDetalhePage() {
                 <Button variant="secondary" onClick={() => navigate(ROUTES.levantamentos)}>
                   <ArrowLeft size={18} /> Voltar
                 </Button>
-                <Button variant="secondary" onClick={() => navigate(ROUTES.levantamentosEditar.replace(':id', levantamento.id))}>
+                <Button variant="secondary" onClick={() => {
+                  const step = normalizeWizardStep(levantamento.ultimo_step ?? 1, levantamento.status)
+                  navigate(`${ROUTES.levantamentosEditar.replace(':id', levantamento.id)}?step=${step}`)
+                }}>
                   <Edit size={18} /> Continuar preenchimento
                 </Button>
               </div>

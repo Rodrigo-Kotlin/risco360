@@ -31,10 +31,10 @@ export default function SincronizacaoPage() {
           />
 
           {/* Resumo geral */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             {!metrics ? (
               <>
-                {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+                {[1, 2, 3, 4, 5].map((i) => <SkeletonCard key={i} />)}
               </>
             ) : (
               <>
@@ -52,6 +52,12 @@ export default function SincronizacaoPage() {
                   <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Falhas</p>
                   <p className={`mt-1 text-headline-small font-bold ${metrics.failed > 0 ? 'text-danger' : 'text-text-muted'}`}>
                     {metrics.failed}
+                  </p>
+                </Card>
+                <Card className="p-4 text-center">
+                  <p className="text-label-medium font-medium text-text-secondary uppercase tracking-wide">Falhas Permanentes</p>
+                  <p className={`mt-1 text-headline-small font-bold ${metrics.failedPermanent > 0 ? 'text-danger' : 'text-text-muted'}`}>
+                    {metrics.failedPermanent}
                   </p>
                 </Card>
                 <Card className="p-4 text-center">
@@ -124,6 +130,7 @@ export default function SincronizacaoPage() {
                 <table className="w-full text-body-small text-left">
                   <thead>
                     <tr className="border-b border-border">
+                      <th className="px-5 py-2 font-medium text-text-secondary">Status</th>
                       <th className="px-5 py-2 font-medium text-text-secondary">Entidade</th>
                       <th className="px-5 py-2 font-medium text-text-secondary">Operação</th>
                       <th className="px-5 py-2 font-medium text-text-secondary">Tentativas</th>
@@ -135,14 +142,19 @@ export default function SincronizacaoPage() {
                     {metrics.failedItems.map((item) => (
                       <tr key={item.id} className="border-b border-border last:border-0">
                         <td className="px-5 py-2">
-                          <Badge variant={item.status === 'conflict' ? 'warning' : 'danger'}>
-                            {item.entity}
+                          <Badge variant={item.status === 'failed_permanent' ? 'danger' : item.status === 'conflict' ? 'warning' : 'danger'}>
+                            {item.status === 'failed_permanent' ? 'Falha permanente' : item.status === 'conflict' ? 'Conflito' : 'Erro'}
                           </Badge>
+                        </td>
+                        <td className="px-5 py-2">
+                          <Badge variant="danger">{item.entity}</Badge>
                         </td>
                         <td className="px-5 py-2 text-text-secondary">{item.operation}</td>
                         <td className="px-5 py-2 text-text-secondary">{item.attempts}/5</td>
                         <td className="px-5 py-2 text-text-secondary max-w-xs truncate" title={item.last_error ?? ''}>
-                          {item.last_error ?? '—'}
+                          {item.status === 'failed_permanent'
+                            ? `Este item excedeu o número máximo de tentativas e precisa de revisão manual.`
+                            : (item.last_error ?? '—')}
                         </td>
                         <td className="px-5 py-2 text-text-secondary whitespace-nowrap">
                           {new Date(item.updated_at).toLocaleString('pt-BR')}
@@ -188,9 +200,10 @@ export default function SincronizacaoPage() {
                             item.status === 'pending' ? 'warning' :
                             item.status === 'syncing' ? 'info' :
                             item.status === 'conflict' ? 'warning' :
+                            item.status === 'failed_permanent' ? 'danger' :
                             'danger'
                           }>
-                            {item.status}
+                            {item.status === 'failed_permanent' ? 'failed_permanent' : item.status}
                           </Badge>
                         </td>
                         <td className="px-5 py-2 text-text-secondary">{item.attempts}/5</td>

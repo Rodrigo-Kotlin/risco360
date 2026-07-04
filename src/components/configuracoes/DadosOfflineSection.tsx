@@ -14,11 +14,11 @@ interface OfflineStatus { available: boolean; dbName: string; version: number }
 interface DataProviderStatus {
   available: boolean; source: string; mockMode: boolean; migrated: boolean; initialized: boolean
   supportsOfflineWrites: boolean; syncEnabled: boolean
-  syncStatus: { pending: number; syncing: number; error: number; synced: number; conflict: number; total: number }
+  syncStatus: { pending: number; syncing: number; error: number; synced: number; conflict: number; failedPermanent: number; total: number }
 }
 
 interface SyncQueueStats {
-  pending: number; syncing: number; error: number; synced: number; conflict: number; total: number
+  pending: number; syncing: number; error: number; synced: number; conflict: number; failedPermanent: number; total: number
 }
 
 interface DadosOfflineSectionProps {

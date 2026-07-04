@@ -106,6 +106,44 @@ describe('uploadEvidenciaFotografica (mock mode)', () => {
     URL.revokeObjectURL(result.data!.preview_url)
   })
 
+  it('passa contexto completo (empresa_id, setor_id, levantamento_id) para registro offline', async () => {
+    const { uploadEvidenciaFotografica } = await import('../evidencias.service')
+    const file = createMockFile('teste.jpg', 'image/jpeg', 1024)
+    const result = await uploadEvidenciaFotografica(
+      { file, legenda: 'Teste', origem: 'camera' },
+      { empresa_id: 'emp_01', setor_id: 'set_01', levantamento_id: 'lev_01' }
+    )
+    expect(result.error).toBeNull()
+
+    const { listarEvidenciasPorLevantamento } = await import('@/services/offline/offline-evidencias.service')
+    const list = await listarEvidenciasPorLevantamento('lev_01')
+    expect(list.data).toHaveLength(1)
+    expect(list.data![0].empresa_id).toBe('emp_01')
+    expect(list.data![0].setor_id).toBe('set_01')
+    expect(list.data![0].levantamento_id).toBe('lev_01')
+
+    URL.revokeObjectURL(result.data!.preview_url)
+  })
+
+  it('passa levantamento_id mesmo sem empresa/setor', async () => {
+    const { uploadEvidenciaFotografica } = await import('../evidencias.service')
+    const file = createMockFile('teste.jpg', 'image/jpeg', 1024)
+    const result = await uploadEvidenciaFotografica(
+      { file, legenda: 'Teste', origem: 'camera' },
+      { levantamento_id: 'lev_only' }
+    )
+    expect(result.error).toBeNull()
+
+    const { listarEvidenciasPorLevantamento } = await import('@/services/offline/offline-evidencias.service')
+    const list = await listarEvidenciasPorLevantamento('lev_only')
+    expect(list.data).toHaveLength(1)
+    expect(list.data![0].levantamento_id).toBe('lev_only')
+    expect(list.data![0].empresa_id).toBeNull()
+    expect(list.data![0].setor_id).toBeNull()
+
+    URL.revokeObjectURL(result.data!.preview_url)
+  })
+
   it('rejeita arquivo com tipo inválido no modo mock', async () => {
     const { uploadEvidenciaFotografica } = await import('../evidencias.service')
     const file = createMockFile('foto.gif', 'image/gif', 1024)

@@ -16,6 +16,8 @@ import type { PaginationParams, PaginatedServiceResult } from '@/types/paginatio
 import type { Empresa, EmpresaCreateInput, EmpresaUpdateInput } from '@/types/empresa'
 import type { EmpresaRow } from '@/types/database'
 
+const EMPRESA_LIST_SELECT = 'id, razao_social, nome_fantasia, cnpj, cnae, grau_risco, endereco, numero, bairro, cidade, uf, cep, responsavel, telefone, email, observacoes, cnae_principal, cnae_principal_descricao, cnaes_secundarios, grau_risco_nr4, user_id, created_at, updated_at, deleted_at, sync_status'
+
 export async function listarEmpresas(
   params?: PaginationParams
 ): Promise<PaginatedServiceResult<Empresa>> {
@@ -25,8 +27,8 @@ export async function listarEmpresas(
       const hasPagination = params?.page != null && params?.pageSize != null
       let query = client
         .from('empresas')
-        .select('*', hasPagination ? { count: 'exact' } : undefined)
-        .is('deleted_at', 'null')
+        .select(EMPRESA_LIST_SELECT, hasPagination ? { count: 'exact' } : undefined)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false })
 
       if (params?.page && params?.pageSize) {
@@ -73,7 +75,7 @@ export async function buscarEmpresaPorId(id: string): Promise<ServiceResult<Empr
         .from('empresas')
         .select('*')
         .eq('id', id)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .single()
 
       if (error) throw error
@@ -239,8 +241,8 @@ export async function buscarEmpresasPorTermo(
 
       const { data, error } = await client
         .from('empresas')
-        .select('*')
-        .is('deleted_at', 'null')
+        .select(EMPRESA_LIST_SELECT)
+        .is('deleted_at', null)
         .or(
           `razao_social.ilike.%${termo}%,nome_fantasia.ilike.%${termo}%,cnpj.ilike.%${termo}%`
         )

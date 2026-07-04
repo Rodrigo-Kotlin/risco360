@@ -12,7 +12,7 @@ import type { IRelatorioService } from '../contracts/relatorio-service'
 import type { IBibliotecaTecnicaService } from '../contracts/biblioteca-service'
 import type { IProfileService } from '../contracts/profile-service'
 import type { ServiceResult } from '@/types/common'
-import type { Profile } from '@/types'
+import type { Relatorio } from '@/types/relatorio'
 import type { UploadEvidenciaResult, UploadEvidenciaInput } from '../evidencias.service'
 
 export const mockEmpresaService: IEmpresaService = {
@@ -72,14 +72,14 @@ export const mockRelatorioService: IRelatorioService = {
     const result = await mockRelatorios.listarRelatorios()
     const idx = (result.data ?? []).findIndex((r) => r.id === id)
     if (idx === -1) return { data: null, error: 'Relatório não encontrado.' }
-    return { data: { ...result.data![idx], ...input, id } as any, error: null }
+    return { data: { ...result.data![idx], ...input, id } as Relatorio, error: null }
   },
   excluirRelatorio: mockRelatorios.excluirRelatorio,
   atualizarStatusRelatorio: async (id, status) => {
     const result = await mockRelatorios.listarRelatorios()
     const idx = (result.data ?? []).findIndex((r) => r.id === id)
     if (idx === -1) return { data: null, error: 'Relatório não encontrado.' }
-    return { data: { ...result.data![idx], status, id } as any, error: null }
+    return { data: { ...result.data![idx], status, id } as Relatorio, error: null }
   },
 }
 
@@ -111,12 +111,12 @@ export const mockBibliotecaService: IBibliotecaTecnicaService = {
   ativarItemBiblioteca: async (id) => {
     const item = await mockBiblioteca.buscarBibliotecaItemPorId(id)
     if (item.error || !item.data) return { data: null, error: 'Item não encontrado.' }
-    return mockBiblioteca.atualizarBibliotecaItem(id, { ativo: true } as any)
+    return mockBiblioteca.atualizarBibliotecaItem(id, { ativo: true })
   },
   desativarItemBiblioteca: async (id) => {
     const item = await mockBiblioteca.buscarBibliotecaItemPorId(id)
     if (item.error || !item.data) return { data: null, error: 'Item não encontrado.' }
-    return mockBiblioteca.atualizarBibliotecaItem(id, { ativo: false } as any)
+    return mockBiblioteca.atualizarBibliotecaItem(id, { ativo: false })
   },
 }
 

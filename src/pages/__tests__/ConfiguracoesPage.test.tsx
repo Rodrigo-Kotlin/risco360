@@ -61,7 +61,7 @@ vi.mock('@/services/offline/sync-queue.service', () => ({
   clearSyncedQueueItems: vi.fn(),
   retryAllFailedItems: vi.fn().mockResolvedValue(0),
   listFailedSyncItems: vi.fn().mockResolvedValue([]),
-  getSyncQueueStats: vi.fn().mockResolvedValue({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 }),
+  getSyncQueueStats: vi.fn().mockResolvedValue({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 }),
 }))
 
 vi.mock('@/services/data-provider', () => ({

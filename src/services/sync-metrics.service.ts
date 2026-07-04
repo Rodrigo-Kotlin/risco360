@@ -7,6 +7,7 @@ export interface SyncMetrics {
   pending: number
   synced: number
   failed: number
+  failedPermanent: number
   conflicts: number
   processing: number
   lastSyncAt: string | null
@@ -27,6 +28,7 @@ export async function getSyncMetrics(): Promise<SyncMetrics> {
     pending: stats.pending,
     synced: stats.synced,
     failed: stats.error,
+    failedPermanent: stats.failedPermanent,
     conflicts: stats.conflict,
     processing: stats.syncing,
     lastSyncAt,

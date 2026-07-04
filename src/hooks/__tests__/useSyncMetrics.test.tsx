@@ -23,9 +23,9 @@ function createWrapper() {
 
 function makeMetrics(overrides: Record<string, unknown> = {}) {
   return {
-    pending: 0, synced: 0, failed: 0, conflicts: 0, processing: 0,
+    pending: 0, synced: 0, failed: 0, failedPermanent: 0, conflicts: 0, processing: 0,
     lastSyncAt: null,
-    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
     failedItems: [],
     allItems: [],
     ...overrides,

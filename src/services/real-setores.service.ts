@@ -17,6 +17,8 @@ import type { PaginationParams, PaginatedServiceResult } from '@/types/paginatio
 import type { Setor, SetorCreateInput, SetorUpdateInput } from '@/types/empresa'
 import type { SetorRow } from '@/types/database'
 
+const SETOR_LIST_SELECT = 'id, empresa_id, nome, descricao, localizacao, responsavel_local, observacoes, user_id, created_at, updated_at, deleted_at, sync_status'
+
 export async function listarSetores(
   params?: PaginationParams
 ): Promise<PaginatedServiceResult<Setor>> {
@@ -26,8 +28,8 @@ export async function listarSetores(
       const hasPagination = params?.page != null && params?.pageSize != null
       let query = client
         .from('setores')
-        .select('*', hasPagination ? { count: 'exact' } : undefined)
-        .is('deleted_at', 'null')
+        .select(SETOR_LIST_SELECT, hasPagination ? { count: 'exact' } : undefined)
+        .is('deleted_at', null)
         .order('nome', { ascending: true })
 
       if (params?.page && params?.pageSize) {
@@ -74,9 +76,9 @@ export async function listarSetoresPorEmpresa(
       const client = getClient()
       const { data, error } = await client
         .from('setores')
-        .select('*')
+        .select(SETOR_LIST_SELECT)
         .eq('empresa_id', empresaId)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('nome', { ascending: true })
 
       if (error) throw error
@@ -105,7 +107,7 @@ export async function buscarSetorPorId(id: string): Promise<ServiceResult<Setor>
         .from('setores')
         .select('*')
         .eq('id', id)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .single()
 
       if (error) throw error

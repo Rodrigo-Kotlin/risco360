@@ -3,7 +3,7 @@ import { FormSection } from '@/components/ui/FormSection'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { Save, Loader2, ArrowLeft, ArrowRight, Plus, X, GripVertical } from 'lucide-react'
+import { Save, Loader2, ArrowLeft, ArrowRight, X, GripVertical } from 'lucide-react'
 import { CONDICAO_POSTOS_OPCOES, LAYOUT_POSTO_OPCOES, MOBILIARIO_OPCOES, MAQUINAS_EQUIPAMENTOS_OPCOES, SEGURANCA_EMERGENCIA_ITENS } from '@/constants/formulario-options'
 import { generateId, ensureArray } from '@/lib/utils'
 import type { SegurancaEquipamentos, ItemInventarioAmbiente } from '@/types/levantamento'
@@ -22,8 +22,6 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
   tipo: ItemInventarioAmbiente['tipo']
   label?: string
 }) {
-  const [customNome, setCustomNome] = useState('')
-
   const toggleChip = (optLabel: string) => {
     const exists = itens.find((i) => i.nome === optLabel)
     if (exists) {
@@ -39,13 +37,6 @@ function ItensInventarioChips({ opcoes, itens, onChange, tipo, label }: {
 
   const remove = (id: string) => {
     onChange(itens.filter((i) => i.id !== id))
-  }
-
-  const addCustom = () => {
-    if (customNome.trim() && !itens.find((i) => i.nome.toLowerCase() === customNome.trim().toLowerCase())) {
-      onChange([...itens, { id: generateId(), nome: customNome.trim(), quantidade: null, observacao: null, tipo }])
-      setCustomNome('')
-    }
   }
 
   return (

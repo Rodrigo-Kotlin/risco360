@@ -18,7 +18,7 @@ export interface SyncState {
 export function useSyncQueue() {
   const { isOnline, wasOffline } = useOnlineStatus()
   const [state, setState] = useState<SyncState>({
-    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
     isSyncing: false,
     lastSyncMessage: '',
     hasPending: false,

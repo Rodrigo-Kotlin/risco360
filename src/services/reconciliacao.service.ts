@@ -31,7 +31,8 @@ export async function reconciliarCache(): Promise<RelatorioReconciliacao> {
     }
   }
 
-  const entidades: Array<{ nome: string; tabela: string; store: string; }> = [
+  type Tabela = 'empresas' | 'setores' | 'levantamentos' | 'evidencias' | 'relatorios'
+  const entidades: Array<{ nome: string; tabela: Tabela; store: string; }> = [
     { nome: 'empresa', tabela: 'empresas', store: 'empresas' },
     { nome: 'setor', tabela: 'setores', store: 'setores' },
     { nome: 'levantamento', tabela: 'levantamentos', store: 'levantamentos' },
@@ -42,8 +43,8 @@ export async function reconciliarCache(): Promise<RelatorioReconciliacao> {
   for (const ent of entidades) {
     const { data: remotos, error } = await client
       .from(ent.tabela)
-      .select('*')
-      .is('deleted_at', 'null')
+      .select('id, updated_at')
+      .is('deleted_at', null)
       .eq('user_id', userData.user.id)
 
     if (error) {

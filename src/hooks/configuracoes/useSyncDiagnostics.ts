@@ -1,7 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { useState, useEffect } from 'react'
 import { useToast } from '@/hooks/useToast'
-import { isSupabaseConfigured } from '@/lib/supabase'
 import { contarOffline, getOfflineStatus, resetOfflineData } from '@/services/offline/offline-storage.service'
 import { limparTodaFila, getSyncQueueStats, clearSyncedQueueItems, retryAllFailedItems, listFailedSyncItems } from '@/services/offline/sync-queue.service'
 import { getDataProviderStatus, resetDataProviderInitialization } from '@/services/data-provider'
@@ -15,35 +13,41 @@ export function useSyncDiagnostics() {
   const [offlineCounts, setOfflineCounts] = useState({ empresas: 0, setores: 0, levantamentos: 0, evidencias: 0, biblioteca_tecnica: 0, relatorios: 0, sync_pendentes: 0 })
   const [offlineStatus, setOfflineStatus] = useState({ available: false, dbName: '', version: 0 })
   const [migrated, setMigrated] = useState(false)
-  const [dataProviderStatus, setDataProviderStatus] = useState({ available: false, source: '', mockMode: false, migrated: false, initialized: false, supportsOfflineWrites: false, syncEnabled: false, syncStatus: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 } })
-  const [syncQueueStats, setSyncQueueStats] = useState({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 })
+  const [dataProviderStatus, setDataProviderStatus] = useState({ available: false, source: '', mockMode: false, migrated: false, initialized: false, supportsOfflineWrites: false, syncEnabled: false, syncStatus: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 } })
+  const [syncQueueStats, setSyncQueueStats] = useState({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 })
   const [failedItems, setFailedItems] = useState<SyncQueueItem[]>([])
   const [syncingNow, setSyncingNow] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
   const [loadingOffline, setLoadingOffline] = useState(true)
 
-  const loadAll = useCallback(async () => {
-    setLoadingOffline(true)
-    const [counts, status, isMigrated, syncStats, failed] = await Promise.all([
-      contarOffline(),
-      getOfflineStatus(),
-      isMockMigrated(),
-      getSyncQueueStats(),
-      listFailedSyncItems(),
-    ])
-    setOfflineCounts(counts)
-    setOfflineStatus(status)
-    setMigrated(isMigrated)
-    setSyncQueueStats(syncStats)
-    setFailedItems(failed)
-    const dpStatus = await getDataProviderStatus()
-    setDataProviderStatus(dpStatus)
-    setLoadingOffline(false)
-  }, [])
-
   useEffect(() => {
-    loadAll()
-  }, [loadAll])
+    let mounted = true
+
+    ;(async () => {
+      setLoadingOffline(true)
+      const [counts, status, isMigrated, syncStats, failed] = await Promise.all([
+        contarOffline(),
+        getOfflineStatus(),
+        isMockMigrated(),
+        getSyncQueueStats(),
+        listFailedSyncItems(),
+      ])
+      if (!mounted) return
+      setOfflineCounts(counts)
+      setOfflineStatus(status)
+      setMigrated(isMigrated)
+      setSyncQueueStats(syncStats)
+      setFailedItems(failed)
+      const dpStatus = await getDataProviderStatus()
+      if (!mounted) return
+      setDataProviderStatus(dpStatus)
+      setLoadingOffline(false)
+    })()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const handleResetOfflineData = async () => {
     const confirmed = window.confirm(

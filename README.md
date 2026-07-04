@@ -45,6 +45,25 @@ VITE_ENABLE_MOCK_MODE=true
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type-check |
 
+## Qualidade automatizada
+
+A suite de qualidade roda em CI via GitHub Actions (`.github/workflows/ci.yml`) a cada push/PR na `master`:
+
+1. **typecheck** — `tsc` sem emitir
+2. **lint** — ESLint com regras do projeto
+3. **test** — Vitest (unitário + integração)
+4. **build** — Vite (typecheck embutido)
+
+Testes E2E (Playwright) podem ser disparados manualmente via `workflow_dispatch`.
+
+### Baseline atual
+
+- Typecheck: 0 erros
+- Lint: 0 erros, 3 warnings (react-hook-form `watch()` — dívida técnica controlada)
+- Testes: 799/799 passando
+- Build: OK
+- npm audit: 0 high, 2 moderate (uuid via exceljs — documentado)
+
 ## Deploy
 
 O projeto está preparado para Cloudflare Pages:
@@ -59,6 +78,7 @@ O projeto está preparado para Cloudflare Pages:
 - Apenas a **anon key pública** do Supabase é usada no frontend.
 - `service_role` e `sb_secret` são rejeitados em runtime.
 - RLS ativo em todas as tabelas do Supabase.
+- Runtime rejeita `service_role` e `sb_secret_` na configuração (`supabase.ts`).
 
 ## Estrutura
 
@@ -90,3 +110,34 @@ Empresa
 ```
 
 Licença: MIT
+
+## Empacotamento seguro para auditoria
+
+Ao compartilhar o projeto para auditoria ou suporte, use o script de pacote limpo:
+
+```bash
+npm run package:audit
+```
+
+Isso gera `risco360-audit-clean.zip` na raiz do projeto, contendo apenas arquivos relevantes e excluindo automaticamente:
+
+- `.env.local` (credenciais reais — **nunca** compartilhar)
+- `.git` (histórico completo do repositório)
+- `node_modules` (centenas de dependências)
+- `dist` / `dev-dist` (artefatos de build)
+- `e2e-report` / `test-results` / `coverage` (relatórios locais)
+
+### Regras de ouro
+
+1. **Nunca** enviar `.env.local` — use apenas `.env.example` como referência.
+2. **Nunca** enviar o diretório `.git`.
+3. **Nunca** enviar `node_modules`.
+4. **Nunca** enviar `dist` ou `dev-dist`.
+5. Sempre rodar `npm run package:audit` antes de empacotar.
+
+### Se uma credencial real foi compartilhada por engano
+
+1. Considerar rotação imediata da chave comprometida.
+2. Revisar logs de acesso ao repositório/Supabase.
+3. Verificar se houve exposição externa (público, terceiros).
+4. Remover o pacote de qualquer local público.

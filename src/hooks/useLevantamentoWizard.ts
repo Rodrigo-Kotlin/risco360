@@ -44,8 +44,7 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       return
     }
     const lev = result.data
-    const rawStep = lev?.status === 'concluido' ? TOTAL_STEPS : (lev?.ultimo_step ?? calcularProximoPasso(lev!))
-    const initialStep = normalizeWizardStep(rawStep)
+    const initialStep = normalizeWizardStep(lev?.ultimo_step ?? calcularProximoPasso(lev!), lev?.status)
     setState((prev) => ({
       ...prev,
       levantamento: lev,
@@ -71,7 +70,19 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       if (!levantamentoId || !state.levantamento) return false
 
       setState((prev) => ({ ...prev, saving: true }))
-      const result = await atualizarLevantamento(levantamentoId, input)
+
+      const newPercentual = calcularPercentual({
+        ...state.levantamento,
+        ...input,
+      })
+
+      const result = await atualizarLevantamento(levantamentoId, {
+        ...input,
+        percentual: newPercentual,
+        ultimo_step: state.currentStep,
+        ultima_edicao: nowISO(),
+      })
+
       setState((prev) => ({ ...prev, saving: false }))
 
       if (result.error) {
@@ -85,22 +96,14 @@ export function useLevantamentoWizard(levantamentoId: string | undefined) {
       }
 
       const updated = result.data
-      const newPercentual = calcularPercentual(updated)
 
       if (updated.sync_status === 'pending') {
         toast('Salvo localmente. Pendente de sincronização.', 'info')
       }
 
-      await atualizarLevantamento(levantamentoId, {
-        percentual: newPercentual,
-        ultimo_step: state.currentStep,
-        ultima_edicao: nowISO(),
-      })
-
-      const refreshed = await buscarLevantamentoPorId(levantamentoId)
       setState((prev) => ({
         ...prev,
-        levantamento: refreshed.data ?? updated,
+        levantamento: updated,
       }))
 
       if (nextStep) {

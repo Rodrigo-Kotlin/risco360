@@ -56,9 +56,9 @@ function makeSyncItem(overrides: Record<string, unknown> = {}) {
 
 function makeMetrics(overrides: Record<string, unknown> = {}) {
   return {
-    pending: 0, synced: 0, failed: 0, conflicts: 0, processing: 0,
+    pending: 0, synced: 0, failed: 0, failedPermanent: 0, conflicts: 0, processing: 0,
     lastSyncAt: null,
-    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
     failedItems: [],
     allItems: [],
     ...overrides,
@@ -69,7 +69,7 @@ const baseSyncQueueState = {
   isSyncing: false,
   lastSyncMessage: '',
   triggerSync: vi.fn(),
-  stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+  stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
   hasPending: false,
   hasErrors: false,
   refreshStats: vi.fn(),
@@ -153,7 +153,7 @@ describe('SincronizacaoPage', () => {
   it('exibe loading skeleton enquanto carrega', () => {
     mockUseSyncMetrics.mockReturnValue({ data: undefined, isLoading: true })
     const { container } = render(<SincronizacaoPage />, { wrapper: createWrapper() })
-    const skeletons = container.querySelectorAll('.animate-pulse')
+    const skeletons = container.querySelectorAll('.animate-skeleton')
     expect(skeletons.length).toBeGreaterThan(0)
   })
 
@@ -184,6 +184,94 @@ describe('SincronizacaoPage', () => {
     render(<SincronizacaoPage />, { wrapper: createWrapper() })
     await waitFor(() => {
       expect(screen.getByText(/Última sincronização/)).toBeInTheDocument()
+    })
+  })
+
+  it('exibe card Falhas Permanentes com valor zero quando não há falhas', async () => {
+    mockUseSyncMetrics.mockReturnValue({ data: makeMetrics(), isLoading: false })
+    render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    await waitFor(() => {
+      expect(screen.getByText('Falhas Permanentes')).toBeInTheDocument()
+    })
+  })
+
+  it('exibe card Falhas Permanentes com contagem > 0 quando há falhas', async () => {
+    mockUseSyncMetrics.mockReturnValue({
+      data: makeMetrics({ failedPermanent: 3, failed: 3, stats: { pending: 0, syncing: 0, error: 3, synced: 0, conflict: 0, failedPermanent: 3, total: 3 } }),
+      isLoading: false,
+    })
+    render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    await waitFor(() => {
+      const cards = screen.getAllByText('3')
+      expect(cards.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  it('exibe "Falha permanente" na tabela de erros para itens failed_permanent', async () => {
+    const failedItem = makeSyncItem({
+      id: 'f1', entity: 'levantamento', entity_id: 'l1',
+      status: 'failed_permanent', attempts: 5, last_error: 'Falha após 5 tentativas: Timeout',
+    })
+    mockUseSyncMetrics.mockReturnValue({
+      data: makeMetrics({ failedPermanent: 1, failed: 1, failedItems: [failedItem], allItems: [failedItem] }),
+      isLoading: false,
+    })
+    render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    await waitFor(() => {
+      expect(screen.getByText('Falha permanente')).toBeInTheDocument()
+      expect(screen.getByText(/Este item excedeu o número máximo de tentativas/)).toBeInTheDocument()
+    })
+  })
+
+  it('diferencia erro transitório de falha permanente visualmente', async () => {
+    const errorItem = makeSyncItem({
+      id: 'e1', entity: 'empresa',
+      status: 'error', attempts: 3, last_error: 'Timeout',
+    })
+    const permItem = makeSyncItem({
+      id: 'p1', entity: 'setor',
+      status: 'failed_permanent', attempts: 5, last_error: 'Falha após 5 tentativas: Erro',
+    })
+    mockUseSyncMetrics.mockReturnValue({
+      data: makeMetrics({
+        failed: 1, failedPermanent: 1,
+        failedItems: [errorItem, permItem],
+        allItems: [errorItem, permItem],
+      }),
+      isLoading: false,
+    })
+    render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    await waitFor(() => {
+      const erroElements = screen.getAllByText('Erro')
+      expect(erroElements.length).toBeGreaterThanOrEqual(1)
+      expect(screen.getByText('Falha permanente')).toBeInTheDocument()
+      expect(screen.getByText('Timeout')).toBeInTheDocument()
+      expect(screen.getByText(/Este item excedeu o número máximo de tentativas/)).toBeInTheDocument()
+    })
+  })
+
+  it('exibe skeleton loading para cards', () => {
+    mockUseSyncMetrics.mockReturnValue({ data: undefined, isLoading: true })
+    const { container } = render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    const skeletons = container.querySelectorAll('.animate-skeleton')
+    expect(skeletons.length).toBeGreaterThan(0)
+  })
+
+  it('tem texto visível para status (não depende apenas de cor)', async () => {
+    const errorItem = makeSyncItem({
+      id: 'e1', status: 'error', last_error: 'Erro de rede',
+    })
+    const permItem = makeSyncItem({
+      id: 'p1', status: 'failed_permanent', last_error: 'Exaustão',
+    })
+    mockUseSyncMetrics.mockReturnValue({
+      data: makeMetrics({ failed: 1, failedPermanent: 1, failedItems: [errorItem, permItem], allItems: [errorItem, permItem] }),
+      isLoading: false,
+    })
+    render(<SincronizacaoPage />, { wrapper: createWrapper() })
+    await waitFor(() => {
+      const badges = screen.getAllByText(/^(Erro|Falha permanente|Conflito)$/)
+      expect(badges.length).toBeGreaterThanOrEqual(2)
     })
   })
 })

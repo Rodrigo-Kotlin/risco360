@@ -170,9 +170,11 @@ export default function LevantamentoWizardPage() {
 
   const handleGoToStep = useCallback((step: number) => {
     const s = normalizeWizardStep(step)
+    const stepStr = String(s)
+    if (stepStr === searchParams.get('step')) return
     goToStep(s)
-    setSearchParams({ step: String(s) }, { replace: false })
-  }, [goToStep, setSearchParams])
+    setSearchParams({ step: stepStr }, { replace: false })
+  }, [goToStep, setSearchParams, searchParams])
 
   const handleNavigateBack = useCallback(() => {
     const prev = currentStep - 1
@@ -303,6 +305,9 @@ export default function LevantamentoWizardPage() {
             data={lev.epis_epcs_evidencias}
             empresaNome={lev.empresa_nome}
             setorNome={lev.setor_nome}
+            levantamentoId={lev.id}
+            empresaId={lev.empresa_id}
+            setorId={lev.setor_id}
             onSave={setEpisEpcs}
             saving={saving}
             onPrevious={handleNavigateBack}

@@ -39,7 +39,7 @@ function makeEvent(overrides: Partial<SyncEvent> = {}): SyncEvent {
   return {
     type: 'start',
     message: '',
-    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+    stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
     ...overrides,
   }
 }
@@ -82,7 +82,7 @@ describe('SyncToastListener', () => {
     handler(makeEvent({
       type: 'complete',
       message: 'Tudo sincronizado.',
-      stats: { pending: 0, syncing: 0, error: 0, synced: 5, conflict: 0, total: 5 },
+      stats: { pending: 0, syncing: 0, error: 0, synced: 5, conflict: 0, failedPermanent: 0, total: 5 },
     }))
     await waitFor(() => {
       expect(document.querySelector('[role="alert"]')).toHaveTextContent('5 registro(s) sincronizado(s) com sucesso.')
@@ -95,7 +95,7 @@ describe('SyncToastListener', () => {
     handler(makeEvent({
       type: 'complete',
       message: 'Nenhum dado pendente para sincronizar.',
-      stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 0 },
+      stats: { pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 0 },
     }))
     await waitFor(() => {
       expect(document.querySelector('[role="alert"]')).toHaveTextContent('Nenhum dado pendente para sincronizar.')
@@ -108,7 +108,7 @@ describe('SyncToastListener', () => {
     handler(makeEvent({
       type: 'error',
       message: 'Erro ao sincronizar empresa.',
-      stats: { pending: 1, syncing: 0, error: 1, synced: 0, conflict: 0, total: 1 },
+      stats: { pending: 1, syncing: 0, error: 1, synced: 0, conflict: 0, failedPermanent: 0, total: 1 },
     }))
     await waitFor(() => {
       expect(document.querySelector('[role="alert"]')).toHaveTextContent('Erro ao sincronizar empresa.')
@@ -134,7 +134,7 @@ describe('SyncToastListener', () => {
     handler(makeEvent({
       type: 'start',
       message: 'Sincronizando dados pendentes...',
-      stats: { pending: 3, syncing: 0, error: 0, synced: 0, conflict: 0, total: 3 },
+      stats: { pending: 3, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 3 },
     }))
     expect(document.querySelector('[role="alert"]')).toBeNull()
   })

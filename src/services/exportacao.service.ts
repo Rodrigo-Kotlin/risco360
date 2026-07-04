@@ -1,4 +1,4 @@
-import type * as XLSX from 'xlsx'
+import type { Workbook } from 'exceljs'
 import type { EmpresaConsolidada, SetorConsolidado } from '@/types/consolidacao'
 import { ensureArray, formatItemQuantificado } from '@/lib/utils'
 import { normalizePontosMedicao } from '@/lib/normalizers'
@@ -247,92 +247,114 @@ function evidenciasParaLinhas(setores: SetorConsolidado[]) {
   })
 }
 
-export async function gerarWorkbookEmpresa(consolidado: EmpresaConsolidada): Promise<XLSX.WorkBook> {
-  const X = await import('xlsx')
-  const book = X.utils.book_new()
+function addSheetFromObjects(book: Workbook, name: string, data: Record<string, unknown>[]): void {
+  const ws = book.addWorksheet(name)
+  if (data.length > 0) {
+    const headers = Object.keys(data[0])
+    ws.addRow(headers)
+    data.forEach(item => {
+      ws.addRow(headers.map(h => item[h] ?? ''))
+    })
+  }
+}
 
-  const empSheet = X.utils.json_to_sheet([empresaParaLinha(consolidado)])
-  X.utils.book_append_sheet(book, empSheet, 'Empresa')
+function addPlaceholderSheet(book: Workbook, name: string, message: string): void {
+  const ws = book.addWorksheet(name)
+  ws.addRow([message])
+}
+
+export async function gerarWorkbookEmpresa(consolidado: EmpresaConsolidada): Promise<Workbook> {
+  const ExcelJS = await import('exceljs')
+  const book = new ExcelJS.Workbook()
+
+  const empSheetData = [empresaParaLinha(consolidado)]
+  addSheetFromObjects(book, 'Empresa', empSheetData)
 
   const setoresLinhas = setoresParaLinhas(consolidado.setores)
   if (setoresLinhas.length > 0) {
-    const setSheet = X.utils.json_to_sheet(setoresLinhas)
-    X.utils.book_append_sheet(book, setSheet, 'Setores')
+    addSheetFromObjects(book, 'Setores', setoresLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhum setor']]), 'Setores')
+    addPlaceholderSheet(book, 'Setores', 'Nenhum setor')
   }
 
   const caracLinhas = caracteristicasParaLinhas(consolidado.setores)
   if (caracLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(caracLinhas), 'Caracteristicas')
+    addSheetFromObjects(book, 'Caracteristicas', caracLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhuma característica']]), 'Caracteristicas')
+    addPlaceholderSheet(book, 'Caracteristicas', 'Nenhuma característica')
   }
 
   const segLinhas = segurancaParaLinhas(consolidado.setores)
   if (segLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(segLinhas), 'Seguranca_Mobiliario')
+    addSheetFromObjects(book, 'Seguranca_Mobiliario', segLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhum dado']]), 'Seguranca_Mobiliario')
+    addPlaceholderSheet(book, 'Seguranca_Mobiliario', 'Nenhum dado')
   }
 
   const episLinhas = episEpcsParaLinhas(consolidado.setores)
   if (episLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(episLinhas), 'EPIs_EPCs')
+    addSheetFromObjects(book, 'EPIs_EPCs', episLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhum EPI/EPC']]), 'EPIs_EPCs')
+    addPlaceholderSheet(book, 'EPIs_EPCs', 'Nenhum EPI/EPC')
   }
 
   const medLinhas = medicoesParaLinhas(consolidado.setores)
   if (medLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(medLinhas), 'Medicoes')
+    addSheetFromObjects(book, 'Medicoes', medLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhuma medição']]), 'Medicoes')
+    addPlaceholderSheet(book, 'Medicoes', 'Nenhuma medição')
   }
 
   const riscLinhas = riscosParaLinhas(consolidado.setores)
   if (riscLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(riscLinhas), 'Riscos')
+    addSheetFromObjects(book, 'Riscos', riscLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhum risco']]), 'Riscos')
+    addPlaceholderSheet(book, 'Riscos', 'Nenhum risco')
   }
 
   const aepLinhas = aepParaLinhas(consolidado.setores)
   if (aepLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(aepLinhas), 'AEP')
+    addSheetFromObjects(book, 'AEP', aepLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhuma AEP']]), 'AEP')
+    addPlaceholderSheet(book, 'AEP', 'Nenhuma AEP')
   }
 
   const paLinhas = planoAcaoParaLinhas(consolidado.setores)
   if (paLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(paLinhas), 'Plano_Acao')
+    addSheetFromObjects(book, 'Plano_Acao', paLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhuma ação']]), 'Plano_Acao')
+    addPlaceholderSheet(book, 'Plano_Acao', 'Nenhuma ação')
   }
 
   const evLinhas = evidenciasParaLinhas(consolidado.setores)
   if (evLinhas.length > 0) {
-    X.utils.book_append_sheet(book, X.utils.json_to_sheet(evLinhas), 'Evidencias')
+    addSheetFromObjects(book, 'Evidencias', evLinhas)
   } else {
-    X.utils.book_append_sheet(book, X.utils.aoa_to_sheet([['Nenhuma evidência']]), 'Evidencias')
+    addPlaceholderSheet(book, 'Evidencias', 'Nenhuma evidência')
   }
 
   return book
 }
 
 export async function exportarEmpresaParaXLSX(consolidado: EmpresaConsolidada): Promise<void> {
-  const X = await import('xlsx')
   const book = await gerarWorkbookEmpresa(consolidado)
   const nomeArquivo = `consolidado_${consolidado.empresa.razao_social.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`
-  X.writeFile(book, nomeArquivo)
+  const buffer = await book.xlsx.writeBuffer()
+  const blob = new Blob([buffer], { type: 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = nomeArquivo
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 
 export async function baixarArquivoXLSX(consolidado: EmpresaConsolidada): Promise<void> {
-  const X = await import('xlsx')
   const book = await gerarWorkbookEmpresa(consolidado)
-  const wbout = X.write(book, { bookType: 'xlsx', type: 'array' })
-  const blob = new Blob([wbout], { type: 'application/octet-stream' })
+  const buffer = await book.xlsx.writeBuffer()
+  const blob = new Blob([buffer], { type: 'application/octet-stream' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

@@ -75,6 +75,18 @@ export async function contarItensPendentes(): Promise<number> {
   return items.length
 }
 
+export async function markSyncItemAsFailedPermanent(id: string, error: string): Promise<void> {
+  const db = await getOfflineDB()
+  const item = await db.get('sync_queue', id)
+  if (item) {
+    item.status = 'failed_permanent'
+    item.last_error = error
+    item.updated_at = nowISO()
+    await db.put('sync_queue', item)
+    notifySyncQueueChange()
+  }
+}
+
 export async function getSyncQueueStats(): Promise<SyncQueueStats> {
   const db = await getOfflineDB()
   const all = await db.getAll('sync_queue')
@@ -83,7 +95,8 @@ export async function getSyncQueueStats(): Promise<SyncQueueStats> {
   const error = all.filter(i => i.status === 'error').length
   const synced = all.filter(i => i.status === 'synced').length
   const conflict = all.filter(i => (i.status as string) === 'conflict').length
-  return { pending, syncing, error, synced, conflict, total: all.length }
+  const failedPermanent = all.filter(i => i.status === 'failed_permanent').length
+  return { pending, syncing, error, synced, conflict, failedPermanent, total: all.length }
 }
 
 export async function marcarItemComoSincronizando(id: string): Promise<void> {
@@ -175,7 +188,7 @@ export async function markConflict(id: string, error: string): Promise<void> {
 export async function retrySyncItem(id: string): Promise<void> {
   const db = await getOfflineDB()
   const item = await db.get('sync_queue', id)
-  if (item && (item.status === 'error' || item.status === 'conflict' as string)) {
+  if (item && item.status === 'error') {
     item.status = 'pending'
     item.updated_at = nowISO()
     await db.put('sync_queue', item)
@@ -186,7 +199,7 @@ export async function retrySyncItem(id: string): Promise<void> {
 export async function retryAllFailedItems(): Promise<number> {
   const db = await getOfflineDB()
   const all = await db.getAll('sync_queue')
-  const failed = all.filter(i => i.status === 'error' || (i.status as string) === 'conflict')
+  const failed = all.filter(i => i.status === 'error')
   const tx = db.transaction('sync_queue', 'readwrite')
   for (const item of failed) {
     item.status = 'pending'
@@ -201,5 +214,5 @@ export async function retryAllFailedItems(): Promise<number> {
 export async function listFailedSyncItems(): Promise<SyncQueueItem[]> {
   const db = await getOfflineDB()
   const all = await db.getAll('sync_queue')
-  return all.filter(i => i.status === 'error' || (i.status as string) === 'conflict')
+  return all.filter(i => i.status === 'error' || i.status === 'failed_permanent' || (i.status as string) === 'conflict')
 }

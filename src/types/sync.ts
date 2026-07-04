@@ -22,6 +22,7 @@ export interface SyncQueueStats {
   error: number
   synced: number
   conflict: number
+  failedPermanent: number
   total: number
 }
 

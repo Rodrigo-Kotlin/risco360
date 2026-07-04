@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcularPercentual } from '@/lib/wizard-progress'
+import { calcularPercentual, normalizeWizardStep, calcularProximoPasso } from '@/lib/wizard-progress'
 import type { Levantamento } from '@/types/levantamento'
 
 function makeBase(id = 'test-1'): Levantamento {
@@ -47,6 +47,91 @@ function makeBase(id = 'test-1'): Levantamento {
     updated_at: '2026-01-01T00:00:00Z',
   }
 }
+
+describe('normalizeWizardStep', () => {
+  it('retorna 1 para null/undefined', () => {
+    expect(normalizeWizardStep(null)).toBe(1)
+    expect(normalizeWizardStep(undefined)).toBe(1)
+  })
+
+  it('retorna 1 para passo menor que 1', () => {
+    expect(normalizeWizardStep(0)).toBe(1)
+    expect(normalizeWizardStep(-1)).toBe(1)
+  })
+
+  it('retorna totalSteps para status concluido', () => {
+    expect(normalizeWizardStep(1, 'concluido')).toBe(9)
+    expect(normalizeWizardStep(5, 'concluido')).toBe(9)
+    expect(normalizeWizardStep(null, 'concluido')).toBe(9)
+  })
+
+  it('retorna passo normal para status em_andamento', () => {
+    expect(normalizeWizardStep(3, 'em_andamento')).toBe(3)
+    expect(normalizeWizardStep(1, 'rascunho')).toBe(1)
+  })
+
+  it('normaliza passo 8 antigo para 9 (migração 8->9 steps)', () => {
+    expect(normalizeWizardStep(8)).toBe(9)
+    expect(normalizeWizardStep(6)).toBe(7)
+    expect(normalizeWizardStep(7)).toBe(8)
+  })
+
+  it('retorna totalSteps para passo maior que totalSteps', () => {
+    expect(normalizeWizardStep(99)).toBe(9)
+    expect(normalizeWizardStep(10)).toBe(9)
+  })
+
+  it('aceita totalSteps customizado', () => {
+    expect(normalizeWizardStep(10, null, 12)).toBe(10)
+    expect(normalizeWizardStep(15, null, 12)).toBe(12)
+  })
+
+  it('passo 1-5 sem migração permanece igual', () => {
+    expect(normalizeWizardStep(1)).toBe(1)
+    expect(normalizeWizardStep(2)).toBe(2)
+    expect(normalizeWizardStep(3)).toBe(3)
+    expect(normalizeWizardStep(4)).toBe(4)
+    expect(normalizeWizardStep(5)).toBe(5)
+  })
+})
+
+describe('calcularProximoPasso', () => {
+  it('retorna 1 quando falta identificaçao basica', () => {
+    expect(calcularProximoPasso(makeBase())).toBe(1)
+  })
+
+  it('retorna 2 quando só tem identificaçao', () => {
+    const lev = makeBase()
+    lev.empresa_nome = 'Empresa'
+    lev.setor_nome = 'Setor'
+    lev.data_levantamento = '2026-01-01'
+    expect(calcularProximoPasso(lev)).toBe(2)
+  })
+
+  it('retorna 3 quando falta iluminaçao', () => {
+    const lev = makeBase()
+    lev.empresa_nome = 'Empresa'
+    lev.setor_nome = 'Setor'
+    lev.data_levantamento = '2026-01-01'
+    lev.caracteristicas_fisicas = { largura: 10 } as Levantamento['caracteristicas_fisicas']
+    expect(calcularProximoPasso(lev)).toBe(3)
+  })
+
+  it('retorna 9 quando todos os dados estao preenchidos', () => {
+    const lev = makeBase()
+    lev.empresa_nome = 'Empresa'
+    lev.setor_nome = 'Setor'
+    lev.data_levantamento = '2026-01-01'
+    lev.caracteristicas_fisicas = { largura: 10 } as Levantamento['caracteristicas_fisicas']
+    lev.iluminacao_ventilacao_conforto = { iluminacao_natural: 'boa' } as Levantamento['iluminacao_ventilacao_conforto']
+    lev.seguranca_equipamentos = { sistema_incendio_emergencia: ['extintores'], sistema_incendio_emergencia_itens: [], possui_ges: null, descricao_ges: null, mobiliarios: [], mobiliario_observacao: null, mobiliario_itens: [], maquinas_equipamentos: [], maquinas_equipamentos_itens: [], ferramentas: [], ferramentas_itens: [], layout_posto: null, condicao_postos: null, observacoes: null }
+    lev.epis_epcs_evidencias = { epis: [{ nome: 'Capacete', ca: '123', observacao: null }], epcs: [{ nome: 'Sinalização', observacao: null }], evidencias: [{ legenda: 'foto.jpg', observacao: null, data: null, hora: null }], observacoes: null }
+    lev.medicoes = [{ id: 'm1', tipo: 'Ruído' }] as Levantamento['medicoes']
+    lev.riscos = [{ id: 'r1', agente: 'Ruído' }] as Levantamento['riscos']
+    lev.parecer = { conclusao: 'Ok' } as Levantamento['parecer']
+    expect(calcularProximoPasso(lev)).toBe(9)
+  })
+})
 
 describe('calcularPercentual', () => {
   it('retorna 0 para levantamento vazio', () => {

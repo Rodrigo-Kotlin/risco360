@@ -29,7 +29,7 @@ vi.mock('@/lib/env', () => ({
 }))
 
 vi.mock('@/services/offline/sync-queue.service', () => ({
-  getSyncQueueStats: vi.fn().mockResolvedValue({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 42 }),
+  getSyncQueueStats: vi.fn().mockResolvedValue({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 42 }),
 }))
 
 let mockModeEnabledValue = false
@@ -90,6 +90,6 @@ describe('data-provider', () => {
   it('retorna syncStatus com estatísticas da sync queue', async () => {
     const { getDataProviderStatus } = await import('../data-provider')
     const status = await getDataProviderStatus()
-    expect(status.syncStatus).toEqual({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, total: 42 })
+    expect(status.syncStatus).toEqual({ pending: 0, syncing: 0, error: 0, synced: 0, conflict: 0, failedPermanent: 0, total: 42 })
   })
 })

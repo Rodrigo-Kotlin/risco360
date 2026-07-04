@@ -174,12 +174,12 @@ export interface EvidenciaRow {
   mime_type: string | null
   size_bytes: number | null
   captured_at: string | null
-  local_id: string | null
-  sync_status: string
-  last_synced_at: string | null
+  local_id?: string | null
+  sync_status?: string
+  last_synced_at?: string | null
   created_at: string
   updated_at: string
-  deleted_at: string | null
+  deleted_at?: string | null
 }
 
 export interface SyncLogRow {
@@ -194,4 +194,97 @@ export interface SyncLogRow {
   payload: Record<string, unknown> | null
   created_at: string
   updated_at: string
+}
+
+export type ProfileInsert = Omit<ProfileRow, 'id' | 'created_at' | 'updated_at'>
+export type ProfileUpdate = Partial<Omit<ProfileRow, 'id'>>
+
+export type EmpresaInsert = Omit<EmpresaRow, 'id' | 'created_at' | 'updated_at'>
+export type EmpresaUpdate = Partial<Omit<EmpresaRow, 'id'>>
+
+export type SetorInsert = Omit<SetorRow, 'id' | 'created_at' | 'updated_at'>
+export type SetorUpdate = Partial<Omit<SetorRow, 'id'>>
+
+export type LevantamentoInsert = Omit<LevantamentoRow, 'id' | 'created_at' | 'updated_at'>
+export type LevantamentoUpdate = Partial<Omit<LevantamentoRow, 'id'>>
+
+export type BibliotecaTecnicaInsert = Omit<BibliotecaTecnicaRow, 'id' | 'created_at' | 'updated_at'>
+export type BibliotecaTecnicaUpdate = Partial<Omit<BibliotecaTecnicaRow, 'id'>>
+
+export type RelatorioInsert = Omit<RelatorioRow, 'id' | 'created_at' | 'updated_at'>
+export type RelatorioUpdate = Partial<Omit<RelatorioRow, 'id'>>
+
+export type EvidenciaInsert = Omit<EvidenciaRow, 'id' | 'created_at' | 'updated_at'>
+export type EvidenciaUpdate = Partial<Omit<EvidenciaRow, 'id'>>
+
+export type SyncLogInsert = Omit<SyncLogRow, 'id' | 'created_at' | 'updated_at'>
+export type SyncLogUpdate = Partial<Omit<SyncLogRow, 'id'>>
+
+type EnsureRecord<T> = Record<string, unknown> & T
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: EnsureRecord<ProfileRow>
+        Insert: EnsureRecord<ProfileInsert>
+        Update: EnsureRecord<ProfileUpdate>
+        Relationships: []
+      }
+      empresas: {
+        Row: EnsureRecord<EmpresaRow>
+        Insert: EnsureRecord<EmpresaInsert>
+        Update: EnsureRecord<EmpresaUpdate>
+        Relationships: []
+      }
+      setores: {
+        Row: EnsureRecord<SetorRow>
+        Insert: EnsureRecord<SetorInsert>
+        Update: EnsureRecord<SetorUpdate>
+        Relationships: []
+      }
+      levantamentos: {
+        Row: EnsureRecord<LevantamentoRow>
+        Insert: EnsureRecord<LevantamentoInsert>
+        Update: EnsureRecord<LevantamentoUpdate>
+        Relationships: []
+      }
+      biblioteca_tecnica: {
+        Row: EnsureRecord<BibliotecaTecnicaRow>
+        Insert: EnsureRecord<BibliotecaTecnicaInsert>
+        Update: EnsureRecord<BibliotecaTecnicaUpdate>
+        Relationships: []
+      }
+      relatorios: {
+        Row: EnsureRecord<RelatorioRow>
+        Insert: EnsureRecord<RelatorioInsert>
+        Update: EnsureRecord<RelatorioUpdate>
+        Relationships: []
+      }
+      evidencias: {
+        Row: EnsureRecord<EvidenciaRow>
+        Insert: EnsureRecord<EvidenciaInsert>
+        Update: EnsureRecord<EvidenciaUpdate>
+        Relationships: []
+      }
+      sync_logs: {
+        Row: EnsureRecord<SyncLogRow>
+        Insert: EnsureRecord<SyncLogInsert>
+        Update: EnsureRecord<SyncLogUpdate>
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }

@@ -1,6 +1,6 @@
 -- 0002_risco360_schema_consolidado.sql
 -- Risco360 — Migração consolidada futura.
--- Atualiza e complementa o schema 001_initial_schema.sql:
+-- Atualiza e complementa o schema 0001_initial_schema.sql:
 --   - Fix: constraint levantamentos.tipo = 'LPR_AEP' (remove LPR, LPP, AEP)
 --   - Add: deleted_at, local_id, sync_status, last_synced_at nas tabelas principais
 --   - Add: pontos_medicao (modelo novo), campos faltantes do frontend
@@ -612,6 +612,6 @@ NÃO usar como fonte primária: limite_tolerancia, fonte, numero_serie, responsa
 -- ============================================================
 -- 12. VALIDAÇÃO FINAL
 -- ============================================================
--- Esta migration deve ser executada APÓS a 001_initial_schema.sql.
+-- Esta migration deve ser executada APÓS a 0001_initial_schema.sql.
 -- Todas as operações são idempotentes (IF NOT EXISTS / do $$).
 -- Não quebra dados existentes.

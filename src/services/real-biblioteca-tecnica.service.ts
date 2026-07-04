@@ -8,14 +8,16 @@ import type {
 } from '@/types/biblioteca'
 import type { BibliotecaTecnicaRow } from '@/types/database'
 
+const BIBLIOTECA_LIST_SELECT = 'id, categoria, titulo, descricao, tipo_risco, perigo, risco, fonte, fonte_geradora, danos_possiveis, meios_propagacao, descricao_exposicao, sugestao_exposicao, medidas_controle, epis, epcs, treinamentos, acoes_recomendadas, observacoes, ativo, publico, user_id, created_at, updated_at, deleted_at'
+
 export async function listarItensBiblioteca(): Promise<ServiceResult<BibliotecaTecnicaItem[]>> {
   try {
     const client = getClient()
 
     const { data, error } = await client
       .from('biblioteca_tecnica')
-      .select('*')
-      .is('deleted_at', 'null')
+      .select(BIBLIOTECA_LIST_SELECT)
+      .is('deleted_at', null)
       .order('categoria', { ascending: true, nullsFirst: false })
       .order('titulo', { ascending: true })
 
@@ -40,7 +42,7 @@ export async function buscarItemBibliotecaPorId(
       .from('biblioteca_tecnica')
       .select('*')
       .eq('id', id)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .single()
 
     if (error) throw error
@@ -59,9 +61,9 @@ export async function buscarItensBibliotecaPorCategoria(
 
     const { data, error } = await client
       .from('biblioteca_tecnica')
-      .select('*')
+      .select(BIBLIOTECA_LIST_SELECT)
       .eq('categoria', categoria)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .order('titulo', { ascending: true })
 
     if (error) throw error
@@ -83,9 +85,9 @@ export async function buscarItensBibliotecaPorTipoRisco(
 
     const { data, error } = await client
       .from('biblioteca_tecnica')
-      .select('*')
+      .select(BIBLIOTECA_LIST_SELECT)
       .eq('tipo_risco', tipoRisco)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .order('titulo', { ascending: true })
 
     if (error) throw error
@@ -107,8 +109,8 @@ export async function pesquisarBibliotecaTecnica(
 
     const { data, error } = await client
       .from('biblioteca_tecnica')
-      .select('*')
-      .is('deleted_at', 'null')
+      .select(BIBLIOTECA_LIST_SELECT)
+      .is('deleted_at', null)
       .or(
         `titulo.ilike.%${termo}%,descricao.ilike.%${termo}%,perigo.ilike.%${termo}%,risco.ilike.%${termo}%`
       )

@@ -15,7 +15,7 @@ export async function gerarCodigoLevantamento(): Promise<ServiceResult<string>> 
       .from('levantamentos')
       .select('codigo')
       .like('codigo', `${prefix}%`)
-      .is('deleted_at', 'null')
+      .is('deleted_at', null)
       .order('codigo', { ascending: false })
       .limit(1)
 

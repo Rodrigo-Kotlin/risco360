@@ -27,6 +27,8 @@ import type {
 import { STATUS_LEVANTAMENTO_VALIDOS } from '@/types/levantamento'
 import type { LevantamentoRow } from '@/types/database'
 
+const LEVANTAMENTO_LIST_SELECT = 'id, codigo, tipo, status, percentual, ultimo_step, progresso_percentual, ultima_edicao, ultima_sincronizacao, empresa_id, empresa_nome, cnpj, unidade, setor, setor_id, setor_nome, responsavel_empresa, auditor_tecnico, registro_mte, data_levantamento, data_lancamento_sgg, responsavel_lancamento, observacoes_iniciais, caracteristicas, caracteristicas_fisicas, iluminacao_ventilacao_conforto, seguranca_equipamentos, epis_epcs_evidencias, medicoes, pontos_medicao, colaboradores, riscos, avaliacao_ergonomica, avaliacao_ergonomica_preliminar, controles, plano_acao, parecer, assinatura_tecnico, assinatura_empresa, observacoes, user_id, created_at, updated_at, deleted_at, sync_status'
+
 export async function listarLevantamentos(
   params?: PaginationParams
 ): Promise<PaginatedServiceResult<Levantamento>> {
@@ -36,8 +38,8 @@ export async function listarLevantamentos(
       const hasPagination = params?.page != null && params?.pageSize != null
       let query = client
         .from('levantamentos')
-        .select('*', hasPagination ? { count: 'exact' } : undefined)
-        .is('deleted_at', 'null')
+        .select(LEVANTAMENTO_LIST_SELECT, hasPagination ? { count: 'exact' } : undefined)
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
 
       if (params?.page && params?.pageSize) {
@@ -86,7 +88,7 @@ export async function buscarLevantamentoPorId(
         .from('levantamentos')
         .select('*')
         .eq('id', id)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .single()
 
       if (error) throw error
@@ -513,9 +515,9 @@ export async function buscarLevantamentosPorEmpresa(
       const client = getClient()
       const { data, error } = await client
         .from('levantamentos')
-        .select('*')
+        .select(LEVANTAMENTO_LIST_SELECT)
         .eq('empresa_id', empresaId)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -544,9 +546,9 @@ export async function buscarLevantamentosPorStatus(
       const client = getClient()
       const { data, error } = await client
         .from('levantamentos')
-        .select('*')
+        .select(LEVANTAMENTO_LIST_SELECT)
         .eq('status', status)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -575,9 +577,9 @@ export async function buscarLevantamentosPorTipo(
       const client = getClient()
       const { data, error } = await client
         .from('levantamentos')
-        .select('*')
+        .select(LEVANTAMENTO_LIST_SELECT)
         .eq('tipo', tipo)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -606,9 +608,9 @@ export async function listarLevantamentosPorSetor(
       const client = getClient()
       const { data, error } = await client
         .from('levantamentos')
-        .select('*')
+        .select(LEVANTAMENTO_LIST_SELECT)
         .eq('setor_id', setorId)
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
 
       if (error) throw error
@@ -637,10 +639,10 @@ export async function buscarFormularioSetorialPorSetor(
       const client = getClient()
       const { data, error } = await client
         .from('levantamentos')
-        .select('*')
+        .select(LEVANTAMENTO_LIST_SELECT)
         .eq('setor_id', setorId)
         .eq('tipo', 'LPR_AEP')
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .order('updated_at', { ascending: false })
         .limit(1)
 

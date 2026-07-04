@@ -5,6 +5,7 @@ import {
   markSyncItemAsSyncing,
   markSyncItemAsSynced,
   markSyncItemWithError,
+  markSyncItemAsFailedPermanent,
   markConflict,
   getSyncQueueStats,
   clearSyncedQueueItems,
@@ -118,7 +119,7 @@ async function processSyncItem(item: SyncQueueItem): Promise<boolean> {
   } catch (error) {
     const attempts = item.attempts + 1
     if (attempts >= MAX_ATTEMPTS) {
-      await markSyncItemWithError(item.id, `Falha após ${MAX_ATTEMPTS} tentativas: ${String(error)}`)
+      await markSyncItemAsFailedPermanent(item.id, `Falha após ${MAX_ATTEMPTS} tentativas: ${String(error)}`)
     } else if (isNetworkError(error)) {
       await markSyncItemWithError(item.id, `Erro de rede: ${String(error)}`)
     } else {
@@ -149,12 +150,12 @@ async function syncEmpresa(item: SyncQueueItem): Promise<boolean> {
       const { data, error } = await client
         .from('empresas')
         .insert({ ...payload, user_id: userData.user.id })
-        .select('*')
+        .select('id')
         .single()
 
       if (error) {
         if (error.message?.toLowerCase().includes('duplicate') || error.code === '23505') {
-          const existing = await client.from('empresas').select('*').eq('cnpj', payload.cnpj).is('deleted_at', 'null').maybeSingle()
+          const existing = await client.from('empresas').select('id').eq('cnpj', payload.cnpj).is('deleted_at', null).maybeSingle()
           if (existing.data) {
             local.remote_id = existing.data.id
             local.sync_status = 'synced' as const
@@ -187,7 +188,7 @@ async function syncEmpresa(item: SyncQueueItem): Promise<boolean> {
         .from('empresas')
         .update(updatePayload)
         .eq('id', local.remote_id)
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
@@ -256,12 +257,12 @@ async function syncSetor(item: SyncQueueItem): Promise<boolean> {
       const { data, error } = await client
         .from('setores')
         .insert({ ...payload, empresa_id: empresaRemoteId ?? payload.empresa_id, user_id: userData.user.id })
-        .select('*')
+        .select('id')
         .single()
 
       if (error) {
         if (error.message?.toLowerCase().includes('duplicate') || error.code === '23505') {
-          const existing = await client.from('setores').select('*').eq('nome', payload.nome).eq('empresa_id', empresaRemoteId).is('deleted_at', 'null').maybeSingle()
+          const existing = await client.from('setores').select('id').eq('nome', payload.nome).eq('empresa_id', empresaRemoteId ?? payload.empresa_id).is('deleted_at', null).maybeSingle()
           if (existing.data) {
             local.remote_id = existing.data.id
             local.sync_status = 'synced' as const
@@ -294,7 +295,7 @@ async function syncSetor(item: SyncQueueItem): Promise<boolean> {
         .from('setores')
         .update(updatePayload)
         .eq('id', local.remote_id)
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
@@ -405,17 +406,17 @@ async function syncLevantamentoCreate(
       empresa_id: empresaRemoteId ?? payload.empresa_id,
       setor_id: setorRemoteId ?? payload.setor_id,
     })
-    .select('*')
+    .select('id')
     .single()
 
   if (error) {
     if (error.message?.toLowerCase().includes('duplicate') || error.code === '23505') {
       const existing = await client
         .from('levantamentos')
-        .select('*')
+        .select('id')
         .eq('setor_id', setorRemoteId ?? payload.setor_id)
         .eq('tipo', 'LPR_AEP')
-        .is('deleted_at', 'null')
+        .is('deleted_at', null)
         .maybeSingle()
       if (existing.data) {
         local.remote_id = existing.data.id
@@ -458,7 +459,7 @@ async function syncLevantamentoUpdate(
     .from('levantamentos')
     .update(updatePayload)
     .eq('id', local.remote_id)
-    .select('*')
+    .select('id')
     .single()
 
   if (error) throw error
@@ -659,7 +660,7 @@ async function syncEvidencia(item: SyncQueueItem): Promise<boolean> {
           levantamento_id: levantamentoRemoteId ?? local.levantamento_id,
           storage_path: storagePath,
         })
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
@@ -692,7 +693,7 @@ async function syncEvidencia(item: SyncQueueItem): Promise<boolean> {
         .from('evidencias')
         .update(updatePayload)
         .eq('id', local.remote_id)
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
@@ -771,7 +772,7 @@ async function syncRelatorio(item: SyncQueueItem): Promise<boolean> {
           levantamento_id: levantamentoRemoteId ?? local.levantamento_id,
           user_id: userData.user.id,
         })
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
@@ -795,7 +796,7 @@ async function syncRelatorio(item: SyncQueueItem): Promise<boolean> {
         .from('relatorios')
         .update(updatePayload)
         .eq('id', local.remote_id)
-        .select('*')
+        .select('id')
         .single()
 
       if (error) throw error
