@@ -65,12 +65,15 @@ export default defineConfig({
     }),
   ],
   build: {
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks(id: string) {
           if (id.includes('node_modules/react') && !id.includes('lucide')) return 'vendor'
+          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/@tanstack/react-query')) return 'vendor'
           if (id.includes('node_modules/@supabase')) return 'supabase'
           if (id.includes('node_modules/lucide-react')) return 'icons'
+          if (id.includes('node_modules/browser-image-compression')) return 'image-compress'
         },
       },
     },

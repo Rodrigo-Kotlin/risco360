@@ -15,10 +15,10 @@ export function AppErrorBoundary() {
     : null
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-surface-alt">
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-surface-alt" role="alert">
       <div className="max-w-md w-full text-center space-y-6">
-        <div className="mx-auto w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center">
-          <AlertTriangle size={32} className="text-danger" />
+        <div className="mx-auto w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center" aria-hidden="true">
+          <AlertTriangle size={32} className="text-danger" aria-hidden="true" />
         </div>
 
         <div className="space-y-2">

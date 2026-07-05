@@ -61,7 +61,7 @@ Testes E2E (Playwright) podem ser disparados manualmente via `workflow_dispatch`
 
 - Typecheck: 0 erros
 - Lint: 0 erros, 3 warnings (react-hook-form `watch()` — dívida técnica controlada)
-- Testes: 799/799 passando
+- Testes: 827/827 passando
 - Build: OK
 - npm audit: 0 high, 2 moderate (uuid via exceljs — documentado)
 
@@ -100,6 +100,31 @@ public/
   _headers      # Cloudflare headers
   _redirects    # Cloudflare SPA redirect
 ```
+
+## Performance e Bundle
+
+### Políticas
+
+- **LoginPage** é carregada eager (sem lazy loading) por ser a primeira tela do usuário.
+- **Páginas protegidas** (Dashboard, Empresas, Wizard, etc.) são lazy-loaded via `React.lazy()`.
+- **exceljs** é importado dinamicamente (`await import('exceljs')`) — não entra no bundle inicial.
+- **browser-image-compression** está em chunk separado — carrega sob demanda (Step06).
+- **Ícones lucide-react** são tree-shakeable e agrupados em chunk próprio.
+- **Não adicionar** bibliotecas grandes sem lazy loading ou justificativa de performance.
+
+### Análise
+
+```bash
+npm run build
+```
+
+Após o build, inspecionar `dist/assets/` para verificar tamanho dos chunks.
+
+### Baseline
+
+- Chunk inicial: ~720 kB (~210 kB gzipped)
+- exceljs: ~930 kB (lazy, fora do bundle inicial)
+- 0 warnings de chunk > 1 MB
 
 ## PWA Manifest
 

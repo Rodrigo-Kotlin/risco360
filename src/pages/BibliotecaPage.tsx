@@ -178,6 +178,7 @@ export default function BibliotecaPage() {
             <FilterBar
               activeFilters={activeFilters}
               onToggle={() => setShowFilters(!showFilters)}
+              isOpen={showFilters}
             >
               <SearchInput value={search} onChange={setSearch} placeholder="Pesquisar por título, descrição ou perigo…" className="max-w-md" />
             </FilterBar>
@@ -186,8 +187,9 @@ export default function BibliotecaPage() {
           {showFilters && status !== 'loading' && (
             <Card className="p-4">
               <div>
-                <label className="block text-label-medium font-medium text-text-secondary mb-1">Categoria</label>
+                <label htmlFor="filter-categoria" className="block text-label-medium font-medium text-text-secondary mb-1">Categoria</label>
                 <select
+                  id="filter-categoria"
                   value={filterCategoria}
                   onChange={(e) => setFilterCategoria(e.target.value)}
                     className="w-full min-h-[48px] rounded-xl border border-border-light bg-white text-body-medium px-3.5 focus:outline-none focus:ring-2 focus:ring-primary-500/70"

@@ -114,7 +114,7 @@ export default function SetoresPage() {
       <>
         <Header title="Erro" />
         <MainContainer>
-          <p className="text-body-medium text-danger">{error instanceof Error ? error.message : 'Erro ao carregar setores'}</p>
+          <p className="text-body-medium text-danger" role="alert">{error instanceof Error ? error.message : 'Erro ao carregar setores'}</p>
           <Button variant="secondary" className="mt-4" onClick={() => setoresQuery.refetch()}>
             Tentar novamente
           </Button>
@@ -134,7 +134,7 @@ export default function SetoresPage() {
             action={{
               label: 'Novo setor',
               onClick: () => navigate(ROUTES.setoresNovo),
-              icon: <Plus size={16} />,
+              icon: <Plus size={16} aria-hidden="true" />,
             }}
           />
 
@@ -143,16 +143,20 @@ export default function SetoresPage() {
               <SearchInput value={search} onChange={setSearch} placeholder="Buscar por nome do setor…" />
             </div>
             {empresaOptions.length > 1 && (
-              <select
-                value={empresaFiltro}
-                onChange={(e) => setEmpresaFiltro(e.target.value)}
-                className="min-h-[48px] rounded-lg border border-border bg-card px-3 text-body-medium text-text-primary"
-              >
-                <option value="">Todas as empresas</option>
-                {empresaOptions.map(op => (
-                  <option key={op.value} value={op.value}>{op.label}</option>
-                ))}
-              </select>
+              <>
+                <label htmlFor="empresa-filtro" className="sr-only">Filtrar por empresa</label>
+                <select
+                  id="empresa-filtro"
+                  value={empresaFiltro}
+                  onChange={(e) => setEmpresaFiltro(e.target.value)}
+                  className="min-h-[48px] rounded-lg border border-border bg-card px-3 text-body-medium text-text-primary"
+                >
+                  <option value="">Todas as empresas</option>
+                  {empresaOptions.map(op => (
+                    <option key={op.value} value={op.value}>{op.label}</option>
+                  ))}
+                </select>
+              </>
             )}
           </div>
 
@@ -174,7 +178,7 @@ export default function SetoresPage() {
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Layers size={16} className="text-text-muted shrink-0" />
+                      <Layers size={16} className="text-text-muted shrink-0" aria-hidden="true" />
                       <CardTitle className="text-body-medium">{setor.nome}</CardTitle>
                     </div>
                     <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -191,7 +195,7 @@ export default function SetoresPage() {
                     <p className="text-body-small text-text-secondary mb-2 line-clamp-2">{setor.descricao}</p>
                   )}
                   <div className="mt-auto flex items-center gap-1.5 text-label-medium text-text-muted">
-                    <Building2 size={12} />
+                    <Building2 size={12} aria-hidden="true" />
                     <span className="truncate">{empresas[setor.empresa_id] ?? 'Empresa'}</span>
                   </div>
                 </Card>

@@ -163,6 +163,7 @@ export default function LevantamentosPage() {
             <FilterBar
               activeFilters={activeFilters}
               onToggle={() => setShowFilters(!showFilters)}
+              isOpen={showFilters}
             >
               <SearchInput value={search} onChange={setSearch} placeholder="Buscar por código, empresa ou unidade…" className="max-w-md" />
             </FilterBar>
@@ -172,8 +173,9 @@ export default function LevantamentosPage() {
             <Card className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-label-medium font-medium text-text-secondary mb-1">Tipo</label>
+                  <label htmlFor="filter-tipo" className="block text-label-medium font-medium text-text-secondary mb-1">Tipo</label>
                   <select
+                    id="filter-tipo"
                     value={filterTipo}
                     onChange={(e) => setFilterTipo(e.target.value as TipoLevantamento | '')}
                     className="w-full h-9 rounded-xl border border-border-light bg-white text-label-large px-3.5 focus:outline-none focus:ring-2 focus:ring-primary-500/70"
@@ -183,8 +185,9 @@ export default function LevantamentosPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-label-medium font-medium text-text-secondary mb-1">Status</label>
+                  <label htmlFor="filter-status" className="block text-label-medium font-medium text-text-secondary mb-1">Status</label>
                   <select
+                    id="filter-status"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as StatusLevantamento | '')}
                     className="w-full h-9 rounded-xl border border-border-light bg-white text-label-large px-3.5 focus:outline-none focus:ring-2 focus:ring-primary-500/70"
@@ -208,7 +211,7 @@ export default function LevantamentosPage() {
 
           {isError && (
             <Card className="p-6">
-              <p className="text-body-medium text-danger mb-2">{error instanceof Error ? error.message : 'Erro ao carregar levantamentos'}</p>
+              <p className="text-body-medium text-danger mb-2" role="alert">{error instanceof Error ? error.message : 'Erro ao carregar levantamentos'}</p>
               <button type="button" onClick={() => refetch()} className="text-body-medium text-primary-600 hover:text-primary-700 underline">Tentar novamente</button>
             </Card>
           )}

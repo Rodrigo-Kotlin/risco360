@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils'
 import { NAV_ITEMS } from '@/constants/app'
 import { NavLink } from 'react-router-dom'
+import { AppNavLink } from '@/components/ui/AppNavLink'
 import { Logo } from '@/components/ui/Logo'
 import { useSyncMetrics } from '@/hooks/useSyncMetrics'
 import { ROUTES } from '@/routes/routes.constants'
@@ -46,19 +47,19 @@ export function Sidebar({ className }: SidebarProps) {
             const Icon = iconMap[item.icon]
             return (
               <li key={item.label}>
-                <NavLink
-                  to={item.href}
-                  end
-                  className={({ isActive }) => cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-large transition-colors',
-                    isActive
-                      ? 'bg-primary-50 text-primary-600 font-semibold'
-                      : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
-                  )}
-                >
-                  {Icon && <Icon size={18} aria-hidden="true" />}
-                  <span>{item.label}</span>
-                </NavLink>
+                  <AppNavLink
+                    to={item.href}
+                    end
+                    className={({ isActive }) => cn(
+                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-large transition-colors',
+                      isActive
+                        ? 'bg-primary-50 text-primary-600 font-semibold'
+                        : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
+                    )}
+                  >
+                    {Icon && <Icon size={18} aria-hidden="true" />}
+                    <span>{item.label}</span>
+                  </AppNavLink>
               </li>
             )
           })}
@@ -72,7 +73,7 @@ export function Sidebar({ className }: SidebarProps) {
         >
           <CloudOff size={14} />
           <span className="flex-1">Sincronização</span>
-          <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-warning text-white text-label-small font-bold leading-none">
+          <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-warning text-white text-label-small font-bold leading-none" aria-label={`${pendingCount} pendente${pendingCount !== 1 ? 's' : ''} de sincronização`}>
             {pendingCount}
           </span>
         </NavLink>

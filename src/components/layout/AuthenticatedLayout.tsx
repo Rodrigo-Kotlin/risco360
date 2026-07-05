@@ -1,4 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { AppNavLink } from '@/components/ui/AppNavLink'
 import { cn } from '@/lib/utils'
 import { Sidebar } from './Sidebar'
 import { MobileBottomNavigation } from './MobileBottomNavigation'
@@ -12,6 +13,7 @@ import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { PWAUpdateBanner } from '@/components/pwa/PWAUpdateBanner'
 import { usePWAUpdate } from '@/hooks/usePWAUpdate'
 import { X, Plus } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import {
   LayoutDashboard, ClipboardList, BookOpen, Settings, Layers, FileText,
   type LucideIcon
@@ -28,12 +30,47 @@ const drawerIconMap: Record<string, LucideIcon> = {
 
 function MobileDrawer() {
   const { drawerOpen, closeDrawer } = useLayout()
+  const drawerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!drawerOpen) return
+
+    const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+    )
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeDrawer()
+        return
+      }
+      if (e.key === 'Tab' && focusable && focusable.length > 0) {
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        const current = document.activeElement
+        if (e.shiftKey && current === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && current === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+
+    if (focusable && focusable.length > 0) {
+      focusable[0].focus()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [drawerOpen, closeDrawer])
 
   if (!drawerOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden">
-      <div className="absolute inset-0 bg-black/40" onClick={closeDrawer} />
+    <div className="fixed inset-0 z-50 lg:hidden" ref={drawerRef}>
+      <div className="absolute inset-0 bg-black/40" onClick={closeDrawer} aria-hidden="true" />
       <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-xl flex flex-col">
         <div className="flex items-center justify-between px-4 h-16 border-b border-border-light shrink-0">
           <Logo />
@@ -49,7 +86,7 @@ function MobileDrawer() {
               const Icon = drawerIconMap[item.icon]
               return (
                 <li key={item.label}>
-                  <NavLink
+                  <AppNavLink
                     to={item.href}
                     end
                     onClick={closeDrawer}
@@ -62,7 +99,7 @@ function MobileDrawer() {
                   >
                     {Icon && <Icon size={18} aria-hidden="true" />}
                     <span>{item.label}</span>
-                  </NavLink>
+                  </AppNavLink>
                 </li>
               )
             })}
@@ -80,8 +117,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-surface-alt">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-white focus:text-primary-600 focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+        Pular para o conteúdo
+      </a>
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
+      <div id="main-content" role="main" className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
         <OfflineBanner />
         {updateAvailable && <PWAUpdateBanner onUpdate={update} onDismiss={dismissUpdate} />}
         {canInstall && <PWAInstallBanner onInstall={install} onDismiss={dismiss} />}

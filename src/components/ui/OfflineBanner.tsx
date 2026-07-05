@@ -90,7 +90,7 @@ export function OfflineBanner() {
         <span>
           {pendingCount} alteraç{pendingCount !== 1 ? 'ões' : 'ão'} pendente{pendingCount !== 1 ? 's' : ''} de sincronização.
         </span>
-        <RefreshCw size={14} className="animate-spin opacity-50" />
+        <RefreshCw size={14} className="animate-spin opacity-50" aria-hidden="true" />
       </div>
     )
   }

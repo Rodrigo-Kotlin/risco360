@@ -12,10 +12,11 @@ interface FilterBarProps {
   children: ReactNode
   activeFilters?: FilterChip[]
   onToggle?: () => void
+  isOpen?: boolean
   className?: string
 }
 
-export function FilterBar({ children, activeFilters, onToggle, className }: FilterBarProps) {
+export function FilterBar({ children, activeFilters, onToggle, isOpen, className }: FilterBarProps) {
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
@@ -25,12 +26,13 @@ export function FilterBar({ children, activeFilters, onToggle, className }: Filt
             variant="secondary"
             size="sm"
             onClick={onToggle}
+            aria-expanded={isOpen}
             className="gap-2 shrink-0 min-h-[48px]"
           >
             <Filter size={14} />
             Filtros
             {activeFilters && activeFilters.length > 0 && (
-              <span className="ml-1 w-5 h-5 rounded-full bg-primary-500 text-white text-label-medium font-bold flex items-center justify-center">
+              <span className="ml-1 w-5 h-5 rounded-full bg-primary-500 text-white text-label-medium font-bold flex items-center justify-center" aria-label={`${activeFilters.length} filtro${activeFilters.length !== 1 ? 's' : ''} ativo${activeFilters.length !== 1 ? 's' : ''}`}>
                 {activeFilters.length}
               </span>
             )}

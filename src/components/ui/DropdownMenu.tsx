@@ -135,6 +135,7 @@ export function DropdownMenu({ trigger, items, align = 'left', className }: Drop
             align === 'right' ? 'right-0' : 'left-0'
           )}
           role="menu"
+          aria-label="Opções"
           onKeyDown={handleMenuKeyDown}
         >
           {items.map((item, i) => (

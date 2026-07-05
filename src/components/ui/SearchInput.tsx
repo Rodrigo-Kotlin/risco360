@@ -7,6 +7,7 @@ interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
   onChange?: (value: string) => void
   debounce?: number
   placeholder?: string
+  'aria-label'?: string
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -53,6 +54,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={local}
           onChange={(e) => setLocal(e.target.value)}
           placeholder={placeholder}
+          aria-label={props['aria-label'] || placeholder}
           className={cn(
             'w-full h-12 pl-10 rounded-xl border border-border-light bg-white text-body-medium',
             'placeholder:text-text-muted',

@@ -14,7 +14,7 @@ export function LoadingScreen({ message = 'Carregando Risco360…', className }:
     )}>
       <div className="relative" role="status" aria-label="Carregando">
         <Shield size={40} className="text-primary-500/20" aria-hidden="true" />
-        <div className="absolute inset-0 w-10 h-10 border-[3px] border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 w-10 h-10 border-[3px] border-primary-500 border-t-transparent rounded-full animate-spin" aria-hidden="true" />
       </div>
       <div className="flex flex-col items-center gap-1">
         <p className="text-title-medium font-semibold text-text-primary">{message}</p>

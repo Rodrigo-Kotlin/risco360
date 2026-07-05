@@ -39,7 +39,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               className
             )}
             aria-invalid={!!error}
-            aria-describedby={error ? `${inputId}-error` : undefined}
+            aria-describedby={inputId ? (cn(error && `${inputId}-error`, hint && !error && `${inputId}-hint`) || undefined) : undefined}
             {...props}
           >
             {placeholder && <option value="" disabled>{placeholder}</option>}
@@ -55,7 +55,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           />
         </div>
         {hint && !error && (
-          <p className="text-label-medium text-text-muted">{hint}</p>
+          <p id={inputId ? `${inputId}-hint` : undefined} className="text-label-medium text-text-muted">{hint}</p>
         )}
         {error && (
           <p id={`${inputId}-error`} className="text-label-medium text-danger" role="alert">

@@ -6,6 +6,7 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
   showText?: boolean
   className?: string
+  ['aria-label']?: string
 }
 
 const sizeMap = {
@@ -14,11 +15,11 @@ const sizeMap = {
   lg: { box: 'w-14 h-14', icon: 28, text: 'text-2xl' },
 }
 
-export function Logo({ size = 'sm', showText = true, className }: LogoProps) {
+export function Logo({ size = 'sm', showText = true, className, 'aria-label': ariaLabel }: LogoProps) {
   const s = sizeMap[size]
 
   return (
-    <div className={cn('flex items-center gap-2.5', className)}>
+    <div className={cn('flex items-center gap-2.5', className)} aria-label={ariaLabel}>
       <div
         className={cn(
           s.box,

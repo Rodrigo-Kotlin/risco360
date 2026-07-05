@@ -140,7 +140,7 @@ export function Modal({ open, onClose, title, description, children, footer, cla
             onClick={onClose}
             className={cn(
               'shrink-0 -mt-0.5 -mr-1',
-              'w-9 h-9 flex items-center justify-center',
+              'w-11 h-11 flex items-center justify-center',
               'rounded-xl hover:bg-surface-muted transition-colors',
               'text-text-muted hover:text-text-primary'
             )}

@@ -7,8 +7,7 @@ import { AuthLayout } from '@/components/layout/AuthLayout'
 import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout'
 import { useAuth } from '@/hooks/useAuth'
 import { env } from '@/lib/env'
-
-const LoginPage = lazy(() => import('@/pages/LoginPage'))
+import LoginPage from '@/pages/LoginPage'
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
 const EmpresasPage = lazy(() => import('@/pages/EmpresasPage'))
 const EmpresaDetalhePage = lazy(() => import('@/pages/EmpresaDetalhePage'))
@@ -63,7 +62,7 @@ const router = createBrowserRouter([
     element: <AuthLayout />,
     errorElement: <AppErrorBoundary />,
     children: [
-      { index: true, element: <Lazy><LoginPage /></Lazy> },
+      { index: true, element: <LoginPage /> },
     ],
   },
 

@@ -52,7 +52,7 @@ export function Header({ title, description, className }: HeaderProps) {
               <h2 className="text-title-small md:text-title-medium font-semibold text-text-primary truncate">{title}</h2>
               {isMockModeEnabled && (
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-label-small font-bold uppercase bg-warning/10 text-warning border border-warning/20 shrink-0">
-                  <Beaker size={10} />
+                  <Beaker size={10} aria-hidden="true" />
                   Mock Dev
                 </span>
               )}
@@ -67,11 +67,11 @@ export function Header({ title, description, className }: HeaderProps) {
       <div className="flex items-center gap-1 md:gap-2">
         {isOnline ? (
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-success font-medium bg-success-50 rounded-md">
-            <Wifi size={12} /> Online
+            <Wifi size={12} aria-hidden="true" /> Online
           </span>
         ) : (
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 text-label-medium text-warning font-medium bg-warning-50 rounded-md">
-            <WifiOff size={12} /> Offline
+            <WifiOff size={12} aria-hidden="true" /> Offline
           </span>
         )}
 

@@ -104,7 +104,7 @@ export function ToastProvider({
               className={cn(
                 'shrink-0 -mr-1 p-2 rounded-md',
                 'opacity-80 hover:opacity-100 transition-opacity',
-                'min-w-[36px] min-h-[36px] flex items-center justify-center'
+                'min-w-[44px] min-h-[44px] flex items-center justify-center'
               )}
               aria-label="Fechar notificação"
             >

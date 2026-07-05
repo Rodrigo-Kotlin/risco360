@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { BOTTOM_NAV_ITEMS } from '@/constants/app'
-import { NavLink } from 'react-router-dom'
+import { AppNavLink } from '@/components/ui/AppNavLink'
 import {
   Building2, FileText, Layers, ClipboardList,
   type LucideIcon
@@ -26,7 +26,7 @@ export function MobileBottomNavigation() {
           const Icon = iconMap[item.icon]
           return (
             <li key={item.label} className="flex-1">
-              <NavLink
+              <AppNavLink
                 to={item.href}
                 end
                 className={({ isActive }) => cn(
@@ -48,7 +48,7 @@ export function MobileBottomNavigation() {
                     <span className="text-label-medium">{item.label}</span>
                   </>
                 )}
-              </NavLink>
+              </AppNavLink>
             </li>
           )
         })}

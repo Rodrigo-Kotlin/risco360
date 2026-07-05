@@ -129,7 +129,6 @@ function AuthForm({ onResetPasswordRequested }: AuthFormProps) {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-[38px] text-text-muted hover:text-text-secondary transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
-            tabIndex={-1}
             aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -296,7 +295,8 @@ export default function LoginPage() {
   return (
     <div className="text-center">
       <div className="flex flex-col items-center gap-1 mb-5">
-        <Logo size="lg" />
+        <Logo size="lg" showText={false} aria-label={APP_NAME} />
+        <h1 className="text-headline-small font-bold text-text-primary">{APP_NAME}</h1>
         <p className="text-body-medium text-text-secondary">Plataforma de gestão de riscos ocupacionais</p>
       </div>
 

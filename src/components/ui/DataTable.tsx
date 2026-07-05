@@ -128,7 +128,7 @@ export function DataTable<T extends object>({
   return (
     <div className={cn('bg-card border border-border rounded-2xl overflow-hidden', className)}>
       <div className="overflow-x-auto scrollbar-thin scroll-shadow-right">
-        <table className="w-full text-body-medium min-w-max md:min-w-0">
+        <table className="w-full text-body-medium min-w-max md:min-w-0" aria-label={emptyTitle}>
           <thead>
             <tr className="border-b border-border bg-surface-muted/60">
               {columns.map((col) => {
@@ -143,6 +143,11 @@ export function DataTable<T extends object>({
                       col.headerClassName
                     )}
                     onClick={() => col.sortable !== false && sortable && handleSort(String(col.key))}
+                    onKeyDown={col.sortable !== false && sortable ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(String(col.key)) }
+                    } : undefined}
+                    tabIndex={col.sortable !== false && sortable ? 0 : undefined}
+                    role={col.sortable !== false && sortable ? 'button' : undefined}
                     aria-sort={isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span className="inline-flex items-center gap-1.5">

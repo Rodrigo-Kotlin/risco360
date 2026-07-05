@@ -128,23 +128,23 @@ export default function NovoLevantamentoPage() {
             ]}
             secondaryActions={
               <Button variant="secondary" onClick={() => navigate(backRoute)}>
-                <ArrowLeft size={16} /> Voltar
+                <ArrowLeft size={16} aria-hidden="true" /> Voltar
               </Button>
             }
           />
 
           {preloading ? (
             <Card className="p-5 flex items-center justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-text-muted" />
+              <Loader2 size={24} className="animate-spin text-text-muted" aria-hidden="true" />
             </Card>
           ) : (
             <Card className="p-4 md:p-5">
               <div className="space-y-6">
                 {!hasParams && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-title-small font-semibold text-text-primary">
-                      <Building2 size={16} /> Selecione empresa e setor
-                    </div>
+                    <h3 className="flex items-center gap-2 text-title-small font-semibold text-text-primary">
+                      <Building2 size={16} aria-hidden="true" /> Selecione empresa e setor
+                    </h3>
                     <Select
                       label="Empresa"
                       value={selectedEmpresaId}
@@ -166,9 +166,9 @@ export default function NovoLevantamentoPage() {
                 )}
 
                 <div className="bg-surface-muted rounded-lg p-4 space-y-3">
-                  <h4 className="text-title-small font-semibold text-text-primary flex items-center gap-2">
-                    <Layers size={16} /> Dados do levantamento
-                  </h4>
+                  <h2 className="text-title-small font-semibold text-text-primary flex items-center gap-2">
+                    <Layers size={16} aria-hidden="true" /> Dados do levantamento
+                  </h2>
                   {(empresa || selectedEmpresaId) && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-medium">
                       <div>
@@ -207,7 +207,7 @@ export default function NovoLevantamentoPage() {
                     Cancelar
                   </Button>
                   <Button onClick={handleSubmit} disabled={loading || !selectedSetorId}>
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : null}
+                    {loading ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : null}
                     {loading ? 'Criando…' : 'Confirmar Novo Levantamento'}
                   </Button>
                 </div>

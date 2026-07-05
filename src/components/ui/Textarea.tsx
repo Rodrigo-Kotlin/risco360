@@ -36,7 +36,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             className
           )}
           aria-invalid={!!error}
-          aria-describedby={error ? `${inputId}-error` : undefined}
+          aria-describedby={inputId ? (cn(error && `${inputId}-error`, hint && !error && `${inputId}-hint`) || undefined) : undefined}
           {...props}
         />
         {hint && !error && (

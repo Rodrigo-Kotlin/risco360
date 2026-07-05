@@ -50,7 +50,7 @@ export function WizardNavigation({
             className="sm:flex-1"
             aria-label="Etapa anterior"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} aria-hidden="true" />
             Anterior
           </Button>
         )}
@@ -62,9 +62,9 @@ export function WizardNavigation({
             aria-label={isLast ? 'Concluir levantamento' : 'Próxima etapa'}
           >
             {saving ? (
-              <Loader2 size={16} className="animate-spin shrink-0" />
+              <Loader2 size={16} className="animate-spin shrink-0" aria-hidden="true" />
             ) : (
-              <ArrowRight size={16} className="shrink-0" />
+              <ArrowRight size={16} className="shrink-0" aria-hidden="true" />
             )}
             {nextLabel ?? (isLast ? 'Concluir' : 'Próximo')}
           </Button>
@@ -81,9 +81,9 @@ export function WizardNavigation({
           aria-label="Salvar rascunho"
         >
           {saving ? (
-            <Loader2 size={15} className="animate-spin shrink-0" />
+            <Loader2 size={15} className="animate-spin shrink-0" aria-hidden="true" />
           ) : (
-            <Save size={15} className="shrink-0" />
+            <Save size={15} className="shrink-0" aria-hidden="true" />
           )}
           Salvar rascunho
         </Button>
