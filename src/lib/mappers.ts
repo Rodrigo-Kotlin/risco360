@@ -78,7 +78,7 @@ export function mapEmpresaRowToEmpresa(row: EmpresaRow): Empresa {
     user_id: row.user_id,
     created_at: row.created_at,
     updated_at: row.updated_at,
-    sync_status: row.sync_status as SyncStatus | undefined,
+    sync_status: (row as unknown as Record<string, unknown>).sync_status as SyncStatus | undefined,
   }
 }
 
@@ -94,7 +94,7 @@ export function mapSetorRowToSetor(row: SetorRow): Setor {
     user_id: row.user_id,
     created_at: row.created_at,
     updated_at: row.updated_at,
-    sync_status: row.sync_status as SyncStatus | undefined,
+    sync_status: (row as unknown as Record<string, unknown>).sync_status as SyncStatus | undefined,
   }
 }
 

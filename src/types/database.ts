@@ -38,9 +38,6 @@ export interface EmpresaRow {
   created_at: string
   updated_at: string
   deleted_at?: string | null
-  local_id?: string | null
-  sync_status?: string
-  last_synced_at?: string | null
 }
 
 export interface SetorRow {
@@ -55,9 +52,6 @@ export interface SetorRow {
   created_at: string
   updated_at: string
   deleted_at?: string | null
-  local_id?: string | null
-  sync_status?: string
-  last_synced_at?: string | null
 }
 
 export interface LevantamentoRow {

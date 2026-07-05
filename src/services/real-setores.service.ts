@@ -17,7 +17,7 @@ import type { PaginationParams, PaginatedServiceResult } from '@/types/paginatio
 import type { Setor, SetorCreateInput, SetorUpdateInput } from '@/types/empresa'
 import type { SetorRow } from '@/types/database'
 
-const SETOR_LIST_SELECT = 'id, empresa_id, nome, descricao, localizacao, responsavel_local, observacoes, user_id, created_at, updated_at, deleted_at, sync_status'
+const SETOR_LIST_SELECT = 'id, empresa_id, nome, descricao, localizacao, responsavel_local, observacoes, user_id, created_at, updated_at, deleted_at'
 
 export async function listarSetores(
   params?: PaginationParams

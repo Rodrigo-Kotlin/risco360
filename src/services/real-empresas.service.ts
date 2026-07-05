@@ -16,7 +16,7 @@ import type { PaginationParams, PaginatedServiceResult } from '@/types/paginatio
 import type { Empresa, EmpresaCreateInput, EmpresaUpdateInput } from '@/types/empresa'
 import type { EmpresaRow } from '@/types/database'
 
-const EMPRESA_LIST_SELECT = 'id, razao_social, nome_fantasia, cnpj, cnae, grau_risco, endereco, numero, bairro, cidade, uf, cep, responsavel, telefone, email, observacoes, cnae_principal, cnae_principal_descricao, cnaes_secundarios, grau_risco_nr4, user_id, created_at, updated_at, deleted_at, sync_status'
+const EMPRESA_LIST_SELECT = 'id, razao_social, nome_fantasia, cnpj, cnae, grau_risco, endereco, numero, bairro, cidade, uf, cep, responsavel, telefone, email, observacoes, cnae_principal, cnae_principal_descricao, cnaes_secundarios, grau_risco_nr4, user_id, created_at, updated_at, deleted_at'
 
 export async function listarEmpresas(
   params?: PaginationParams
