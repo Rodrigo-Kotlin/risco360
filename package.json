@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "package:audit": "node scripts/package-audit.mjs"
+    "package:audit": "node scripts/package-audit.mjs",
+    "validate:pwa": "node scripts/validate-pwa-manifest.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.0",

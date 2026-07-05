@@ -44,6 +44,7 @@ VITE_ENABLE_MOCK_MODE=true
 | `npm run test:e2e` | Testes E2E (Playwright) |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type-check |
+| `npm run validate:pwa` | Valida assets e campos do PWA Manifest |
 
 ## Qualidade automatizada
 
@@ -99,6 +100,24 @@ public/
   _headers      # Cloudflare headers
   _redirects    # Cloudflare SPA redirect
 ```
+
+## PWA Manifest
+
+O Manifest PWA é gerado automaticamente pelo `vite-plugin-pwa` a partir da configuração em `vite.config.ts`.
+
+### Políticas
+
+- **Ícones obrigatórios:** No mínimo 192×192 e 512×512 PNG, com variante maskable opcional.
+- **Screenshots:** Apenas screenshots reais do app (sem dados sensíveis ou clientes reais). Atualmente removidas do manifest até que capturas oficiais de release sejam geradas.
+- **`iarc_rating_id`:** Não deve ser declarado sem um ID real emitido por autoridade de classificação.
+
+### Validação
+
+```bash
+npm run validate:pwa
+```
+
+Valida assets declarados, campos essenciais e ausência de placeholders. Executada localmente (não obrigatória no CI).
 
 ## Fluxo principal
 

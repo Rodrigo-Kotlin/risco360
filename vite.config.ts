@@ -32,7 +32,6 @@ export default defineConfig({
         orientation: 'portrait-primary',
         lang: 'pt-BR',
         categories: ['business', 'productivity', 'health'],
-        iarc_rating_id: 'e.g.',
         shortcuts: [
           {
             name: 'Novo levantamento',
@@ -47,29 +46,6 @@ export default defineConfig({
             description: 'Ir para o painel principal',
             url: '/',
             icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }],
-          },
-        ],
-        screenshots: [
-          {
-            src: '/screenshots/mobile-home.png',
-            sizes: '390x844',
-            type: 'image/png',
-            form_factor: 'narrow',
-            label: 'Tela inicial do Risco360',
-          },
-          {
-            src: '/screenshots/mobile-levantamento.png',
-            sizes: '390x844',
-            type: 'image/png',
-            form_factor: 'narrow',
-            label: 'Wizard de levantamento',
-          },
-          {
-            src: '/screenshots/desktop-dashboard.png',
-            sizes: '1440x900',
-            type: 'image/png',
-            form_factor: 'wide',
-            label: 'Dashboard no desktop',
           },
         ],
         icons: [
