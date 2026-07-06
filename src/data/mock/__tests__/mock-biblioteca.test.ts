@@ -20,7 +20,6 @@ describe('mock-biblioteca', () => {
     expect(item).toHaveProperty('descricao_exposicao')
     expect(item).toHaveProperty('sugestao_exposicao')
     expect(item).toHaveProperty('acoes_recomendadas')
-    expect(item).toHaveProperty('observacoes')
   })
 
   it('cobre todas as categorias principais', () => {

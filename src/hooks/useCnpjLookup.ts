@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { consultarCnpj, validarCnpj, normalizarCnpj } from '@/services/cnpj.service'
 import { getCachedCnpj, setCachedCnpj } from '@/lib/cnpj-cache'
-import { buscarGrauRiscoPorCnae } from '@/data/cnae-grau-risco'
+import { buscarGrauRiscoPorCnae } from '@/services/nr4.service'
 import type { EmpresaReceita } from '@/services/cnpj.service'
 
 export interface CnpjLookupResult extends EmpresaReceita {
@@ -19,10 +19,10 @@ export interface UseCnpjLookupReturn {
 const cacheMemoria = new Map<string, CnpjLookupResult>()
 
 function enriquecerComRisco(data: EmpresaReceita): CnpjLookupResult {
-  const cnaeRisk = buscarGrauRiscoPorCnae(data.cnae_principal)
+  const result = buscarGrauRiscoPorCnae(data.cnae_principal)
   return {
     ...data,
-    grau_risco_nr4: cnaeRisk?.grauRisco ?? null,
+    grau_risco_nr4: result.found ? result.grauRisco : null,
   }
 }
 

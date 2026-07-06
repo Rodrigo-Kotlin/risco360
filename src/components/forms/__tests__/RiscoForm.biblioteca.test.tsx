@@ -44,7 +44,6 @@ function makeBibItem(overrides: Partial<BibliotecaTecnicaItem> = {}): Biblioteca
       { descricao: 'Conservação auditiva', tipo: 'Periódico', carga_horaria: 4, periodicidade: 'Anual' },
     ],
     acoes_recomendadas: ['Realizar audiometria', 'Substituir protetores'],
-    observacoes: 'Ruído comum em indústrias',
     ativo: true,
     publico: true,
     user_id: null,
@@ -187,7 +186,7 @@ describe('RiscoForm — integração com Biblioteca Técnica', () => {
     expect(screen.getByDisplayValue('85 dB(A) para 8h')).toBeInTheDocument()
   })
 
-  it('não sobrescreve campos já preenchidos', async () => {
+  it('não sobrescreve campos já preenchidos quando usuário mantém', async () => {
     const user = userEvent.setup()
     render(
       <RiscoForm
@@ -200,8 +199,43 @@ describe('RiscoForm — integração com Biblioteca Técnica', () => {
     await user.type(agenteInput, 'Meu agente personalizado')
     await user.click(screen.getByText('Selecionar item'))
     await user.click(screen.getByText('Ruído Ocupacional'))
+    await user.click(screen.getByText('Manter atuais'))
     expect(screen.getByDisplayValue('Meu agente personalizado')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('Ruído acima do limite')).not.toBeInTheDocument()
+  })
+
+  it('mostra confirmação antes de sobrescrever campos preenchidos', async () => {
+    const user = userEvent.setup()
+    render(
+      <RiscoForm
+        onSave={mockOnSave}
+        onCancel={mockOnCancel}
+        bibliotecaItens={[makeBibItem()]}
+      />
+    )
+    const agenteInput = screen.getByPlaceholderText('Ex: Ruído')
+    await user.type(agenteInput, 'Meu agente personalizado')
+    await user.click(screen.getByText('Selecionar item'))
+    await user.click(screen.getByText('Ruído Ocupacional'))
+    expect(screen.getByText('Substituir dados?')).toBeInTheDocument()
+  })
+
+  it('sobrescreve campos quando usuário confirma substituição', async () => {
+    const user = userEvent.setup()
+    render(
+      <RiscoForm
+        onSave={mockOnSave}
+        onCancel={mockOnCancel}
+        bibliotecaItens={[makeBibItem()]}
+      />
+    )
+    const agenteInput = screen.getByPlaceholderText('Ex: Ruído')
+    await user.type(agenteInput, 'Meu agente personalizado')
+    await user.click(screen.getByText('Selecionar item'))
+    await user.click(screen.getByText('Ruído Ocupacional'))
+    await user.click(screen.getByText('Substituir'))
+    expect(screen.getByDisplayValue('Ruído acima do limite')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Meu agente personalizado')).not.toBeInTheDocument()
   })
 
   it('mostra badge de vínculo após selecionar item', async () => {
@@ -249,6 +283,7 @@ describe('RiscoForm — integração com Biblioteca Técnica', () => {
     await user.type(agenteInput, 'Teste')
     await user.click(screen.getByText('Selecionar item'))
     await user.click(screen.getByText('Ruído Ocupacional'))
+    await user.click(screen.getByText('Manter atuais'))
     expect(await screen.findByText(/Preenchido a partir de/)).toBeInTheDocument()
     await user.click(screen.getByText('Salvar'))
     await waitFor(() => { expect(onSave).toHaveBeenCalled() })

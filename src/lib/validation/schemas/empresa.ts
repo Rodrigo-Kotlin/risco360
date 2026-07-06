@@ -7,6 +7,7 @@ export const EmpresaSchema = z.object({
   cnpj: z.string().trim().optional().or(z.literal('')),
   cnae: z.string().trim().optional().or(z.literal('')),
   grau_risco: z.string().optional().or(z.literal('')),
+  grau_risco_nr4: z.number().optional().nullable(),
   endereco: z.string().trim().optional().or(z.literal('')),
   numero: z.string().trim().optional().or(z.literal('')),
   bairro: z.string().trim().optional().or(z.literal('')),

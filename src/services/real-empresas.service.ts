@@ -108,7 +108,7 @@ export async function criarEmpresa(
         return { data: null, error: 'Usuário não autenticado.' }
       }
 
-      const payload: Omit<EmpresaRow, 'id' | 'created_at' | 'updated_at'> = {
+      const payload = {
         razao_social: input.razao_social,
         nome_fantasia: input.nome_fantasia ?? null,
         cnpj: input.cnpj ?? null,
@@ -124,6 +124,10 @@ export async function criarEmpresa(
         telefone: input.telefone ?? null,
         email: input.email ?? null,
         observacoes: input.observacoes ?? null,
+        cnae_principal: input.cnae_principal ?? undefined,
+        cnae_principal_descricao: input.cnae_principal_descricao ?? undefined,
+        cnaes_secundarios: input.cnaes_secundarios?.length ? input.cnaes_secundarios as unknown as Record<string, unknown>[] : undefined,
+        grau_risco_nr4: input.grau_risco_nr4 ?? null,
         user_id: userData.user.id,
       }
 
@@ -174,6 +178,10 @@ export async function atualizarEmpresa(
       if (input.telefone !== undefined) payload.telefone = input.telefone
       if (input.email !== undefined) payload.email = input.email
       if (input.observacoes !== undefined) payload.observacoes = input.observacoes
+      if (input.cnae_principal !== undefined) payload.cnae_principal = input.cnae_principal
+      if (input.cnae_principal_descricao !== undefined) payload.cnae_principal_descricao = input.cnae_principal_descricao
+      if (input.cnaes_secundarios !== undefined) payload.cnaes_secundarios = input.cnaes_secundarios as unknown as Record<string, unknown>[]
+      if (input.grau_risco_nr4 !== undefined) payload.grau_risco_nr4 = input.grau_risco_nr4
 
       const { data, error } = await client
         .from('empresas')

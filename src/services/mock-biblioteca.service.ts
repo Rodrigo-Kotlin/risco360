@@ -50,7 +50,6 @@ export async function criarBibliotecaItem(
     epcs: input.epcs ?? [],
     treinamentos: input.treinamentos ?? [],
     acoes_recomendadas: input.acoes_recomendadas ?? [],
-    observacoes: input.observacoes ?? null,
     ativo: input.ativo ?? true,
     publico: input.publico ?? false,
     user_id: mockUserId,

@@ -19,7 +19,6 @@ export interface BibliotecaTecnicaItem extends BaseEntity {
   epcs: string[]
   treinamentos: Treinamento[]
   acoes_recomendadas: string[]
-  observacoes: string | null
   ativo: boolean
   publico: boolean
   user_id: ID | null
@@ -43,7 +42,6 @@ export interface BibliotecaTecnicaCreateInput {
   epcs?: string[]
   treinamentos?: Treinamento[]
   acoes_recomendadas?: string[]
-  observacoes?: string
   ativo?: boolean
   publico?: boolean
 }

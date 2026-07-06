@@ -33,7 +33,6 @@ function makeItem(overrides: Partial<BibliotecaTecnicaItem> = {}): BibliotecaTec
     epcs: [],
     treinamentos: [],
     acoes_recomendadas: [],
-    observacoes: null,
     ativo: true,
     publico: true,
     user_id: null,

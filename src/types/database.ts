@@ -123,7 +123,6 @@ export interface BibliotecaTecnicaRow {
   epcs: Record<string, unknown>[]
   treinamentos: Record<string, unknown>[]
   acoes_recomendadas: Record<string, unknown>[]
-  observacoes: string | null
   ativo: boolean
   publico: boolean
   user_id: ID | null

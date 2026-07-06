@@ -101,12 +101,24 @@ export default function EmpresaDetalhePage() {
     )
   }
 
+  const cnae4 = empresa.cnae_principal
+    ? empresa.cnae_principal.replace(/\D/g, '').slice(0, 4)
+    : empresa.cnae
+      ? empresa.cnae.replace(/\D/g, '').slice(0, 4)
+      : null
+
   const infoItems = [
     { icon: Building2, label: 'Razão social', value: empresa.razao_social },
     { icon: Building2, label: 'Nome fantasia', value: empresa.nome_fantasia },
     { icon: FileText, label: 'CNPJ', value: empresa.cnpj },
     { icon: FileText, label: 'CNAE', value: empresa.cnae },
     { icon: Shield, label: 'Grau de risco', value: empresa.grau_risco ? `Grau ${empresa.grau_risco}` : null },
+    ...(empresa.grau_risco_nr4 != null
+      ? [{ icon: Shield, label: 'Grau de Risco NR-4', value: `Grau ${empresa.grau_risco_nr4}` } as const]
+      : []),
+    ...(cnae4
+      ? [{ icon: Shield, label: 'Prefixo NR-4', value: cnae4 } as const]
+      : []),
     { icon: MapPin, label: 'Endereço', value: [empresa.endereco, empresa.numero, empresa.bairro].filter(Boolean).join(', ') },
     { icon: Globe, label: 'Cidade/UF', value: [empresa.cidade, empresa.uf].filter(Boolean).join('/') },
     { icon: MapPin, label: 'CEP', value: empresa.cep },

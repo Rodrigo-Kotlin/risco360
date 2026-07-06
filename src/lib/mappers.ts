@@ -180,7 +180,6 @@ export function mapBibliotecaRowToBibliotecaItem(row: BibliotecaTecnicaRow): Bib
     epcs: ensureArray<string>(row.epcs),
     treinamentos: ensureArray(row.treinamentos),
     acoes_recomendadas: ensureArray<string>(row.acoes_recomendadas),
-    observacoes: row.observacoes,
     ativo: row.ativo,
     publico: row.publico,
     user_id: row.user_id,

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormSection } from '@/components/ui/FormSection'
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Save, Loader2, Search, CheckCircle2, AlertCircle, WifiOff } from 'lucide-react'
 import { useCnpjLookup } from '@/hooks/useCnpjLookup'
 import { obterDescricaoGrauRisco } from '@/data/cnae-grau-risco'
+import { buscarGrauRiscoPorCnae, obterDescricaoGrauRiscoNR4 } from '@/services/nr4.service'
 import { normalizarCnpj } from '@/services/cnpj.service'
 import { EmpresaSchema, type EmpresaFormData } from '@/lib/validation/schemas/empresa'
 import type { Empresa, EmpresaCreateInput, EmpresaUpdateInput } from '@/types/empresa'
@@ -72,12 +73,14 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
       observacoes: initialData?.observacoes ?? '',
       cnae_principal: initialData?.cnae_principal ?? '',
       cnae_principal_descricao: initialData?.cnae_principal_descricao ?? '',
+      grau_risco_nr4: initialData?.grau_risco_nr4 ?? null,
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
 
   const cnpjValue = watch('cnpj')
+  const cnaeValue = watch('cnae')
   const { loading: cnpjLoading, error: cnpjError, empresa: cnpjEmpresa, buscar: buscarCnpj, limpar: limparCnpj } = useCnpjLookup()
 
   const preencherAutomaticamente = useCallback(() => {
@@ -112,6 +115,7 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
 
   useEffect(() => {
     if (cnpjEmpresa) {
+      setNr4Message(null)
       preencherAutomaticamente()
     }
   }, [cnpjEmpresa, preencherAutomaticamente])
@@ -128,6 +132,30 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
       limparCnpj()
     }
   }, [cnpjValue, buscarCnpj, limparCnpj])
+
+  const lastCnaeRef = useRef<string>('')
+  const [nr4Message, setNr4Message] = useState<string | null>(null)
+
+  useEffect(() => {
+    const cnae = cnaeValue ?? ''
+    if (!cnae.trim() || cnae === lastCnaeRef.current) return
+    if (autoFilledRef.current.has('cnae')) return
+
+    lastCnaeRef.current = cnae
+    setNr4Message(null)
+    const result = buscarGrauRiscoPorCnae(cnae)
+
+    if (result.found && !autoFilledRef.current.has('grau_risco')) {
+      setValue('grau_risco', String(result.grauRisco))
+      setValue('grau_risco_nr4', result.grauRisco)
+      autoFilledRef.current.add('grau_risco')
+      setNr4Message(`Grau de risco preenchido automaticamente pela NR-4 com base no CNAE ${result.cnae4}.`)
+    } else if (!result.found && result.reason === 'not_found') {
+      setNr4Message(`CNAE não localizado na base NR-4. Informe o grau de risco manualmente.`)
+    } else if (!result.found && result.reason === 'ambiguous') {
+      setNr4Message(result.message)
+    }
+  }, [cnaeValue, setValue])
 
   const onSubmitForm = async (data: EmpresaFormData) => {
     const payload: EmpresaCreateInput = {
@@ -149,7 +177,7 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
       cnae_principal: data.cnae_principal?.trim() || undefined,
       cnae_principal_descricao: data.cnae_principal_descricao?.trim() || undefined,
       cnaes_secundarios: cnpjEmpresa?.cnaes_secundarios,
-      grau_risco_nr4: cnpjEmpresa?.grau_risco_nr4 ?? null,
+      grau_risco_nr4: data.grau_risco_nr4 ?? (cnpjEmpresa?.grau_risco_nr4 ?? null),
     }
 
     await onSubmit(payload)
@@ -202,11 +230,19 @@ export function EmpresaForm({ initialData, onSubmit, onCancel, loading }: Empres
               </p>
             )}
           </div>
-          <Input
-            label="CNAE"
-            placeholder="CNAE principal"
-            {...register('cnae')}
-          />
+          <div className="space-y-1">
+            <Input
+              label="CNAE"
+              placeholder="CNAE principal"
+              {...register('cnae')}
+            />
+            {nr4Message && (
+              <p className="text-body-small text-text-muted flex items-center gap-1">
+                <AlertCircle size={12} />
+                {nr4Message}
+              </p>
+            )}
+          </div>
           <Select
             label="Grau de risco"
             options={GRAU_RISCO_OPTIONS}

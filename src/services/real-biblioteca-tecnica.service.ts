@@ -8,7 +8,7 @@ import type {
 } from '@/types/biblioteca'
 import type { BibliotecaTecnicaRow } from '@/types/database'
 
-const BIBLIOTECA_LIST_SELECT = 'id, categoria, titulo, descricao, tipo_risco, perigo, risco, fonte, fonte_geradora, danos_possiveis, meios_propagacao, descricao_exposicao, sugestao_exposicao, medidas_controle, epis, epcs, treinamentos, acoes_recomendadas, observacoes, ativo, publico, user_id, created_at, updated_at, deleted_at'
+const BIBLIOTECA_LIST_SELECT = 'id, categoria, titulo, descricao, tipo_risco, perigo, risco, fonte, fonte_geradora, danos_possiveis, meios_propagacao, descricao_exposicao, sugestao_exposicao, medidas_controle, epis, epcs, treinamentos, acoes_recomendadas, ativo, publico, user_id, created_at, updated_at, deleted_at'
 
 export async function listarItensBiblioteca(): Promise<ServiceResult<BibliotecaTecnicaItem[]>> {
   try {
@@ -160,7 +160,6 @@ export async function criarItemBiblioteca(
       epcs: (input.epcs ?? []) as unknown as Record<string, unknown>[],
       treinamentos: jsonbArr(input.treinamentos ?? []),
       acoes_recomendadas: jsonbArr(input.acoes_recomendadas ?? []),
-      observacoes: input.observacoes ?? null,
       ativo: input.ativo ?? true,
       publico: input.publico ?? false,
       user_id: userData.user.id,
@@ -222,7 +221,6 @@ export async function atualizarItemBiblioteca(
     if (input.acoes_recomendadas !== undefined) {
       payload.acoes_recomendadas = jsonbArr(input.acoes_recomendadas)
     }
-    if (input.observacoes !== undefined) payload.observacoes = input.observacoes
     if (input.ativo !== undefined) payload.ativo = input.ativo
     if (input.publico !== undefined) payload.publico = input.publico
 

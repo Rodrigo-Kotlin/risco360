@@ -31,7 +31,6 @@ describe('mock-biblioteca.service', () => {
         expect(item).toHaveProperty('descricao_exposicao')
         expect(item).toHaveProperty('sugestao_exposicao')
         expect(item).toHaveProperty('acoes_recomendadas')
-        expect(item).toHaveProperty('observacoes')
       }
     })
 
@@ -59,7 +58,6 @@ describe('mock-biblioteca.service', () => {
         epcs: ['EPC 1'],
         treinamentos: [{ descricao: 'Treinamento 1', tipo: 'Inicial', carga_horaria: 4, periodicidade: 'Anual' }],
         acoes_recomendadas: ['Ação 1', 'Ação 2'],
-        observacoes: 'Obs teste',
         ativo: true,
         publico: false,
       })
@@ -70,7 +68,6 @@ describe('mock-biblioteca.service', () => {
       expect(result.data!.descricao_exposicao).toBe('Exposição teste')
       expect(result.data!.sugestao_exposicao).toBe('Sugestão teste')
       expect(result.data!.acoes_recomendadas).toEqual(['Ação 1', 'Ação 2'])
-      expect(result.data!.observacoes).toBe('Obs teste')
     })
 
     it('cria item sem campos novos (compatibilidade)', async () => {
@@ -82,7 +79,6 @@ describe('mock-biblioteca.service', () => {
       expect(result.data!.danos_possiveis).toEqual([])
       expect(result.data!.meios_propagacao).toEqual([])
       expect(result.data!.acoes_recomendadas).toEqual([])
-      expect(result.data!.observacoes).toBeNull()
     })
 
     it('item criado aparece na listagem', async () => {

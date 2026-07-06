@@ -73,6 +73,7 @@ function normalizeCategoria(val: string | null | undefined): CategoriaRisco {
 
 export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoFormProps) {
   const [bibliotecaModalOpen, setBibliotecaModalOpen] = useState(false)
+  const [confirmOverwriteModal, setConfirmOverwriteModal] = useState<BibliotecaTecnicaItem | null>(null)
   const [saving, setSaving] = useState(false)
   const [bibliotecaItemId, setBibliotecaItemId] = useState<string | null>(initial?.biblioteca_item_id ?? null)
   const [bibliotecaTitulo, setBibliotecaTitulo] = useState<string | null>(initial?.biblioteca_titulo ?? null)
@@ -127,12 +128,41 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
     setValue('meios_propagacao', next)
   }
 
-  const applyBibliotecaItem = (item: BibliotecaTecnicaItem) => {
+  function hasExistingFields(): boolean {
+    return !!(getValues('agente') || getValues('descricao') || getValues('fonte_geradora') ||
+      getValues('dano_possivel') || getValues('fonte_avaliacao') ||
+      getValues('sugestoes_exposicao') || getValues('acoes_recomendadas')?.trim() ||
+      medidasControle.length > 0 || epis.length > 0)
+  }
+
+  const handleBibliotecaSelect = (item: BibliotecaTecnicaItem) => {
+    if (hasExistingFields() && !confirmOverwriteModal) {
+      setConfirmOverwriteModal(item)
+      return
+    }
+    applyBibliotecaItem(item)
+  }
+
+  const confirmOverwrite = () => {
+    if (confirmOverwriteModal) {
+      applyBibliotecaItem(confirmOverwriteModal, true)
+      setConfirmOverwriteModal(null)
+    }
+  }
+
+  const cancelOverwrite = () => {
+    if (confirmOverwriteModal) {
+      applyBibliotecaItem(confirmOverwriteModal, false)
+      setConfirmOverwriteModal(null)
+    }
+  }
+
+  const applyBibliotecaItem = (item: BibliotecaTecnicaItem, overwrite = false) => {
     setValue('categoria', normalizeCategoria(item.categoria))
-    if (item.perigo && !getValues('agente')) setValue('agente', item.perigo)
-    if (item.descricao && !getValues('descricao')) setValue('descricao', item.descricao)
-    if (item.fonte_geradora && !getValues('fonte_geradora')) setValue('fonte_geradora', item.fonte_geradora)
-    if (item.meios_propagacao && item.meios_propagacao.length > 0 && meiosPropagacao.length === 0) {
+    if (item.perigo && (overwrite || !getValues('agente'))) setValue('agente', item.perigo)
+    if (item.descricao && (overwrite || !getValues('descricao'))) setValue('descricao', item.descricao)
+    if (item.fonte_geradora && (overwrite || !getValues('fonte_geradora'))) setValue('fonte_geradora', item.fonte_geradora)
+    if (item.meios_propagacao && item.meios_propagacao.length > 0 && (overwrite || meiosPropagacao.length === 0)) {
       const mapped: string[] = []
       for (const mp of item.meios_propagacao) {
         const mpLower = mp.toLowerCase().replace(/[^a-z0-9_]/g, '_')
@@ -143,18 +173,18 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
       }
       if (mapped.length > 0) setValue('meios_propagacao', mapped)
     }
-    if (item.danos_possiveis && item.danos_possiveis.length > 0 && !getValues('dano_possivel')) {
+    if (item.danos_possiveis && item.danos_possiveis.length > 0 && (overwrite || !getValues('dano_possivel'))) {
       setValue('dano_possivel', item.danos_possiveis.join(', '))
     }
-    if (item.fonte && !getValues('fonte_avaliacao')) setValue('fonte_avaliacao', item.fonte)
-    if (item.sugestao_exposicao && !getValues('sugestoes_exposicao')) setValue('sugestoes_exposicao', item.sugestao_exposicao)
-    if (item.acoes_recomendadas && item.acoes_recomendadas.length > 0 && !getValues('acoes_recomendadas')?.trim()) {
+    if (item.fonte && (overwrite || !getValues('fonte_avaliacao'))) setValue('fonte_avaliacao', item.fonte)
+    if (item.sugestao_exposicao && (overwrite || !getValues('sugestoes_exposicao'))) setValue('sugestoes_exposicao', item.sugestao_exposicao)
+    if (item.acoes_recomendadas && item.acoes_recomendadas.length > 0 && (overwrite || !getValues('acoes_recomendadas')?.trim())) {
       setValue('acoes_recomendadas', item.acoes_recomendadas.join('\n'))
     }
-    if (item.medidas_controle && item.medidas_controle.length > 0 && medidasControle.length === 0) {
+    if (item.medidas_controle && item.medidas_controle.length > 0 && (overwrite || medidasControle.length === 0)) {
       setMedidasControle(item.medidas_controle)
     }
-    if (item.epis && item.epis.length > 0 && epis.length === 0) {
+    if (item.epis && item.epis.length > 0 && (overwrite || epis.length === 0)) {
       setEpis(item.epis)
     }
     bibliotecaItemIdRef.current = item.id
@@ -236,9 +266,29 @@ export function RiscoForm({ initial, onSave, onCancel, bibliotecaItens }: RiscoF
             onClick={(e) => e.stopPropagation()}>
             <BibliotecaRiscoSelector
               items={bibliotecaItens}
-              onSelect={applyBibliotecaItem}
+              onSelect={handleBibliotecaSelect}
               onClose={() => setBibliotecaModalOpen(false)}
             />
+          </div>
+        </div>
+      )}
+
+      {confirmOverwriteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-title-large font-semibold text-text-primary">Substituir dados?</h3>
+            <p className="text-body-medium text-text-secondary mt-2">
+              Deseja substituir os dados atuais pelos dados da biblioteca?
+              Campos já preenchidos serão sobrescritos.
+            </p>
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <Button type="button" variant="secondary" onClick={cancelOverwrite}>
+                Manter atuais
+              </Button>
+              <Button type="button" onClick={confirmOverwrite}>
+                Substituir
+              </Button>
+            </div>
           </div>
         </div>
       )}
